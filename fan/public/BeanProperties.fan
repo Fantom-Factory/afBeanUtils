@@ -1,4 +1,3 @@
-using afPegger
 
 ** Does its best attempt to complete the action, be it creating classes along the way, coercing strings to types
 ** 
@@ -50,56 +49,76 @@ class BeanProperty {
 	}
 }
 
-internal class BeanSlotFactory : Rules {
+internal class BeanSlotFactory {
+	
+	// Fantex test string: obj.list[2].map[wot][thing].meth(judge, dredd).str().prop
+	private static const Regex	slotRegex	:= Regex<|([^\.\[\]\(\)]*)(?:\[([^\]]+)\])?(?:\(([^\)]+)\))?|>
 	
 	static BeanSlot[] parse(Type type, Str property) {
 		beanSlots	:= BeanSlot[,]
 		beanType	:= type
+		
+		matcher	:= slotRegex.matcher(property)
+		
+		while (matcher.find) {
+			if (matcher.group(0).isEmpty)
+				continue
+			slotName	:= matcher.group(1)
+			indexName	:= matcher.group(2)
+			methodArgs	:= matcher.group(3)?.split(',', true)
 
-		basicField := fieldName	{ 
-			it.name = "basicField" 
-			it.action = |Match match| {
-				field := beanType.field(match.matched)
-				beanSlots.add(BeanSlotObjField(field))
-				beanType = beanSlots.last.returns 
+			if (slotName.isEmpty) {
+				beanSlot := BeanSlotOperator(beanType, indexName)
+				beanSlots.add(beanSlot)
+				beanType = beanSlot.returns				
+				continue
+			}
+			
+			slot := beanType.slot(slotName)			
+			beanSlot := (BeanSlot?) null
+			if (slot.isField && isObj(slot))
+				beanSlot = BeanSlotObjField(slot)
+			if (slot.isField && isList(slot))
+				beanSlot = BeanSlotListField(slot, indexName.toInt)
+			if (slot.isField && isMap(slot))
+				beanSlot = BeanSlotMapField(slot, indexName)
+			if (slot.isMethod)
+				beanSlot = BeanSlotMethod(slot, methodArgs ?: Obj#.emptyList)
+
+			beanSlots.add(beanSlot)
+			beanType = beanSlot.returns
+
+			if (slot.isField && isObj(slot) && indexName != null) {
+				beanSlot = BeanSlotOperator(beanType, indexName)
+				beanSlots.add(beanSlot)
+				beanType = beanSlot.returns				
+			}
+
+			if (slot.isMethod && indexName != null) {
+				beanSlot = BeanSlotOperator(beanType, indexName)
+				beanSlots.add(beanSlot)
+				beanType = beanSlot.returns				
 			}
 		}
-
-//		indexName  := oneOrMore(any) { it.name = "indexName" }	// TODO: to dat onlyIfNot
-		indexName  := oneOrMore(anyAlphaNum) { it.name = "indexName" }
-		indexField := sequence([fieldName, str("["), indexName, str("]")]) { 
-			it.name = "indexField" 
-			it.action = |Match match| {
-				field := beanType.field(match.matches["fieldName"].matched)
-				index := match.matches["indexName"].matched
-				if (field.type.name == "List")
-					beanSlots.add(BeanSlotListField(field, index.toInt))
-				if (field.type.name == "Map")
-					beanSlots.add(BeanSlotMapField(field, index))
-				beanType = beanSlots.last.returns 
-			}
-		}
-		
-		beanField  := sequence([firstOf([indexField, basicField]), optional(str("."))])
-//		beanField  := sequence([basicField, optional(str("."))])
-		
-		parser  := Parser(beanField, property.in)
-		matches := parser.parseAll
-		
-		if (beanSlots.isEmpty)
-			throw Err(parser.failures.toStr)
-		// TODO: just check for failures, full stop!
 		
 		beanSlots.eachRange(0..<-1) { it.createIfNull = true }
+		
+		if (beanSlots.isEmpty)
+			throw Err(ErrMsgs.property_badParse(property))		
 		
 		return beanSlots
 	}
 	
-	private static Rule fieldName() {
-		sequence([
-			firstOf([str("_"), anyAlpha]), 
-			zeroOrMore(firstOf([str("_"), anyAlphaNum]))
-		]) { it.name = "fieldName" }
+	private static Bool isList(Field field) {
+		field.type.name == "List"
+	}
+
+	private static Bool isMap(Field field) {
+		field.type.name == "Map"
+	}
+
+	private static Bool isObj(Field field) {
+		!isList(field) && !isMap(field)
 	}
 }
 
@@ -234,7 +253,6 @@ internal class BeanSlotMapField : BeanSlot {
 }
 
 internal class BeanSlotMethod : BeanSlot {
-
 	private Obj?[] args
 	
 	new make(Method method, Str[] args) : super(method) {
@@ -256,4 +274,31 @@ internal class BeanSlotMethod : BeanSlot {
 	override Type returns() {
 		method.returns
 	}
+}
+
+internal class BeanSlotOperator : BeanSlot {
+	private Type type
+	private Obj  index
+	
+	new make(Type type, Obj index) : super(type.method("get")) {
+		this.type = type
+		this.index = index
+	}
+	
+	override Obj? get(Obj? instance) {
+		ret := type.method("get").callOn(instance, [index])
+		if (ret == null && createIfNull) {
+			ret = returns.make
+			set(instance, ret)
+		}
+		return ret
+	}
+	
+	override Void set(Obj? instance, Obj? value) {
+		type.method("set").callOn(instance, [index, value])
+	}
+	
+	override Type returns() {
+		type.method("get").returns
+	}	
 }

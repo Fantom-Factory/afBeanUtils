@@ -9,6 +9,10 @@ internal class ErrMsgs {
 		stripSys("Could not find coercion from ${from?.qname} to ${to.signature}")
 	}
 	
+	static Str property_badParse(Str input) {
+		"Could not parse property string: ${input}"
+	}
+
 	static Str property_crazy(Int index, Type listType, Field field) {
 		stripSys("Are you CRAZY!? Do you *really* want to create ${index} instances of ${listType} for ${field.qname}???")
 	}
