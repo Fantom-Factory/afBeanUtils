@@ -8,8 +8,10 @@ internal class TestBeanProperty : BeanTest {
 	[Int:Int]?		map2
 	[Str:T_Obj01]?	map3
 	T_Obj01?		obj
+	Str				judge() { "Dredd" }
+	Str				add(Int x, Int y, Int a := -1) { "$x + $y = $a" }
 	
-	Void testBasic() {		
+	Void testBasic() {
 		prop := BeanProperty(TestBeanProperty#, "basic")
 		
 		// test normal
@@ -94,7 +96,6 @@ internal class TestBeanProperty : BeanTest {
 		verifyEq(list[5], 42)
 		verifyEq(list.size, 6)
 
-		// TODO sanity check at creating 10000 list items!
 		prop = BeanProperty(TestBeanProperty#, "list[10006]")
 		verifyErrMsg(ArgErr#, ErrMsgs.property_crazy(10006, Int#, TestBeanProperty#list)) {
 			prop.set(this, 6)			
@@ -137,12 +138,41 @@ internal class TestBeanProperty : BeanTest {
 		verifyEq(obj["wot"].str, "ever")
 		verifyEq(prop.get(this), "ever")
 	}
+	
+	Void testMethod() {
+		prop := BeanProperty(TestBeanProperty#, "judge")
+		verifyEq(prop.get(this), "Dredd")
+		verifyErrMsg(ArgErr#, ErrMsgs.property_setOnMethod(#judge)) {
+			prop.set(this, "Anderson")
+		}
+
+		prop = BeanProperty(TestBeanProperty#, "judge()")
+		verifyEq(prop.get(this), "Dredd")
+		verifyErrMsg(ArgErr#, ErrMsgs.property_setOnMethod(#judge)) {
+			prop.set(this, "Dredd")			
+		}
+	}
+	
+	Void testMethodArgs() {
+		prop := BeanProperty(TestBeanProperty#, "add(1, 2, 3)")
+		verifyEq(prop.get(this), "1 + 2 = 3")
+
+		prop = BeanProperty(TestBeanProperty#, "add(1, 2)")
+		verifyEq(prop.get(this), "1 + 2 = -1")
+	}
+
+	Void testMethodNested() {
+		prop := BeanProperty(TestBeanProperty#, "obj.list[2].map[wot].meth(dredd).str")
+		verifyEq(prop[this], "dredd")
+	}
 }
 
 internal class T_Obj01 {
 	Str? 			str
 	T_Obj01[]?		list
 	[Str:T_Obj01]?	map
+	
+	T_Obj01	meth(Str str) { T_Obj01().with { it.str = str } }
 	
 	@Operator
 	T_Obj01 get(Str key) {

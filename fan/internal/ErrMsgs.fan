@@ -13,6 +13,10 @@ internal class ErrMsgs {
 		stripSys("Are you CRAZY!? Do you *really* want to create ${index} instances of ${listType} for ${field.qname}???")
 	}
 
+	static Str property_setOnMethod(Method method) {
+		stripSys("Can not *set* a value on method: ${method.qname}")
+	}
+
 	private static Str stripSys(Str str) {
 		str.replace("sys::", "")
 	}
