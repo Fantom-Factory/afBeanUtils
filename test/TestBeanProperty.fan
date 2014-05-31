@@ -10,7 +10,18 @@ internal class TestBeanProperty : BeanTest {
 	T_Obj01?		obj
 	Str				judge() { "Dredd" }
 	Str				add(Int x, Int y, Int a := -1) { "$x + $y = $a" }
-	
+	T_Obj01?		obj2() { obj }
+
+	@Operator
+	T_Obj01? get(Str key) { 
+		if (map3 == null)
+			map3 = [:]
+		return map3[key] 
+	}
+
+	@Operator
+	Void set(Str key, T_Obj01 val) { map3[key] = val }
+
 	Void testBasic() {
 		prop := BeanProperty(TestBeanProperty#, "basic")
 		
@@ -137,6 +148,17 @@ internal class TestBeanProperty : BeanTest {
 		prop.set(this, "ever")
 		verifyEq(obj["wot"].str, "ever")
 		verifyEq(prop.get(this), "ever")
+
+		// test @Op getter following a method 
+		prop = BeanProperty(TestBeanProperty#, "obj2[wot].str")
+		prop.set(this, "blah")
+		verifyEq(obj2["wot"].str, "blah")
+		verifyEq(prop.get(this), "blah")
+
+		prop = BeanProperty(TestBeanProperty#, "[woot].str")
+		prop.set(this, "ever")
+		verifyEq(get("woot").str, "ever")
+		verifyEq(prop.get(this), "ever")
 	}
 	
 	Void testMethod() {
@@ -171,17 +193,18 @@ internal class T_Obj01 {
 	Str? 			str
 	T_Obj01[]?		list
 	[Str:T_Obj01]?	map
+	[Str:T_Obj01?]	map2 := [:]
 	
 	T_Obj01	meth(Str str) { T_Obj01().with { it.str = str } }
 	
 	@Operator
-	T_Obj01 get(Str key) {
-		map[key]
+	T_Obj01? get(Str key) {
+		return map2[key]
 	}
 
 	@Operator
 	Void set(Str key, T_Obj01 val) {
-		map[key] = val
+		map2[key] = val
 	}
 }
 

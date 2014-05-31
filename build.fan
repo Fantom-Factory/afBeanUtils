@@ -14,8 +14,7 @@ class Build : BuildPod {
 		]
 
 		depends = [
-			"sys 1.0",
-			"afPegger 0+"
+			"sys 1.0"
 		]
 		
 		srcDirs = [`test/`, `fan/`, `fan/public/`, `fan/internal/`]
