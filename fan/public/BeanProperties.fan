@@ -1,20 +1,28 @@
 using afPegger
 
 ** Does its best attempt to complete the action, be it creating classes along the way, coercing strings to types
-class BeanProperties {
+** 
+** Static typing, all Maps, Lists and methods must be correctly defined with return types 
+** 
+** Can't use -> dynamic calls as need to know if it's field or a method
+class BeanSloterties {
 
-	// TODO:
-//	static Obj getStaticProperty(Str property, Type type) {
+	// todo: Bad idea, static values are const! (Okay, well, thread safe - but they rarely change anyhow.)
+//	static Obj getStaticProperty(Type type, Str property) { ... }
 	
-	static Obj getProperty(Str property, Obj instance) {
+	static Obj execute(Obj instance, Str property) {
+		BeanProperty(instance.typeof, property).get(instance)
+	}
+
+	static Obj? getProperty(Obj instance, Str property) {
 		BeanProperty(instance.typeof, property).get(instance)
 	}
 	
-	static Void setProperty(Str property, Obj instance, Obj? value) {
+	static Void setProperty(Obj instance, Str property, Obj? value) {
 		BeanProperty(instance.typeof, property).set(instance, value)
 	}
 	
-	static Void setProperties(Str:Obj? propertyValues, Obj instance) {
+	static Void setProperties(Obj instance, Str:Obj? propertyValues) {
 		propertyValues.each |value, property| {
 			BeanProperty(instance.typeof, property).set(instance, value)
 		}
@@ -22,35 +30,38 @@ class BeanProperties {
 }
 
 ** Uses the getter and setters
+@NoDoc
 class BeanProperty {
-	private BeanField[] beanFields
+	private BeanSlot[] beanSlots
 	
 	new make(Type type, Str property) {
-		beanFields = BeanFieldFactory.parse(type, property)
+		beanSlots = BeanSlotFactory.parse(type, property)
 	}
 
+	@Operator
 	Obj? get(Obj? instance) {
-		beanFields.reduce(instance) |inst, bean| { bean.get(inst) }
+		beanSlots.reduce(instance) |inst, bean| { bean.get(inst) }
 	}
 	
+	@Operator
 	Void set(Obj? instance, Obj? value) {
-		beanFields.eachRange(0..<-1) |bean| { instance = bean.get(instance) }
-		beanFields[-1].set(instance, value)
+		beanSlots.eachRange(0..<-1) |bean| { instance = bean.get(instance) }
+		beanSlots[-1].set(instance, value)
 	}
 }
 
-internal class BeanFieldFactory : Rules {
+internal class BeanSlotFactory : Rules {
 	
-	static BeanField[] parse(Type type, Str property) {
-		beanFields := BeanField[,]
-		beanType   := type
+	static BeanSlot[] parse(Type type, Str property) {
+		beanSlots	:= BeanSlot[,]
+		beanType	:= type
 
 		basicField := fieldName	{ 
 			it.name = "basicField" 
 			it.action = |Match match| {
 				field := beanType.field(match.matched)
-				beanFields.add(BeanFieldObj(field))
-				beanType = beanFields.last.returns 
+				beanSlots.add(BeanSlotObjField(field))
+				beanType = beanSlots.last.returns 
 			}
 		}
 
@@ -62,10 +73,10 @@ internal class BeanFieldFactory : Rules {
 				field := beanType.field(match.matches["fieldName"].matched)
 				index := match.matches["indexName"].matched
 				if (field.type.name == "List")
-					beanFields.add(BeanFieldList(field, index.toInt))
+					beanSlots.add(BeanSlotListField(field, index.toInt))
 				if (field.type.name == "Map")
-					beanFields.add(BeanFieldMap(field, index))
-				beanType = beanFields.last.returns 
+					beanSlots.add(BeanSlotMapField(field, index))
+				beanType = beanSlots.last.returns 
 			}
 		}
 		
@@ -75,13 +86,13 @@ internal class BeanFieldFactory : Rules {
 		parser  := Parser(beanField, property.in)
 		matches := parser.parseAll
 		
-		if (beanFields.isEmpty)
+		if (beanSlots.isEmpty)
 			throw Err(parser.failures.toStr)
 		// TODO: just check for failures, full stop!
 		
-		beanFields.eachRange(0..<-1) { it.createIfNull = true }
+		beanSlots.eachRange(0..<-1) { it.createIfNull = true }
 		
-		return beanFields
+		return beanSlots
 	}
 	
 	private static Rule fieldName() {
@@ -92,21 +103,24 @@ internal class BeanFieldFactory : Rules {
 	}
 }
 
-internal abstract class BeanField {
+internal abstract class BeanSlot {
 	TypeCoercer typeCoercer	:= TypeCoercer()
-	Field 		field
+	Slot 		slot
 	Bool		createIfNull
 	
-	new make(Field field) {
-		this.field = field
+	new make(Slot slot) {
+		this.slot = slot
 	}
+	
+	Field field() { slot }
+	Method method() { slot }
 
 	abstract Obj? get(Obj? instance)
 	abstract Void set(Obj? instance, Obj? val)
 	abstract Type returns()
 }
 
-internal class BeanFieldObj : BeanField {
+internal class BeanSlotObjField : BeanSlot {
 
 	new make(Field field) : super(field) { }
 	
@@ -128,7 +142,7 @@ internal class BeanFieldObj : BeanField {
 	}
 }
 
-internal class BeanFieldList : BeanField {
+internal class BeanSlotListField : BeanSlot {
 	private Int index
 	private Type listType
 	
@@ -180,7 +194,7 @@ internal class BeanFieldList : BeanField {
 	}
 }
 
-internal class BeanFieldMap : BeanField {
+internal class BeanSlotMapField : BeanSlot {
 	private Obj key
 	private Type keyType
 	private Type valType
@@ -216,5 +230,30 @@ internal class BeanFieldMap : BeanField {
 		map := Map(field.type.toNonNullable)
 		field.set(instance, map)
 		return map
+	}
+}
+
+internal class BeanSlotMethod : BeanSlot {
+
+	private Obj?[] args
+	
+	new make(Method method, Str[] args) : super(method) {
+		objs := [,]
+		args.each |arg, i| {
+			objs.add(typeCoercer.coerce(arg, method.params[i].type))
+		}
+		this.args = objs
+	}
+	
+	override Obj? get(Obj? instance) {
+		method.callOn(instance, args) 
+	}
+
+	override Void set(Obj? instance, Obj? value) {
+		throw ArgErr(ErrMsgs.property_setOnMethod(method))
+	}
+
+	override Type returns() {
+		method.returns
 	}
 }

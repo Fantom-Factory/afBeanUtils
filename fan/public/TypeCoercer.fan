@@ -1,7 +1,9 @@
 
 ** A helper class that coerces Objs to a given Type via 'fromXXX()' / 'toXXX()' ctors and methods. 
 ** This is mainly useful for converting to and from Strs.
-**  
+** 
+** mention maps and lists
+** 
 ** As a lot of repetition of types is expected for each 'TypeCoercer' the conversion methods are 
 ** cached.
 **  
@@ -17,9 +19,9 @@ const class TypeCoercer {
 	
 	** Coerces the Obj to the given type. 
 	** Coercion methods are looked up in the following order:
-	**  1. toXXX()
-	**  2. fromXXX()
-	**  3. makeFromXXX() 
+	**  1. 'toXXX()'
+	**  2. 'fromXXX()'
+	**  3. 'makeFromXXX()' 
 	Obj? coerce(Obj? value, Type toType) {
 		if (value == null) 
 			return toType.isNullable ? null : throw ArgErr(ErrMsgs.typeCoercer_notFound(null, toType))
@@ -66,7 +68,8 @@ const class TypeCoercer {
 	}
 	
 	protected virtual |Obj->Obj|? coerceMethod(Type fromType, Type toType) {
-//		key	:= "${fromType.qname}->${toType.qname}"
+		// TODO: cache
+//		key	:= "${fromType.qname}->${toType.qname}"	
 //		return cache.getOrAdd(key) { lookupMethod(fromType, toType) }
 
 		// check the basics first!
