@@ -1,13 +1,36 @@
 
-** A helper class that coerces Objs to a given Type via 'fromXXX()' / 'toXXX()' ctors and methods. 
-** This is mainly useful for converting to and from Strs.
+** Coerces objects to a given type via 'fromXXX()' / 'toXXX()' ctors and methods.
+** This is often useful for converting objects to and from Strs, but can be used for much more. 
 ** 
-** mention maps and lists
+** TODO: mention maps and lists
+** 'TypeCoercer' recognises type parameters in Lists and Maps and will convert the content of each to 
 ** 
-** As a lot of repetition of types is expected for each 'TypeCoercer' the conversion methods are 
-** cached.
-**  
-** FIXME
+** 'caseInsensitive' and 'ordered' attributes of new maps are preserved.
+** 
+** If performance is required, then use [Concurrent]`http://www.fantomfactory.org/pods/afConcurrent` 
+** to create a 'TypeCoercer' that caches the functions used to convert between one type and another. 
+** Full code for a 'CachedTypeCoercer' is given below: 
+** 
+** pre>
+** using afBeanUtils
+** using afConcurrent
+** 
+** ** A 'TypeCoercer' that caches its conversion methods.
+** const class CachingTypeCoercer : TypeCoercer {
+**    private const AtomicMap cache := AtomicMap()
+** 
+**    ** Cache the conversion methods
+**    override protected |Obj->Obj|? coerceMethod(Type fromType, Type toType) {
+**       key   := "${fromType.qname}->${toType.qname}"
+**       return cache.getOrAdd(key) { lookupMethod(fromType, toType) } 
+**    }
+** 
+**    ** Clears the lookup cache 
+**    Void clearCache() {
+**       cache.clear
+**    }
+** }
+** <pre
 const class TypeCoercer {
 	
 	** Returns 'true' if 'fromType' can be coerced to the given 'toType'.
@@ -67,11 +90,16 @@ const class TypeCoercer {
 		}
 	}
 	
+	** Override this method should you wish to cache the conversion functions. 
+	@NoDoc
 	protected virtual |Obj->Obj|? coerceMethod(Type fromType, Type toType) {
-		// TODO: cache
-//		key	:= "${fromType.qname}->${toType.qname}"	
-//		return cache.getOrAdd(key) { lookupMethod(fromType, toType) }
+		lookupMethod(fromType, toType)
+	}
 
+	** This method kinda sucks, but it's a workaround.
+	** @see http://fantom.org/sidewalk/topic/2289
+	@NoDoc
+	protected virtual |Obj->Obj|? lookupMethod(Type fromType, Type toType) {
 		// check the basics first!
 		if (fromType.fits(toType))
 			return |Obj val -> Obj| { val }
