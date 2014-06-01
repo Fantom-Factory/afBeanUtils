@@ -1,37 +1,129 @@
 
-** A helper class that looks up Objs via Type inheritance search.
+** Looks up values via a type inheritance search.
+** 
+** Example, if a 'TypeLookup' was created with 'Obj#, Num#' and 'Int#', the inheritance and 
+** matching types would look like:
+** 
+** pre>
+** Type  findParent()  findChildren()
+** 
+** Obj   Obj           Obj, Num, Int
+**  | 
+** Num   Num           Num, Int
+**  |
+** Int   Int           Int
+** <pre
+** 
+** Note that 'findParent()' and 'findChildren()' return the value associated with the type, not the 
+** type itself. They also match the given type if 'TypeLookup' was created with it, hence 
+** 'findParent()' above matches itself.
+** 
+** While the above results are quite obvious, 'TypeLookup' is more useful when passed a type it 
+** doesn't know about:  
+** 
+**   findParent(Float#)    // --> Num#
+**   findChildren(Float#)  // --> Err
+** 
+** When searching the type hierarchy for a closest match (see 'findParent()' ), note that 
+** 'TypeLookup' also searches mixins.
+** 
+** Example usages can be found in:
+**  - [IoC]`http://www.fantomfactory.org/pods/afIoc`: All known implementations of a mixin are looked up via 'findChildren()'
+**  - [BedSheet]`http://www.fantomfactory.org/pods/afBedSheet`: Strategies for handling Err types are looked up via 'findParent()'
+**
+** If performance is required, then use [Concurrent]`http://www.fantomfactory.org/pods/afConcurrent` 
+** to create a 'TypeLookup' that caches the lookups. 
+** Full code for a 'CachingTypeLookup' is given below: 
+**  
+** pre>
+** using afBeanUtils
+** using afConcurrent
+** 
+** ** A 'TypeLookup' that caches the lookup results.
+** internal const class CachingTypeLookup : TypeLookup {
+**     private const AtomicMap parentCache   := AtomicMap()
+**     private const AtomicMap childrenCache := AtomicMap()
+** 
+**     new make(Type:Obj? values) : super(values) { }
+**     
+**     ** Cache the lookup results
+**     override Obj? findParent(Type type, Bool checked := true) {
+**         nonNullable := type.toNonNullable
+**         return parentCache.getOrAdd(nonNullable) { doFindParent(nonNullable, checked) } 
+**     }
+**     
+**     ** Cache the lookup results
+**     override Obj?[] findChildren(Type type, Bool checked := true) {
+**         nonNullable := type.toNonNullable
+**         return parentCache.getOrAdd(nonNullable) { doFindChildren(nonNullable, checked) } 
+**     }
+** 
+**     ** Clears the lookup cache 
+**     Void clear() {
+**         parentCache.clear
+**         childrenCache.clear
+**     }
+** }
+** <pre
 const class TypeLookup {	
 	private const Type:Obj? 	values
 	
-	** Creates an TypeLookup with the given map. All types are coerced to non-nullable types.
+	** Creates a 'TypeLookup' with the given map. All types are coerced to non-nullable types.
 	** An 'ArgErr' is thrown if a duplicate is found in the process. 
 	new make(Type:Obj? values) {
-		nonDups := [Type:Obj?][:]
+		values  = values.rw
+		nonDups := Type:Obj?[:]
+		nonDups.ordered = values.ordered	// mainly for testing, lookup is faster when not ordered 
 		values.each |val, type| {
 			nonNullable := type.toNonNullable
 			if (nonDups.containsKey(nonNullable)) 
 				throw ArgErr("Type $nonNullable is already mapped to value ${nonDups[nonNullable]}")
 			nonDups[nonNullable] = val
 		}
-		this.values = nonDups.toImmutable
+		this.values = nonDups
 	}
 
-	** Standard Map behaviour - looks up an Obj via the type. 
+	** Returns the value that matches the given type. This is just standard Map behaviour.
+	**  
+	** If no match is found and 'checked' is 'false', 'null' is returned.
 	Obj? findExact(Type exact, Bool checked := true) {
 		nonNullable := exact.toNonNullable
-		return values.get(nonNullable)
-			?: check(nonNullable, checked)
+		return values.get(nonNullable) ?: check(nonNullable, checked)
 	}
 
-	** Returns the value of the closest parent of the given type.
+	** Returns the value of the closest parent of the given type (or the given type should ).
 	** Example:
 	** pre>
 	**   strategy := StrategyRegistry( [Obj#:1, Num#:2, Int#:3] )
-	**   strategy.findClosestParent(Obj#)   // --> 1
-	**   strategy.findClosestParent(Num#)   // --> 2
-	**   strategy.findClosestParent(Float#) // --> 2
+	**   strategy.findClosestParent(Obj#)     // --> 1
+	**   strategy.findClosestParent(Num#)     // --> 2
+	**   strategy.findClosestParent(Float#)   // --> 2
+	**   strategy.findClosestParent(Wotever#) // --> Err
 	** <pre
-	Obj? findParent(Type type, Bool checked := true) {
+	** 
+	** If no parent is found and 'checked' is 'false', 'null' is returned.
+	virtual Obj? findParent(Type type, Bool checked := true) {
+		doFindParent(type, checked)
+	}
+	
+	** Returns the values of the children of the given type.
+	** Example:
+	** pre>
+	**   strategy := StrategyRegistry( [Obj#:1, Num#:2, Int#:3] )
+	** 	 strategy.findChildren(Obj#)     // --> [1, 2, 3]
+	**   strategy.findChildren(Num#)     // --> [2, 3]
+	**   strategy.findChildren(Float#)   // --> Err
+	** <pre
+	** 
+	** If no children are found and 'checked' is 'false', an empty list is returned.
+	virtual Obj?[] findChildren(Type type, Bool checked := true) {
+		doFindChildren(type, checked)
+	}
+	
+	** It kinda sucks to need this method, but it's a workaround to 
+	** [this issue]`http://fantom.org/sidewalk/topic/2289`.
+	@NoDoc
+	protected Obj? doFindParent(Type type, Bool checked := true) {
 		nonNullable := type.toNonNullable
 
 		// chill, I got tests for all this!
@@ -51,19 +143,13 @@ const class TypeLookup {
 		return values[match]
 	}
 	
-	** Returns the values of the children of the given type.
-	** Example:
-	** pre>
-	**   strategy := StrategyRegistry( [Obj#:1, Num#:2, Int#:3] )
-	** 	 strategy.findChildrenOf(Obj#)   // --> [1, 2, 3]
-	**   strategy.findChildrenOf(Num#)   // --> [2, 3]
-	**   strategy.findChildrenOf(Float#) // --> [,]
-	** <pre
-	** 
-	** If no children are found, an empty list is returned.
-	Obj?[] findChildren(Type type) {
+	** It kinda sucks to need this method, but it's a workaround to 
+	** [this issue]`http://fantom.org/sidewalk/topic/2289`.
+	@NoDoc
+	protected Obj?[] doFindChildren(Type type, Bool checked := true) {
 		nonNullable := type.toNonNullable
-		return values.findAll |val, key| { key.fits(type) }.vals
+		children := values.findAll |val, key| { key.fits(type) }.vals
+		return !children.isEmpty ? children : (check(nonNullable, checked) ?: Obj?#.emptyList)
 	}
 	
 	private Obj? check(Type nonNullable, Bool checked) {
@@ -76,6 +162,7 @@ const class TypeLookup {
 	}
 }
 
+** This Err is left public just in case someone wants to catch it.
 @NoDoc
 const class TypeNotFoundErr : Err, NotFoundErr {
 	override const Str?[] availableValues

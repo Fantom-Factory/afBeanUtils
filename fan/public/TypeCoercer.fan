@@ -10,7 +10,7 @@
 ** 
 ** If performance is required, then use [Concurrent]`http://www.fantomfactory.org/pods/afConcurrent` 
 ** to create a 'TypeCoercer' that caches the functions used to convert between one type and another. 
-** Full code for a 'CachedTypeCoercer' is given below: 
+** Full code for a 'CachingTypeCoercer' is given below: 
 ** 
 ** pre>
 ** using afBeanUtils
@@ -20,14 +20,14 @@
 ** const class CachingTypeCoercer : TypeCoercer {
 **    private const AtomicMap cache := AtomicMap()
 ** 
-**    ** Cache the conversion methods
-**    override protected |Obj->Obj|? coerceMethod(Type fromType, Type toType) {
+**    ** Cache the conversion functions
+**    override protected |Obj->Obj|? createCoercionFunc(Type fromType, Type toType) {
 **       key := "${fromType.qname}->${toType.qname}"
-**       return cache.getOrAdd(key) { doCoerceMethod(fromType, toType) } 
+**       return cache.getOrAdd(key) { doCreateCoercionFunc(fromType, toType) } 
 **    }
 ** 
-**    ** Clears the lookup cache 
-**    Void clearCache() {
+**    ** Clears the function cache 
+**    Void clear() {
 **       cache.clear
 **    }
 ** }
@@ -36,9 +36,18 @@ const class TypeCoercer {
 	
 	** Returns 'true' if 'fromType' can be coerced to the given 'toType'.
 	Bool canCoerce(Type fromType, Type toType) {
-		if (fromType.name == "List" && toType.name == "List") 
-			return coerceMethod(fromType.params["V"], toType.params["V"]) != null
-		return coerceMethod(fromType, toType) != null
+		if (fromType.name == "List" && toType.name == "List") {
+			valFunc := createCoercionFunc(fromType.params["V"] ?: Obj?#, toType.params["V"] ?: Obj?#) 
+			return valFunc != null
+		}
+
+		if (fromType.name == "Map" && toType.name == "Map") {
+			keyFunc := createCoercionFunc(fromType.params["K"] ?: Obj#,  toType.params["K"] ?: Obj#) 
+			valFunc := createCoercionFunc(fromType.params["V"] ?: Obj?#, toType.params["V"] ?: Obj?#) 
+			return keyFunc != null && valFunc != null
+		}
+
+		return createCoercionFunc(fromType, toType) != null
 	}
 	
 	** Coerces the Obj to the given type. 
@@ -51,7 +60,7 @@ const class TypeCoercer {
 			return toType.isNullable ? null : throw ArgErr(ErrMsgs.typeCoercer_notFound(null, toType))
 
 		if (value.typeof.name == "List" && toType.name == "List") {
-			toListType 	:= toType.params["V"]
+			toListType 	:= toType.params["V"] ?: Obj?#
 			toList 		:= (Obj?[]) toListType.emptyList.rw
 			((List) value).each {
 				toList.add(coerce(it, toListType))
@@ -60,8 +69,8 @@ const class TypeCoercer {
 		}
 
 		if (value.typeof.name == "Map" && toType.name == "Map") {
-			toKeyType := toType.params["K"]
-			toValType := toType.params["V"]
+			toKeyType := toType.params["K"] ?: Obj#
+			toValType := toType.params["V"] ?: Obj?#
 			toMap	  := ([Obj:Obj?]?) null
 			
 			if (((Map) value).caseInsensitive && toKeyType.fits(Str#))
@@ -69,7 +78,7 @@ const class TypeCoercer {
 			if (((Map) value).ordered)
 				toMap	 = Map.make(toType) { ordered = true }
 			if (toMap == null)
-				toMap	 = Map.make(toType)
+				toMap	 = toType.isGeneric ? Map.make(Obj:Obj?#) : Map.make(toType)
 
 			((Map) value).each |v1, k1| {
 				k2	:= coerce(k1, toKeyType)
@@ -79,7 +88,7 @@ const class TypeCoercer {
 			return toMap
 		}
 
-		meth := coerceMethod(value.typeof, toType)
+		meth := createCoercionFunc(value.typeof, toType)
 		
 		if (meth == null)
 			throw ArgErr(ErrMsgs.typeCoercer_notFound(value.typeof, toType))
@@ -95,14 +104,14 @@ const class TypeCoercer {
 	** 
 	** @see http://fantom.org/sidewalk/topic/2289
 	@NoDoc
-	protected virtual |Obj->Obj|? coerceMethod(Type fromType, Type toType) {
-		doCoerceMethod(fromType, toType)
+	protected virtual |Obj->Obj|? createCoercionFunc(Type fromType, Type toType) {
+		doCreateCoercionFunc(fromType, toType)
 	}
 
 	** It kinda sucks to need this method, but it's a workaround to 
 	** [this issue]`http://fantom.org/sidewalk/topic/2289`.
 	@NoDoc
-	protected |Obj->Obj|? doCoerceMethod(Type fromType, Type toType) {
+	protected |Obj->Obj|? doCreateCoercionFunc(Type fromType, Type toType) {
 		// check the basics first!
 		if (fromType.fits(toType))
 			return |Obj val -> Obj| { val }
