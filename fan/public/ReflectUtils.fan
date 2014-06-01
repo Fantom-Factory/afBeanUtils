@@ -1,6 +1,6 @@
 
-** A collection of methods for finding fields, methods and ctors.
-mixin ReflectUtils {
+** Methods for finding fields, methods and ctors that match given parameter types.
+class ReflectUtils {
 
 	** Finds a field.
 	static Field? findField(Type type, Str fieldName, Type fieldType) {

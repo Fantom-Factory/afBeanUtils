@@ -4,7 +4,7 @@ class Build : BuildPod {
 
 	new make() {
 		podName = "afBeanUtils"
-		summary = ""
+		summary = "(Internal) "
 		version = Version("0.0.1")
 
 		meta = [
