@@ -9,21 +9,26 @@ class BeanProperties {
 	// todo: Bad idea, static values are const! (Okay, well, thread safe - but they rarely change anyhow.)
 //	static Obj getStaticProperty(Type type, Str property) { ... }
 	
-	static Obj execute(Obj instance, Str property) {
+	** Identical to 'get()' but may read better in code if you know the expression ends with a method.
+	static Obj call(Obj instance, Str property) {
 		BeanPropertyFactory().parse(instance.typeof, property).get(instance)
 	}
 
+	** Gets the value of the field (or method) at the end of the property expression.
 	static Obj? getProperty(Obj instance, Str property) {
 		BeanPropertyFactory().parse(instance.typeof, property).get(instance)
 	}
 	
+	** Sets the value of the field at the end of the property expression.
 	static Void setProperty(Obj instance, Str property, Obj? value) {
 		BeanPropertyFactory().parse(instance.typeof, property).set(instance, value)
 	}
 	
+	** Given a map of values, keyed by property expressions, this sets them on the given instance.
 	static Void setProperties(Obj instance, Str:Obj? propertyValues) {
+		factory := BeanPropertyFactory()
 		propertyValues.each |value, property| {
-			BeanPropertyFactory().parse(instance.typeof, property).set(instance, value)
+			factory.parse(instance.typeof, property).set(instance, value)
 		}
 	}
 }
