@@ -2,10 +2,11 @@
 ** Coerces objects to a given type via 'fromXXX()' / 'toXXX()' ctors and methods.
 ** This is often useful for converting objects to and from Strs, but can be used for much more. 
 ** 
-** TODO: mention maps and lists
-** 'TypeCoercer' recognises type parameters in Lists and Maps and will convert the content of each to 
+** 'TypeCoercer' inspects type parameters in Lists and Maps and also converts the contents of each.
+** Example, coercing 'Int[1, 2, 3]' to 'Str[]' will convert each item of the list into a Str.
+** Similarly, when coercing a map to a new map type, all the key and vals will be converted.   
 ** 
-** 'caseInsensitive' and 'ordered' attributes of new maps are preserved.
+** The 'caseInsensitive' and 'ordered' attributes of new maps are preserved.
 ** 
 ** If performance is required, then use [Concurrent]`http://www.fantomfactory.org/pods/afConcurrent` 
 ** to create a 'TypeCoercer' that caches the functions used to convert between one type and another. 
@@ -21,8 +22,8 @@
 ** 
 **    ** Cache the conversion methods
 **    override protected |Obj->Obj|? coerceMethod(Type fromType, Type toType) {
-**       key   := "${fromType.qname}->${toType.qname}"
-**       return cache.getOrAdd(key) { lookupMethod(fromType, toType) } 
+**       key := "${fromType.qname}->${toType.qname}"
+**       return cache.getOrAdd(key) { doCoerceMethod(fromType, toType) } 
 **    }
 ** 
 **    ** Clears the lookup cache 
@@ -91,15 +92,17 @@ const class TypeCoercer {
 	}
 	
 	** Override this method should you wish to cache the conversion functions. 
-	@NoDoc
-	protected virtual |Obj->Obj|? coerceMethod(Type fromType, Type toType) {
-		lookupMethod(fromType, toType)
-	}
-
-	** This method kinda sucks, but it's a workaround.
+	** 
 	** @see http://fantom.org/sidewalk/topic/2289
 	@NoDoc
-	protected virtual |Obj->Obj|? lookupMethod(Type fromType, Type toType) {
+	protected virtual |Obj->Obj|? coerceMethod(Type fromType, Type toType) {
+		doCoerceMethod(fromType, toType)
+	}
+
+	** It kinda sucks to need this method, but it's a workaround to 
+	** [this issue]`http://fantom.org/sidewalk/topic/2289`.
+	@NoDoc
+	protected |Obj->Obj|? doCoerceMethod(Type fromType, Type toType) {
 		// check the basics first!
 		if (fromType.fits(toType))
 			return |Obj val -> Obj| { val }
