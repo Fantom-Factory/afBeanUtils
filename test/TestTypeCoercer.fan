@@ -53,6 +53,9 @@ internal class TestTypeCoercer : BeanTest {
 		// test cache 
 		verify     (tc.canCoerce(Str[]#, Int[]#))
 		verifyFalse(tc.canCoerce(TestTypeCoercer[]#, Int[]#))
+		
+		// test non-parameterised lists
+		verify     (tc.canCoerce(Str[]#, List#))
 	}
 
 	Void testCoerceLists() {
@@ -78,6 +81,9 @@ internal class TestTypeCoercer : BeanTest {
 		// test cache doesn't fail conversion
 		verifyEq(tc.coerce([69, 42], Str[]#), ["69", "42"])
 		verifyEq(tc.coerce(["69", "42"], Int[]#), [69, 42])
+
+		// test non-parameterised lists
+		verifyEq(tc.coerce([69], List#), Obj?[69])
 	}
 	
 	Void testCoerceEmptyLists() {
@@ -109,5 +115,8 @@ internal class TestTypeCoercer : BeanTest {
 		// test cache doesn't fail conversion
 		verifyEq(tc.coerce([6:9, 4:2], Str:Str#), ["6":"9", "4":"2"])
 		verifyEq(tc.coerce(["6":"9", "4":"2"], Int:Int?#), Int:Int?[6:9, 4:2])
+		
+		// test non-parameterised maps
+		verifyEq(tc.coerce([6:9], Map#), Obj:Obj?[6:9])
 	}
 }
