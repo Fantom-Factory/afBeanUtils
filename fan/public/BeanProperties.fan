@@ -6,8 +6,8 @@
 ** Can't use -> dynamic calls as need to know if it's field or a method
 class BeanProperties {
 
-	// todo: Bad idea, static values are const! (Okay, well, thread safe - but they rarely change anyhow.)
-//	static Obj getStaticProperty(Type type, Str property) { ... }
+	// Bad idea, static values are const! (Okay, well, thread safe - but they rarely change anyhow.)
+	// static Obj getStaticProperty(Type type, Str property) { ... }
 	
 	** Identical to 'get()' but may read better in code if you know the expression ends with a method.
 	static Obj call(Obj instance, Str property) {
@@ -68,6 +68,8 @@ class BeanPropertyFactory {
 		
 		matcher	:= slotRegex.matcher(property)
 		
+		f := |BeanSlot bs| { bs.typeCoercer = this.typeCoercer; bs.makeFunc = this.makeFunc }
+		
 		while (matcher.find) {
 			if (matcher.group(0).isEmpty)
 				continue
@@ -76,7 +78,7 @@ class BeanPropertyFactory {
 			methodArgs	:= matcher.group(3)?.split(',', true)
 
 			if (slotName.isEmpty) {
-				beanSlot := BeanSlotOperator(beanType, indexName)
+				beanSlot := BeanSlotOperator(beanType, indexName, f)
 				beanSlots.add(beanSlot)
 				beanType = beanSlot.returns				
 				continue
@@ -85,34 +87,35 @@ class BeanPropertyFactory {
 			slot := beanType.slot(slotName)			
 			beanSlot := (BeanSlot?) null
 			if (slot.isField && isObj(slot))
-				beanSlot = BeanSlotObjField(slot)
+				beanSlot = BeanSlotObjField(slot, f)
 			if (slot.isField && isList(slot))
-				beanSlot = BeanSlotListField(slot, indexName.toInt)
+				beanSlot = BeanSlotListField(slot, indexName.toInt, f)
 			if (slot.isField && isMap(slot))
-				beanSlot = BeanSlotMapField(slot, indexName)
+				beanSlot = BeanSlotMapField(slot, indexName, f)
 			if (slot.isMethod)
-				beanSlot = BeanSlotMethod(slot, methodArgs ?: Obj#.emptyList)
+				beanSlot = BeanSlotMethod(slot, methodArgs ?: Obj#.emptyList, f)
 
 			beanSlots.add(beanSlot)
 			beanType = beanSlot.returns
 
 			if (slot.isField && isObj(slot) && indexName != null) {
-				beanSlot = BeanSlotOperator(beanType, indexName)
+				beanSlot = BeanSlotOperator(beanType, indexName, f)
 				beanSlots.add(beanSlot)
 				beanType = beanSlot.returns				
 			}
 
 			if (slot.isMethod && indexName != null) {
-				beanSlot = BeanSlotOperator(beanType, indexName)
+				beanSlot = BeanSlotOperator(beanType, indexName, f)
 				beanSlots.add(beanSlot)
 				beanType = beanSlot.returns				
 			}
 		}
-		
-		beanSlots.eachRange(0..<-1) { it.createIfNull = true }
-		
+
 		if (beanSlots.isEmpty)
 			throw Err(ErrMsgs.property_badParse(property))		
+		
+		if (createIfNull)
+			beanSlots.eachRange(0..<-1) { it.createIfNull = true }
 		
 		return BeanProperty(property, beanSlots)
 	}

@@ -1,12 +1,14 @@
 
+** Can't be 'const' 'cos method args may not be const.
 internal abstract class BeanSlot {
 	Slot 			slot
 	TypeCoercer? 	typeCoercer
 	|Type->Obj|?	makeFunc 
 	Bool?			createIfNull
 	
-	new make(Slot slot) {
+	new make(Slot slot, |This| f) {
 		this.slot = slot
+		f(this)
 	}
 	
 	Field field() { slot }
@@ -19,7 +21,7 @@ internal abstract class BeanSlot {
 
 internal class BeanSlotObjField : BeanSlot {
 
-	new make(Field field) : super(field) { }
+	new make(Field field, |BeanSlot| f) : super(field, f) { }
 	
 	override Obj? get(Obj? instance) {
 		ret := field.get(instance) 
@@ -43,7 +45,7 @@ internal class BeanSlotListField : BeanSlot {
 	private Int index
 	private Type listType
 	
-	new make(Field field, Int index) : super(field) {
+	new make(Field field, Int index, |BeanSlot| f) : super(field, f) {
 		this.index = index
 		this.listType = field.type.params["V"] ?: Obj?#
 	}
@@ -96,7 +98,7 @@ internal class BeanSlotMapField : BeanSlot {
 	private Type keyType
 	private Type valType
 	
-	new make(Field field, Obj key) : super(field) {
+	new make(Field field, Obj key, |BeanSlot| f) : super(field, f) {
 		this.keyType = field.type.params["K"] ?: Obj#
 		this.valType = field.type.params["V"] ?: Obj?#
 		this.key	 = typeCoercer.coerce(key, keyType)
@@ -133,7 +135,7 @@ internal class BeanSlotMapField : BeanSlot {
 internal class BeanSlotMethod : BeanSlot {
 	private Obj?[] args
 	
-	new make(Method method, Str[] args) : super(method) {
+	new make(Method method, Str[] args, |BeanSlot| f) : super(method, f) {
 		objs := [,]
 		args.each |arg, i| {
 			objs.add(typeCoercer.coerce(arg, method.params[i].type))
@@ -158,7 +160,7 @@ internal class BeanSlotOperator : BeanSlot {
 	private Type type
 	private Obj  index
 	
-	new make(Type type, Obj index) : super(type.method("get")) {
+	new make(Type type, Obj index, |BeanSlot| f) : super(type.method("get"), f) {
 		this.type = type
 		this.index = index
 	}
