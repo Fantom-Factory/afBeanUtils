@@ -3,6 +3,9 @@ Overview [#overview]
 *@{project.name} is a support library that aids Alien-Factory in the development of other libraries, frameworks and applications.
 Though you are welcome to use it, you may find features are missing and the documentation incomplete.*
 
+Loosely named after [JavaBeans]`http://www.oracle.com/technetwork/java/javase/documentation/spec-136004.html`, 'Bean Utils'
+is a collection of utilities and software patterns for overcoming common issues associated with data objects.
+
 
 
 Install [#Install]
@@ -23,11 +26,98 @@ Full API & fandocs are available on the [Status302 repository]`http://repo.statu
 
 
 
-Quick Start [#quickStart]
-*************************
+Bean Properties [#beanProperties]
+*********************************
+`BeanProperties` is a niffty way to get and set properties, and call methods, on nested objects.
+
+Properties are accessed via a *property expression*. Property expressions look like Fantom code and may traverse many objects.
+Their main purpose is to get and set properties, but may be used to call methods also.
+
 pre>
-  Example here
+  string := "100 101 102"
+  result := BeanProperties.call(string, "split[1].get(2).plus(2).toChar")
+  echo(result)  // --> 3
 <pre
+
+Features of property expressions include:
+
+
+
+Field Access [#fieldAcces]
+==========================
+The simplest use case is getting and setting basic fields.
+In this example we access the field 'Buf.capacity':
+
+pre>
+  buf := Buf()
+  BeanProperties.get(buf, "capacity")     // --> 16
+  BeanProperties.set(buf, "capacity", 42) // set a new value
+<pre
+
+When setting fields, the given value is [Type Coerced]`TypeCoerecer` to fit the field type. Consider:
+
+pre>
+  BeanProperties.set(buf, "charset", "UTF-16")  // string "UTF-16" is converted to a Charset
+<pre
+
+
+
+Method Calling
+==============
+Property expressions can call methods too. Like Fantom code, should the method not take any parameters, brackets are optional:
+
+pre>
+  buf := Buf()
+  BeanProperties.call(buf, "flush")
+  BeanProperties.call(buf, "flush()")
+<pre
+
+Method arguments may also form part of the expression and like property values, are type coerced to their respective types:
+
+pre>
+  buf := Buf()
+  BeanProperties.call(buf, "fill(255, 4)")    // --> 0xFFFFFFFF
+  BeanProperties.call(buf, "getRange(1..2)")  // --> 0xFFFF
+<pre
+
+
+
+List Access
+===========
+ - notation
+ - create list items
+  - null
+  - make / defVal -> Type.make
+
+Map Access
+==========
+ - notation
+ - key conversion
+ - val type important
+
+Operator Shortcuts
+==================
+ - notation
+
+Nesting
+=======
+
+Object Creation
+===============
+ - fields
+ - lists
+ - maps
+ - operators
+
+
+Example -> form
+
+
+
+Bean Identity [#beanIdentity]
+*****************************
+Annotate fields with the `BeanId` facet to denote fields that can be used in an 'equals()' method and
+to be used to create values for 'hash()' and 'toStr()', and in
 
 
 

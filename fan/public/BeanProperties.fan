@@ -15,17 +15,17 @@ class BeanProperties {
 	}
 
 	** Gets the value of the field (or method) at the end of the property expression.
-	static Obj? getProperty(Obj instance, Str property) {
+	static Obj? get(Obj instance, Str property) {
 		BeanPropertyFactory().parse(instance.typeof, property).get(instance)
 	}
 	
 	** Sets the value of the field at the end of the property expression.
-	static Void setProperty(Obj instance, Str property, Obj? value) {
+	static Void set(Obj instance, Str property, Obj? value) {
 		BeanPropertyFactory().parse(instance.typeof, property).set(instance, value)
 	}
 	
 	** Given a map of values, keyed by property expressions, this sets them on the given instance.
-	static Void setProperties(Obj instance, Str:Obj? propertyValues) {
+	static Void setAll(Obj instance, Str:Obj? propertyValues) {
 		factory := BeanPropertyFactory()
 		propertyValues.each |value, property| {
 			factory.parse(instance.typeof, property).set(instance, value)
@@ -69,7 +69,7 @@ class BeanPropertyFactory {
 		matcher	:= slotRegex.matcher(property)
 		
 		f := |BeanSlot bs| { bs.typeCoercer = this.typeCoercer; bs.makeFunc = this.makeFunc }
-		
+
 		while (matcher.find) {
 			if (matcher.group(0).isEmpty)
 				continue
@@ -105,7 +105,12 @@ class BeanPropertyFactory {
 			}
 
 			if (slot.isMethod && indexName != null) {
-				beanSlot = BeanSlotOperator(beanType, indexName, f)
+				if (isList(slot))
+					beanSlot = BeanSlotMethod(beanType.method("get"), [indexName], f)
+				else if (isMap(slot))
+					beanSlot = BeanSlotMethod(beanType.method("get"), [indexName], f)
+				else
+					beanSlot = BeanSlotOperator(beanType, indexName, f)
 				beanSlots.add(beanSlot)
 				beanType = beanSlot.returns				
 			}
@@ -120,16 +125,18 @@ class BeanPropertyFactory {
 		return BeanProperty(property, beanSlots)
 	}
 	
-	private static Bool isList(Field field) {
-		field.type.name == "List"
+	private static Bool isList(Slot slot) {
+		(slot.isField  && ((Field)  slot).type.name    == "List") ||
+		(slot.isMethod && ((Method) slot).returns.name == "List")
 	}
 
-	private static Bool isMap(Field field) {
-		field.type.name == "Map"
+	private static Bool isMap(Slot slot) {
+		(slot.isField  && ((Field)  slot).type.name    == "Map") ||
+		(slot.isMethod && ((Method) slot).returns.name == "Map")
 	}
 
-	private static Bool isObj(Field field) {
-		!isList(field) && !isMap(field)
+	private static Bool isObj(Slot slot) {
+		!isList(slot) && !isMap(slot)
 	}
 }
 
