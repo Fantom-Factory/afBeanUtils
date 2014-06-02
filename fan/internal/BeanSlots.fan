@@ -188,6 +188,15 @@ internal class ExecuteIndex : SegmentExecutor {
 		valType
 	}
 
+	** The problem with dynamic inspection is that Lists and Maps are not always what they're declared to be! 
+	** Consider:
+	** 
+	**   Int:Int map() { [:] } // --> bad, returns Obj:Obj? !!!
+	** 
+	** Which means we'll actually create a key of Obj and not Int! 
+	** So we keep track of the last statically declared return type and choose which ever one appears more specific.
+	** 
+	** Very clever!
 	private Type mostSpecific(Type type1, Type type2, Str param) {
 		pType1 	:= type1.params[param] ?: Obj?#
 		pType2 	:= type2.params[param] ?: Obj?#
