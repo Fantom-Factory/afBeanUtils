@@ -1,27 +1,15 @@
 
-internal const abstract class ExpressionSegment {
+internal const abstract class SegmentFactory {
 	const TypeCoercer	typeCoercer
 	const |Type->Obj|	makeFunc 
 	const Bool			createIfNull
 	
 	new make(|This| f) { f(this) }
 
-	Obj? call(Obj instance, Obj?[]? args) {
-		makeSegment(instance, true).get(args)
-	}
-	
-	Obj? get (Obj instance, Bool isLast := false) {
-		makeSegment(instance, isLast).get(null)
-	}
-
-	Void set (Obj instance, Obj? value) {
-		makeSegment(instance, true).set(value)
-	}
-
-	abstract SegmentExecutor makeSegment(Obj instance, Bool isLast)
+	abstract SegmentExecutor makeSegment(Type staticType, Obj instance, Bool isLast)
 }
 
-internal const class SlotSegment : ExpressionSegment {
+internal const class SlotSegment : SegmentFactory {
 	const Obj?[]	methodArgs
 	const Str 		slotName
 	
@@ -30,7 +18,7 @@ internal const class SlotSegment : ExpressionSegment {
 		this.methodArgs = methodArgs ?: Str#.emptyList
 	}
 
-	override SegmentExecutor makeSegment(Obj instance, Bool isLast) {
+	override SegmentExecutor makeSegment(Type staticType, Obj instance, Bool isLast) {
 		slot := instance.typeof.slot(slotName)
 		
 		if (slot.isField)
@@ -51,7 +39,7 @@ internal const class SlotSegment : ExpressionSegment {
 	}
 }
 
-internal const class IndexSegment : ExpressionSegment {
+internal const class IndexSegment : SegmentFactory {
 	const Int	maxListSize
 	const Str	index
 
@@ -59,8 +47,8 @@ internal const class IndexSegment : ExpressionSegment {
 		this.index	= index
 	}
 
-	override SegmentExecutor makeSegment(Obj instance, Bool isLast) {
-		ExecuteIndex(instance, index) {
+	override SegmentExecutor makeSegment(Type staticType, Obj instance, Bool isLast) {
+		ExecuteIndex(staticType, instance, index) {
 			it.typeCoercer 	= this.typeCoercer
 			it.createIfNull	= isLast ? false : this.createIfNull
 			it.makeFunc		= this.makeFunc
@@ -79,6 +67,7 @@ internal abstract class SegmentExecutor {
 
 	abstract Obj? get(Obj?[]? args)
 	abstract Void set(Obj? value)
+	abstract Type returns()
 }
 
 internal class ExecuteField : SegmentExecutor{
@@ -106,6 +95,10 @@ internal class ExecuteField : SegmentExecutor{
 		val := typeCoercer.coerce(value, field.type)
 		field.set(instance, val)
 	}
+	
+	override Type returns() {
+		field.type
+	}
 }
 
 internal class ExecuteMethod : SegmentExecutor {
@@ -128,6 +121,10 @@ internal class ExecuteMethod : SegmentExecutor {
 	override Void set(Obj? value) {
 		throw ArgErr(ErrMsgs.property_setOnMethod(method))
 	}
+
+	override Type returns() {
+		method.returns
+	}
 }
 
 internal class ExecuteIndex : SegmentExecutor {
@@ -139,7 +136,7 @@ internal class ExecuteIndex : SegmentExecutor {
 	Type		valType
 	Bool		isList
 
-	new make(Obj instance, Str index, |This| f) {
+	new make(Type staticType, Obj instance, Str index, |This| f) {
 		f(this)
 		type			:= instance.typeof
 		this.isList		= false
@@ -150,16 +147,16 @@ internal class ExecuteIndex : SegmentExecutor {
 		if (type.name == "List") {
 			this.isList		= true
 			this.idxType 	= Int#
-			this.valType 	= type.params["V"] ?: Obj?#			
+			this.valType 	= mostSpecific(type, staticType, "V")
 		} else
 		if (type.name == "Map") {
-			this.idxType 	= type.params["K"] ?: Obj#
-			this.valType 	= type.params["V"] ?: Obj?#			
+			this.idxType 	= mostSpecific(type, staticType, "K")
+			this.valType 	= mostSpecific(type, staticType, "V")
 		}
 		else {
 			this.idxType 	= getMethod.params.first.type
 			this.valType	= getMethod.returns			
-		}		
+		}
 	}
 	
 	override Obj? get(Obj?[]? args) {
@@ -185,6 +182,16 @@ internal class ExecuteIndex : SegmentExecutor {
 			ensureListSize(instance, idx)
 		val := typeCoercer.coerce(value, valType)
 		setMethod.callOn(instance, [idx, val])
+	}
+	
+	override Type returns() {
+		valType
+	}
+
+	private Type mostSpecific(Type type1, Type type2, Str param) {
+		pType1 	:= type1.params[param] ?: Obj?#
+		pType2 	:= type2.params[param] ?: Obj?#
+		return pType1.fits(pType2) ? pType1 : pType2
 	}
 	
 	private Void ensureListSize(Obj?[] list, Int idx) {

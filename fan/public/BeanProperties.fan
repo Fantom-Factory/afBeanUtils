@@ -78,7 +78,7 @@ class BeanPropertyFactory {
 	
 	** Parses a property expression stemming from the given type to produce a 'BeanProperty' that can be used to get / set / call the value at the end. 
 	BeanProperty parse(Str property) {
-		beanSlots	:= ExpressionSegment[,]
+		beanSlots	:= SegmentFactory[,]
 
 		matcher	:= slotRegex.matcher(property)
 		while (matcher.find) {
@@ -88,7 +88,7 @@ class BeanPropertyFactory {
 			slotName	:= matcher.group(1)
 			methodArgs	:= matcher.group(2)?.split(',', true)
 			indexName	:= matcher.group(3)
-			beanSlot 	:= (ExpressionSegment?) null
+			beanSlot 	:= (SegmentFactory?) null
 
 			if (!slotName.isEmpty)
 				beanSlots.add(SlotSegment(slotName, methodArgs) { 
@@ -124,9 +124,9 @@ const class BeanProperty {
 	** The property expression that this class ultimately calls. 
 	const Str expression
 
-	private const ExpressionSegment[] segments
+	private const SegmentFactory[] segments
 	
-	internal new make(Str expression, ExpressionSegment[] segments) {
+	internal new make(Str expression, SegmentFactory[] segments) {
 		this.expression = expression
 		this.segments	= segments
 	}
@@ -136,22 +136,29 @@ const class BeanProperty {
 	** Any arguments given overwrite arguments in the expression. Example:
 	** 
 	**   BeanProperties.call(Buf(), "fill(255, 4)", [128, 2])  // --> 0x8080
-	Obj? call(Obj? instance, Obj?[]? args := null) {
-		segments.eachRange(0..<-1) |bean| { instance = bean.get(instance) }
-		return segments[-1].call(instance, args)
+	Obj? call(Obj instance, Obj?[]? args := null) {
+		callChain(instance).get(args)
 	}
 	
 	** Gets the value of the field (or method) at the end of the property expression.
 	@Operator
-	Obj? get(Obj? instance) {
-		segments.eachRange(0..<-1) |bean| { instance = bean.get(instance) }
-		return segments[-1].get(instance, true)
+	Obj? get(Obj instance) {
+		callChain(instance).get(null)
 	}
 	
 	** Sets the value of the field at the end of the property expression.
 	@Operator
-	Void set(Obj? instance, Obj? value) {
-		segments.eachRange(0..<-1) |bean| { instance = bean.get(instance) }
-		segments[-1].set(instance, value)
+	Void set(Obj instance, Obj? value) {
+		callChain(instance).set(value)
+	}
+	
+	private SegmentExecutor callChain(Obj instance) {
+		staticType := instance.typeof
+		segments.eachRange(0..<-1) |bean| {
+			segment 	:= bean.makeSegment(staticType, instance, false)
+			instance 	= segment.get(null) 
+			staticType	= segment.returns
+		}
+		return segments[-1].makeSegment(staticType, instance, true)
 	}
 }
