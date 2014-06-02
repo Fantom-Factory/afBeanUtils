@@ -26,25 +26,38 @@ Full API & fandocs are available on the [Status302 repository]`http://repo.statu
 
 
 
+Bean Identity [#beanIdentity]
+*****************************
+Annotate fields with the `BeanId` facet to denote fields that can be used in an 'equals()' method and
+to be used to create values for 'hash()' and 'toStr()', and in
+
+
+
 Bean Properties [#beanProperties]
 *********************************
-`BeanProperties` is a niffty way to get and set properties, and call methods, on nested objects.
+`BeanProperties` is a nifty way to get and set properties, and call methods, on nested objects.
 
 Properties are accessed via a *property expression*. Property expressions look like Fantom code and may traverse many objects.
 Their main purpose is to get and set properties, but may be used to call methods also.
 
 pre>
   string := "100 101 102"
-  result := BeanProperties.call(string, "split[1].get(2).plus(2).toChar")
-  echo(result)  // --> 3
+  BeanProperties.call(string, "split[1].get(2).plus(2).toChar") // --> 3
+<pre
+
+Using 'BeanProperties' and a bit of naming convention care, it now becomes trivial to populate an object with properties
+submitted from a HTTP form:
+
+pre>
+  formBean := BeanProperties.setAll(FormBean(), req.form)
 <pre
 
 Features of property expressions include:
 
 
 
-Field Access [#fieldAcces]
-==========================
+Field Access [#fieldAccess]
+===========================
 The simplest use case is getting and setting basic fields.
 In this example we access the field 'Buf.capacity':
 
@@ -62,8 +75,8 @@ pre>
 
 
 
-Method Calling
-==============
+Method Calls [#methodCalls]
+===========================
 Property expressions can call methods too. Like Fantom code, if the method does not take any parameters then brackets are optional:
 
 pre>
@@ -88,46 +101,69 @@ pre>
 
 
 
-List Access
-===========
-Property expressions can traverse Lists too. Use the standard notation of [square] brackets
+Indexed Properties [#indexedProperties]
+=======================================
+Lists, Maps and '@Operator' shortcuts for 'get' and 'set' may all be traversed using square bracket notation:
 
- - notation
- - create list items
-  - null
-  - make / defVal -> Type.make
+pre>
+  list := Str?["a", "b", "c"]
+  BeanProperties.get(list, "[1]") // --> "b"
+<pre
 
-Map Access
-==========
- Property expressions can traverse Maps too.
-
- - notation
- - key conversion
- - val type important
-
-Operator Shortcuts
-==================
- - notation
-
-Nesting
-=======
-
-Object Creation
-===============
- - fields
- - lists
- - maps
- - operators
-
-
-Example -> form
+All keys and values are [Type Coerced]`TypeCoerecer` to the correct type.
 
 
 
-Bean Identity [#beanIdentity]
-*****************************
-Annotate fields with the `BeanId` facet to denote fields that can be used in an 'equals()' method and
-to be used to create values for 'hash()' and 'toStr()', and in
+Lists [#lists]
+--------------
+When setting List items special attention is given make sure they don't throw 'IndexErrs'.
+Should the list size be smaller than the given index, the list is automatically grown to accommodate:
+
+pre>
+  list := Str?[,]
+  BeanProperties.set(list, "[1]", "b")
+  list.size                            // --> 2
+  list[0]                              // --> null
+  list[1]                              // --> "b"
+<pre
+
+If the list items are *not* nullable, then new objects are created:
+
+pre>
+  list := Str[,]
+  BeanProperties.set(list, "[1]", "b")
+  list.size                            // --> 2
+  list[0]                              // --> ""
+  list[1]                              // --> "b"
+<pre
+
+
+
+Chaining [#chaining]
+====================
+Property expressions become very powerful when chained:
+
+  obj.method(arg, arg).map[key].list[idx][operator].field
+
+Note that calls to each expression part are not dynamic and types are checked when the expression is parsed.
+So it is important to pay attention to the return types of methods, lists, maps, etc...
+Think of the expression as being statically typed.
+
+
+
+Object Creation [#objCreation]
+==============================
+When traversing a property expression, the last thing you want is a 'NullErr' half way through.
+With that in mind, should a property expression encounter 'null' part way through, a new object is created and set.
+
+This lets you happily chain your expressions in confidence!
+
+
+
+Advanced [#advanced]
+--------------------
+If you need more control over when and how intermediate objects are created, then use `BeanPropertyFactory` to manually parse
+property expressions and create your own `BeanProperty` instances.
 
 
 

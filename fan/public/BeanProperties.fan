@@ -14,7 +14,7 @@ class BeanProperties {
 	** Any arguments given overwrite arguments in the expression. Example:
 	** 
 	**   BeanProperties.call(Buf(), "fill(255, 4)", [128, 2])  // --> 0x8080
-	static Obj call(Obj instance, Str property, Obj?[]? args := null) {
+	static Obj? call(Obj instance, Str property, Obj?[]? args := null) {
 		BeanPropertyFactory().parse(instance.typeof, property).call(instance, args)
 	}
 
@@ -29,11 +29,14 @@ class BeanProperties {
 	}
 	
 	** Given a map of values, keyed by property expressions, this sets them on the given instance.
-	static Void setAll(Obj instance, Str:Obj? propertyValues) {
+	** 
+	** Returns the given instance.
+	static Obj setAll(Obj instance, Str:Obj? propertyValues) {
 		factory := BeanPropertyFactory()
 		propertyValues.each |value, property| {
 			factory.parse(instance.typeof, property).set(instance, value)
 		}
+		return instance
 	}
 }
 
@@ -62,16 +65,22 @@ class BeanPropertyFactory {
 	** For example, in the expression 'a.b.c', should 'b' be null then a new instance is created and set. 
 	** This also applies when setting instances in a 'List' where the List size is less than the index.
 	** 
-	** Defaults to 'true'
+	** Defaults to 'true' 
 	Bool			createIfNull := true
+	
+	** Given to 'BeanProperties' to limit how may list items it may create for any given list.
+	** If it attempts to grow a list greater than this size then an Err is raised.
+	** 
+	** Defaults to '10,000'. 
+	** 
+	** Automatically creating 1000 items is mad, but 10,000 is *insane*!
+	Int				maxListSize	:= 10000
 	
 	** Parses a property expression stemming from the given type to produce a 'BeanProperty' that can be used to get / set / call the value at the end. 
 	BeanProperty parse(Type type, Str property) {
 		beanSlots	:= BeanSlot[,]
 		beanType	:= type
 				
-		f := |BeanSlot bs| { bs.typeCoercer = this.typeCoercer; bs.makeFunc = this.makeFunc }
-
 		matcher	:= slotRegex.matcher(property)
 		while (matcher.find) {
 			if (matcher.group(0).isEmpty)
@@ -89,23 +98,16 @@ class BeanPropertyFactory {
 					throw ArgErr("Field ${slot.qname} cannot take method arguments: ${property}")
 				
 				if (slot.isField)
-					beanSlot = BeanSlotField(slot, f)
+					beanSlot = BeanSlotField(slot) { it.typeCoercer = this.typeCoercer; it.makeFunc = this.makeFunc }
 				if (slot.isMethod)
-					beanSlot = BeanSlotMethod(slot, methodArgs ?: Obj?#.emptyList, f)
+					beanSlot = BeanSlotMethod(slot, methodArgs ?: Obj?#.emptyList) { it.typeCoercer = this.typeCoercer; it.makeFunc = this.makeFunc}
 
 				beanSlots.add(beanSlot)
 				beanType = beanSlot.returns
 			}
 			
 			if (indexName != null) {
-				Env.cur.err.printLine(beanType.name)
-				if (beanType.name == "List")
-					beanSlot = BeanSlotList(beanType, indexName, f)
-				else
-				if (beanType.name == "Map")
-					beanSlot = BeanSlotMap(beanType, indexName, f)
-				else
-					beanSlot = BeanSlotOperator(beanType, indexName, f)
+				beanSlot = BeanSlotIndexed(beanType, indexName) { it.typeCoercer = this.typeCoercer; it.makeFunc = this.makeFunc; it.maxListSize = this.maxListSize }
 				beanSlots.add(beanSlot)
 				beanType = beanSlot.returns				
 			}

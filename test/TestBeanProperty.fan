@@ -107,8 +107,8 @@ internal class TestBeanProperty : BeanTest {
 		verifyEq(list[5], 42)
 		verifyEq(list.size, 6)
 
-		prop = BeanPropertyFactory().parse(TestBeanProperty#, "list[10006]")
-		verifyErrMsg(ArgErr#, ErrMsgs.property_crazy(10006, Int#)) {
+		prop = BeanPropertyFactory() { it.maxListSize = 100 }.parse(TestBeanProperty#, "list[101]")
+		verifyErrMsg(ArgErr#, ErrMsgs.property_crazyList(101, Int#).splitLines.first) {
 			prop.set(this, 6)			
 		}
 	}
@@ -144,15 +144,15 @@ internal class TestBeanProperty : BeanTest {
 	}
 
 	Void testGetSetOperators() {
-		prop := BeanPropertyFactory().parse(TestBeanProperty#, "obj[wot].str")
+		prop := BeanPropertyFactory().parse(TestBeanProperty#, "obj[2].str")
 		prop.set(this, "ever")
-		verifyEq(obj["wot"].str, "ever")
+		verifyEq(obj[2].str, "ever")
 		verifyEq(prop.get(this), "ever")
 
 		// test @Op getter following a method 
-		prop = BeanPropertyFactory().parse(TestBeanProperty#, "obj2[wot].str")
+		prop = BeanPropertyFactory().parse(TestBeanProperty#, "obj2[2].str")
 		prop.set(this, "blah")
-		verifyEq(obj2["wot"].str, "blah")
+		verifyEq(obj2[2].str, "blah")
 		verifyEq(prop.get(this), "blah")
 
 		prop = BeanPropertyFactory().parse(TestBeanProperty#, "[woot].str")
@@ -193,17 +193,17 @@ internal class T_Obj01 {
 	Str? 			str
 	T_Obj01[]?		list
 	[Str:T_Obj01]?	map
-	[Str:T_Obj01?]	map2 := [:]
+	[Int:T_Obj01?]	map2 := [:]
 	
 	T_Obj01	meth(Str str) { T_Obj01().with { it.str = str } }
 	
 	@Operator
-	T_Obj01? get(Str key) {
+	T_Obj01? get(Int key) {
 		return map2[key]
 	}
 
 	@Operator
-	Void set(Str key, T_Obj01 val) {
+	Void set(Int key, T_Obj01 val) {
 		map2[key] = val
 	}
 }

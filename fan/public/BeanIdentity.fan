@@ -1,9 +1,12 @@
 
-**
+** 'equals()', 'hash()' and 'toStr()' methods using fields annotated with `BeanId`. 
+** Sample usage:
+** 
 ** pre>
 ** class User {
-**   @BeanId Int id
-**   @BeanId Str name
+**   @BeanId Int? id
+**   @BeanId Str? name
+**           Str? notUsed 
 ** 
 **   override Int hash() {
 **     BeanIdentity.beanHash(this)
@@ -18,8 +21,11 @@
 **   }
 ** }
 ** <pre
+** 
+** @see `BeanId`
 const class BeanIdentity {
 	
+	** Calculates a hash value from 'BeanId' fields.
 	static Int beanHash(Obj objThis) {
 		beanIdFields(objThis)
 			.findAll { beanId(it).useInHash }
@@ -29,6 +35,7 @@ const class BeanIdentity {
 			}
 	}
 
+	** Calculates equality based on 'BeanId' fields.
 	static Bool beanEquals(Obj objThis, Obj? obj) {
 		if (!(obj?.typeof?.fits(objThis.typeof) ?: false))
 			return false
@@ -40,6 +47,7 @@ const class BeanIdentity {
 			}
 	}
 	
+	** Calculates a Str value from 'BeanId' fields.
 	static Str beanToStr(Obj objThis) {
 		beanIdFields(objThis)
 			.findAll { beanId(it).useInToStr }
@@ -58,11 +66,14 @@ const class BeanIdentity {
 	}
 }
 
-**
+** Place on fields to mark them as being important to the object's identity.
+** 
+** Sample usage:
 ** pre>
 ** class User {
-**   @BeanId Int id
-**   @BeanId Str name
+**   @BeanId Int? id
+**   @BeanId Str? name
+**           Str? notUsed 
 ** 
 **   override Int hash() {
 **     BeanIdentity.beanHash(this)
@@ -77,6 +88,8 @@ const class BeanIdentity {
 **   }
 ** }
 ** <pre
+** 
+** @see `BeanIdentity`
 facet class BeanId {
 	const Bool useInEquals	:= true
 	const Bool useInHash	:= true
