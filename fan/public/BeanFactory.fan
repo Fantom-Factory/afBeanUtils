@@ -1,19 +1,34 @@
 
-//Do that ctor plan
-//
-//have a clone method
-// make like IoC.autobuild
-
 ** Creates Lists, Maps and other Objects, optionally setting fields via an it-block ctor. 
 class BeanFactory {
+	
+	** The type this factory will create 
 	Type type {
 		private set
 	}
 	
-	new make(Type type) {
+	private Obj?[]? 	ctorArgs
+	private Field:Obj? 	ctorPlan
+	
+	new make(Type type, Obj?[]? ctorArgs := null, [Field:Obj?]? ctorPlan := null) {
 		this.type = type
+		this.ctorArgs = ctorArgs ?: Obj?#.emptyList
+		this.ctorPlan = ctorPlan ?: [:]
 	}
 	
+	** Fantom Bug: http://fantom.org/sidewalk/topic/2163#c13978
+	@Operator 
+	private Obj? get(Obj key) { null }
+
+	// IoC requires a Str name
+	@Operator
+	This set(Str fieldName, Obj? val) {
+		field := type.field(fieldName)
+		ctorPlan[field] = val
+		return this
+	}
+
+	** Creates the object.
 	Obj create() {
 		if (type.name == "List") {
 			valType := type.params["V"] ?: Obj?#
@@ -25,7 +40,8 @@ class BeanFactory {
 			return Map(mapType.toNonNullable)
 		}
 
-		return type.make
+		args := ctorPlan.isEmpty ? (ctorArgs.isEmpty ? null : ctorArgs) : ctorArgs.dup.add(ctorPlan)
+		return type.make(args)
 	}
 }
 
