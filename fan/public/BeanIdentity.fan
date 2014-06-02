@@ -1,4 +1,23 @@
 
+**
+** pre>
+** class User {
+**   @BeanId Int id
+**   @BeanId Str name
+** 
+**   override Int hash() {
+**     BeanIdentity.beanHash(this)
+**   }
+**   
+**   override Bool equals(Obj? obj) {
+**     BeanIdentity.beanEquals(this, obj)
+**   }
+**   
+**   override Str toStr() {
+**     BeanIdentity.beanToStr(this)
+**   }
+** }
+** <pre
 const class BeanIdentity {
 	
 	static Int beanHash(Obj objThis) {
