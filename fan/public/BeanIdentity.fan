@@ -58,6 +58,25 @@ const class BeanIdentity {
 	}
 }
 
+**
+** pre>
+** class User {
+**   @BeanId Int id
+**   @BeanId Str name
+** 
+**   override Int hash() {
+**     BeanIdentity.beanHash(this)
+**   }
+**   
+**   override Bool equals(Obj? obj) {
+**     BeanIdentity.beanEquals(this, obj)
+**   }
+**   
+**   override Str toStr() {
+**     BeanIdentity.beanToStr(this)
+**   }
+** }
+** <pre
 facet class BeanId {
 	const Bool useInEquals	:= true
 	const Bool useInHash	:= true

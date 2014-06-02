@@ -9,9 +9,13 @@ class BeanProperties {
 	// Bad idea, static values are const! (Okay, well, thread safe - but they rarely change anyhow.)
 	// static Obj getStaticProperty(Type type, Str property) { ... }
 	
-	** Identical to 'get()' but may read better in code if you know the expression ends with a method.
-	static Obj call(Obj instance, Str property) {
-		BeanPropertyFactory().parse(instance.typeof, property).get(instance)
+	** Similar to 'get()' but may read better in code if you know the expression ends with a method.
+	** 
+	** Any arguments given overwrite arguments in the expression. Example:
+	** 
+	**   BeanProperties.call(Buf(), "fill(255, 4)", [128, 2])  // --> 0x8080
+	static Obj call(Obj instance, Str property, Obj?[]? args := null) {
+		BeanPropertyFactory().parse(instance.typeof, property).call(instance, args)
 	}
 
 	** Gets the value of the field (or method) at the end of the property expression.
@@ -38,7 +42,7 @@ class BeanProperties {
 class BeanPropertyFactory {
 	
 	// Fantex test string: obj.list[2].map[wot][thing].meth(judge, dredd).str().prop
-	private static const Regex	slotRegex	:= Regex<|([^\.\[\]\(\)]*)(?:\[([^\]]+)\])?(?:\(([^\)]+)\))?|>
+	private static const Regex	slotRegex	:= Regex<|(?:([^\.\[\]\(\)]*)(?:\(([^\)]+)\))?)?(?:\[([^\]]+)\])?|>
 	
 	** Given to 'BeanProperties' to convert Str values into objects. 
 	** Supplied so you may substitute it with a cached version. 
@@ -49,8 +53,8 @@ class BeanPropertyFactory {
 	** 
 	** Only used if 'createIfNull' is 'true'. 
 	** 
-	** Defaults to '|Type type->Obj| { type.make }'
-	|Type->Obj|		makeFunc 	 := |Type type->Obj| { type.make }
+	** Defaults to '|Type type->Obj| { BeanFactory(type).create }'
+	|Type->Obj|		makeFunc 	 := |Type type->Obj| { BeanFactory(type).create }
 
 	** Given to 'BeanProperties' to indicate if they should create new object instances when traversing an expression.
 	** If an a new instance is *not* created then a 'NullErr' will occur.
@@ -65,50 +69,41 @@ class BeanPropertyFactory {
 	BeanProperty parse(Type type, Str property) {
 		beanSlots	:= BeanSlot[,]
 		beanType	:= type
-		
-		matcher	:= slotRegex.matcher(property)
-		
+				
 		f := |BeanSlot bs| { bs.typeCoercer = this.typeCoercer; bs.makeFunc = this.makeFunc }
 
+		matcher	:= slotRegex.matcher(property)
 		while (matcher.find) {
 			if (matcher.group(0).isEmpty)
 				continue
+
 			slotName	:= matcher.group(1)
-			indexName	:= matcher.group(2)
-			methodArgs	:= matcher.group(3)?.split(',', true)
+			methodArgs	:= matcher.group(2)?.split(',', true)
+			indexName	:= matcher.group(3)
+			beanSlot 	:= (BeanSlot?) null
 
-			if (slotName.isEmpty) {
-				beanSlot := BeanSlotOperator(beanType, indexName, f)
+			if (!slotName.isEmpty) {
+				slot := beanType.slot(slotName)
+
+				if (slot.isField && methodArgs != null)
+					throw ArgErr("Field ${slot.qname} cannot take method arguments: ${property}")
+				
+				if (slot.isField)
+					beanSlot = BeanSlotField(slot, f)
+				if (slot.isMethod)
+					beanSlot = BeanSlotMethod(slot, methodArgs ?: Obj?#.emptyList, f)
+
 				beanSlots.add(beanSlot)
-				beanType = beanSlot.returns				
-				continue
+				beanType = beanSlot.returns
 			}
-
-			slot := beanType.slot(slotName)			
-			beanSlot := (BeanSlot?) null
-			if (slot.isField && isObj(slot))
-				beanSlot = BeanSlotObjField(slot, f)
-			if (slot.isField && isList(slot))
-				beanSlot = BeanSlotListField(slot, indexName.toInt, f)
-			if (slot.isField && isMap(slot))
-				beanSlot = BeanSlotMapField(slot, indexName, f)
-			if (slot.isMethod)
-				beanSlot = BeanSlotMethod(slot, methodArgs ?: Obj#.emptyList, f)
-
-			beanSlots.add(beanSlot)
-			beanType = beanSlot.returns
-
-			if (slot.isField && isObj(slot) && indexName != null) {
-				beanSlot = BeanSlotOperator(beanType, indexName, f)
-				beanSlots.add(beanSlot)
-				beanType = beanSlot.returns				
-			}
-
-			if (slot.isMethod && indexName != null) {
-				if (isList(slot))
-					beanSlot = BeanSlotMethod(beanType.method("get"), [indexName], f)
-				else if (isMap(slot))
-					beanSlot = BeanSlotMethod(beanType.method("get"), [indexName], f)
+			
+			if (indexName != null) {
+				Env.cur.err.printLine(beanType.name)
+				if (beanType.name == "List")
+					beanSlot = BeanSlotList(beanType, indexName, f)
+				else
+				if (beanType.name == "Map")
+					beanSlot = BeanSlotMap(beanType, indexName, f)
 				else
 					beanSlot = BeanSlotOperator(beanType, indexName, f)
 				beanSlots.add(beanSlot)
@@ -123,20 +118,6 @@ class BeanPropertyFactory {
 			beanSlots.eachRange(0..<-1) { it.createIfNull = true }
 		
 		return BeanProperty(property, beanSlots)
-	}
-	
-	private static Bool isList(Slot slot) {
-		(slot.isField  && ((Field)  slot).type.name    == "List") ||
-		(slot.isMethod && ((Method) slot).returns.name == "List")
-	}
-
-	private static Bool isMap(Slot slot) {
-		(slot.isField  && ((Field)  slot).type.name    == "Map") ||
-		(slot.isMethod && ((Method) slot).returns.name == "Map")
-	}
-
-	private static Bool isObj(Slot slot) {
-		!isList(slot) && !isMap(slot)
 	}
 }
 
@@ -160,9 +141,25 @@ class BeanProperty {
 		this.beanSlots = beanSlots
 	}
 
-	** Identical to 'get()' but may read better in code if you know the expression ends with a method.
-	Obj? call(Obj? instance) {
-		get(instance)
+	** Similar to 'get()' but may read better in code if you know the expression ends with a method.
+	** 
+	** Any arguments given overwrite arguments in the expression. Example:
+	** 
+	**   BeanProperties.call(Buf(), "fill(255, 4)", [128, 2])  // --> 0x8080
+	Obj? call(Obj? instance, Obj?[]? args := null) {
+		if (args != null) {
+			if (beanSlots[-1] isnot BeanSlotMethod)
+				throw ArgErr(ErrMsgs.property_notMethod(expression))
+			
+			beanSlot := (BeanSlotMethod) beanSlots[-1]
+			origArgs := beanSlot.args
+			try {
+				beanSlot.args = args
+				return get(instance)
+			} finally
+			beanSlot.args = origArgs
+		}
+		return get(instance)
 	}
 	
 	** Gets the value of the field (or method) at the end of the property expression.

@@ -18,6 +18,24 @@ internal class TestBeanProperties : BeanTest {
 		BeanProperties.call(buf, "fill(255, 4)")
 		a := BeanProperties.call(buf, "getRange(1..2)")
 		verifyEq(0xffff, a->readU2)
+		
+		buf = Buf()
+		BeanProperties.call(buf, "fill", [1, 4])
+		a = BeanProperties.call(buf, "getRange()", [1..2])
+		verifyEq(0x0101, a->readU2)
+		
+		buf = Buf()
+		BeanProperties.call(buf, "fill(255, 4)", [128, 2])
+		verifyEq(0x8080, buf.flip.readU2)
+		
+		list := Str?["a", "b", "c"]
+		verifyEq(BeanProperties.get(list, "[1]"), "b")
+		
+		list = Str?[,]
+		verifyNull(BeanProperties.get(list, "[1]"))
+		verifyEq(list.size, 2)
+		verifyEq(list[0], null)
+		verifyEq(list[1], null)
 	}
 	
 }

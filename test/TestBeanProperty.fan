@@ -108,7 +108,7 @@ internal class TestBeanProperty : BeanTest {
 		verifyEq(list.size, 6)
 
 		prop = BeanPropertyFactory().parse(TestBeanProperty#, "list[10006]")
-		verifyErrMsg(ArgErr#, ErrMsgs.property_crazy(10006, Int#, TestBeanProperty#list)) {
+		verifyErrMsg(ArgErr#, ErrMsgs.property_crazy(10006, Int#)) {
 			prop.set(this, 6)			
 		}
 	}
