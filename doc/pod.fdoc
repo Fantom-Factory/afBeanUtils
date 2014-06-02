@@ -166,10 +166,6 @@ Property expressions become very powerful when chained:
 
   obj.method(arg, arg).map[key].list[idx][operator].field
 
-Note that calls to each expression part are not dynamic and types are checked when the expression is parsed.
-So it is important to pay attention to the return types of methods, lists, maps, etc...
-Think of the expression as being statically typed.
-
 
 
 Object Creation [#objCreation]
@@ -177,7 +173,14 @@ Object Creation [#objCreation]
 When traversing a property expression, the last thing you want is a 'NullErr' half way through.
 With that in mind, should a property expression encounter 'null' part way through, a new object is created and set.
 
-This lets you happily chain your expressions in confidence!
+Note that each part of the expression chain is dynamically inspected at Runtime.
+This means you can *not* be lazy when assigning empty Lists and Maps.
+
+  Int:Int map() { [:] }         // --> bad, returns Obj:Obj? !!!
+
+  Int:Int map() { Int:Int[:] }  // --> good
+
+Inconsistent Errs may occur if you do.
 
 
 

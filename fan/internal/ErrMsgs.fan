@@ -21,8 +21,8 @@ internal class ErrMsgs {
 		stripSys("Can not *set* a value on method: ${method.qname}")
 	}
 
-	static Str property_notMethod(Str expression) {
-		stripSys("Property expression does not end with a method: ${expression}")
+	static Str property_notMethod(Field field) {
+		stripSys("Can not pass method arguments to a field: ${field.qname}")
 	}
 
 	private static Str stripSys(Str str) {
