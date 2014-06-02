@@ -13,12 +13,16 @@ internal class ErrMsgs {
 		"Could not parse property string: ${input}"
 	}
 
-	static Str property_crazy(Int index, Type listType, Field field) {
-		stripSys("Are you CRAZY!? Do you *really* want to create ${index} instances of ${listType} for ${field.qname}???")
+	static Str property_crazy(Int index, Type listType) {
+		stripSys("Are you CRAZY!? Do you *really* want to create ${index} instances of ${listType}???")
 	}
 
 	static Str property_setOnMethod(Method method) {
 		stripSys("Can not *set* a value on method: ${method.qname}")
+	}
+
+	static Str property_notMethod(Str expression) {
+		stripSys("Property expression does not end with a method: ${expression}")
 	}
 
 	private static Str stripSys(Str str) {

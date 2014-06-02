@@ -64,7 +64,7 @@ pre>
 
 Method Calling
 ==============
-Property expressions can call methods too. Like Fantom code, should the method not take any parameters, brackets are optional:
+Property expressions can call methods too. Like Fantom code, if the method does not take any parameters then brackets are optional:
 
 pre>
   buf := Buf()
@@ -72,18 +72,26 @@ pre>
   BeanProperties.call(buf, "flush()")
 <pre
 
-Method arguments may also form part of the expression and like property values, are type coerced to their respective types:
+Method arguments may also form part of the expression, and like property values, are type coerced to their respective types:
 
 pre>
-  buf := Buf()
   BeanProperties.call(buf, "fill(255, 4)")    // --> 0xFFFFFFFF
   BeanProperties.call(buf, "getRange(1..2)")  // --> 0xFFFF
+<pre
+
+Or you may pass arguments in:
+
+pre>
+  BeanProperties.call(buf, "fill", [128, 4])      // --> 0x80808080
+  BeanProperties.call(buf, "getRange()", [1..2])  // --> 0x8080
 <pre
 
 
 
 List Access
 ===========
+Property expressions can traverse Lists too. Use the standard notation of [square] brackets
+
  - notation
  - create list items
   - null
@@ -91,6 +99,8 @@ List Access
 
 Map Access
 ==========
+ Property expressions can traverse Maps too.
+
  - notation
  - key conversion
  - val type important
