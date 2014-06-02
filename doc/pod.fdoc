@@ -28,9 +28,30 @@ Full API & fandocs are available on the [Status302 repository]`http://repo.statu
 
 Bean Identity [#beanIdentity]
 *****************************
-Annotate fields with the `BeanId` facet to denote fields that can be used in an 'equals()' method and
-to be used to create values for 'hash()' and 'toStr()', and in
+Nobody likes writing 'hash()' and 'equals()' methods, so let `BeanIdentity` take the pain away!
+Simply annotate important identity fields with '@BeanId' and override the Obj methods.
 
+Sample usage:
+
+pre>
+class User {
+  @BeanId Int? id
+  @BeanId Str? name
+          Str? notUsed
+
+  override Int hash() {
+    BeanIdentity.beanHash(this)
+  }
+
+  override Bool equals(Obj? obj) {
+    BeanIdentity.beanEquals(this, obj)
+  }
+
+  override Str toStr() {
+    BeanIdentity.beanToStr(this)
+  }
+}
+<pre
 
 
 Bean Properties [#beanProperties]
