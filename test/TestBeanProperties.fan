@@ -32,10 +32,21 @@ internal class TestBeanProperties : BeanTest {
 		verifyEq(BeanProperties.get(list, "[1]"), "b")
 		
 		list = Str?[,]
-		verifyNull(BeanProperties.get(list, "[1]"))
+		BeanProperties.set(list, "[1]", "b")
 		verifyEq(list.size, 2)
 		verifyEq(list[0], null)
-		verifyEq(list[1], null)
+		verifyEq(list[1], "b")
+
+		list = Str[,]
+		BeanProperties.set(list, "[1]", "b")
+		verifyEq(list.size, 2)
+		verifyEq(list[0], "")
+		verifyEq(list[1], "b")
+
+		map := Str:Str[:]
+		BeanProperties.set(map, "[1]", "b")
+		s := BeanProperties.get(map, "[1]")
+		verifyEq(s, "b")
 	}
-	
+
 }

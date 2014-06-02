@@ -13,7 +13,7 @@ internal abstract class BeanSlot {
 internal class BeanSlotField : BeanSlot {
 	private Field field
 	
-	new make(Field field, |BeanSlot| f) {
+	new make(Field field, |This| f) {
 		f(this)
 		this.field = field
 	}
@@ -40,7 +40,7 @@ internal class BeanSlotMethod : BeanSlot {
 	Obj?[] args
 	private Method method
 	
-	new make(Method method, Str[] args, |BeanSlot| f) {
+	new make(Method method, Str[] args, |This| f) {
 		f(this)
 		this.method = method
 		objs := [,]
@@ -63,121 +63,76 @@ internal class BeanSlotMethod : BeanSlot {
 	}
 }
 
-internal class BeanSlotList : BeanSlot {
-	private Int index
-	private Type valType
-	
-	new make(Type listType, Str index, |BeanSlot| f) {
+internal class BeanSlotIndexed : BeanSlot {
+			Int		maxListSize
+	private Method	getMethod
+	private Method	setMethod
+	private Type	idxType
+	private Type	valType
+	private Str		index
+	private Bool	isList
+
+	new make(Type type, Str index, |This| f) {
 		f(this)
-		this.valType = listType.params["V"] ?: Obj?#
-		this.index   = index.toInt
+		this.getMethod	= type.method("get") 
+		this.setMethod	= type.method("set")
+		this.index		= index
+		
+		if (type.name == "List") {
+			this.isList		= true
+			this.idxType 	= Int#
+			this.valType 	= type.params["V"] ?: Obj?#			
+		} else
+		if (type.name == "Map") {
+			this.idxType 	= type.params["K"] ?: Obj#
+			this.valType 	= type.params["V"] ?: Obj?#			
+		}
+		else {
+			this.idxType 	= getMethod.params.first.type
+			this.valType	= getMethod.returns			
+		}
 	}
 	
 	override Obj? get(Obj? instance) {
-		list := (Obj?[]) instance	// should never be null
+		idx := typeCoercer.coerce(index, idxType)
 		
 		// if in the middle of an expression, ensure we succeed
-		if (createIfNull)
-			ensureSize(list)
+		if (isList && createIfNull)
+			ensureListSize(instance, idx)
 		
-		ret := list.get(index)
+		ret := getMethod.callOn(instance, [idx])
 		
 		// don't return null in the middle of an expression
 		if (createIfNull && ret == null) {
 			ret = makeFunc(returns)
-			list.set(index, ret)
+			setMethod.callOn(instance, [idx, ret])
 		}
 
 		return ret
 	}
 	
 	override Void set(Obj? instance, Obj? value) {
-		list := (Obj?[]) instance	// should never be null
-
-		ensureSize(list)
-		list.set(index, typeCoercer.coerce(value, valType))
+		idx := typeCoercer.coerce(index, idxType)
+		if (isList)
+			ensureListSize(instance, idx)
+		val := typeCoercer.coerce(value, valType)
+		setMethod.callOn(instance, [idx, val])
 	}
 	
 	override Type returns() {
 		valType
 	}
 	
-	private Void ensureSize(Obj?[] list) {
-		if (list.size <= index) {
-			toAdd := index - list.size + 1
-			if (toAdd > 10000)
-				// adding 1000 items is mad, but 10,000 is *insane*!
-				throw ArgErr(ErrMsgs.property_crazy(index, valType))
+	private Void ensureListSize(Obj?[] list, Int idx) {
+		if (list.size <= idx) {
+			if (idx > maxListSize)
+				throw ArgErr(ErrMsgs.property_crazyList(idx, valType))
 			if (valType.isNullable)
-				list.size = index + 1
-			else
+				list.size = idx + 1
+			else {
+				toAdd := idx - list.size + 1
 				toAdd.times { list.add(makeFunc(returns)) }
+			}
 		}
 	}
-}
-
-internal class BeanSlotMap : BeanSlot {
-	private Obj key
-	private Type keyType
-	private Type valType
-	
-	new make(Type mapType, Obj key, |BeanSlot| f) {
-		f(this)
-		this.keyType = mapType.params["K"] ?: Obj#
-		this.valType = mapType.params["V"] ?: Obj?#
-		this.key	 = typeCoercer.coerce(key, keyType)
-	}
-	
-	override Obj? get(Obj? instance) {
-		map := (Obj:Obj?) instance	// should never be null
-
-		ret := map.get(key)
-
-		// don't return null in the middle of an expression
-		if (createIfNull && ret == null) {
-			ret = makeFunc(returns)
-			map.set(key, ret)
-		}
-
-		return ret
-	}
-	
-	override Void set(Obj? instance, Obj? value) {
-		map := (Obj:Obj?) instance	// should never be null
-		map.set(key, typeCoercer.coerce(value, valType))
-	}
-	
-	override Type returns() {
-		valType
-	}
-}
-
-internal class BeanSlotOperator : BeanSlot {
-	private Type type
-	private Obj  index
-	
-	new make(Type type, Obj index, |BeanSlot| f) {
-		f(this)
-		this.type  = type
-		this.index = index
-	}
-	
-	override Obj? get(Obj? instance) {
-		ret := type.method("get").callOn(instance, [index])
-		
-		// don't return null in the middle of an expression
-		if (createIfNull && ret == null) {
-			ret = makeFunc(returns)
-			set(instance, ret)
-		}
-		return ret
-	}
-	
-	override Void set(Obj? instance, Obj? value) {
-		type.method("set").callOn(instance, [index, value])
-	}
-	
-	override Type returns() {
-		type.method("get").returns
-	}	
 }
