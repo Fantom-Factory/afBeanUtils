@@ -23,7 +23,7 @@ internal class TestBeanProperty : BeanTest {
 	Void set(Str key, T_Obj01 val) { map3[key] = val }
 
 	Void testBasic() {
-		prop := BeanPropertyFactory().parse(TestBeanProperty#, "basic")
+		prop := BeanPropertyFactory().parse("basic")
 		
 		// test normal
 		prop.set(this, 69)
@@ -35,9 +35,9 @@ internal class TestBeanProperty : BeanTest {
 		verifyEq(basic, 42)
 		verifyEq(prop.get(this), 42)
 	}
-	
+
 	Void testList() {
-		prop := BeanPropertyFactory().parse(TestBeanProperty#, "list[0]")
+		prop := BeanPropertyFactory().parse("list[0]")
 		list = [,]
 
 		// test normal
@@ -46,7 +46,7 @@ internal class TestBeanProperty : BeanTest {
 		verifyEq(prop.get(this), 69)
 		
 		// test another
-		BeanPropertyFactory().parse(TestBeanProperty#, "list[1]").set(this, 3)
+		BeanPropertyFactory().parse("list[1]").set(this, 3)
 		verifyEq(list[1], 3)
 		
 		// test type coercion
@@ -56,8 +56,8 @@ internal class TestBeanProperty : BeanTest {
 	}
 
 	Void testMap() {
-		prop1 := BeanPropertyFactory().parse(TestBeanProperty#, "map1[wot]")
-		prop2 := BeanPropertyFactory().parse(TestBeanProperty#, "map2[6]")
+		prop1 := BeanPropertyFactory().parse("map1[wot]")
+		prop2 := BeanPropertyFactory().parse("map2[6]")
 		map1 = [:]
 		map2 = [:]
 
@@ -67,31 +67,31 @@ internal class TestBeanProperty : BeanTest {
 		verifyEq(prop1.get(this), "ever")
 		
 		// test another
-		BeanPropertyFactory().parse(TestBeanProperty#, "map1[tough]").set(this, "man")
+		BeanPropertyFactory().parse("map1[tough]").set(this, "man")
 		verifyEq(map1["tough"], "man")
 		
 		// test type coercion
-		prop2.set(this, 9)
+		prop2.set(this, "9")
 		verifyEq(map2[6], 9)
 		verifyEq(prop2.get(this), 9)
 	}
 	
 	Void testObjCreation() {
-		prop := BeanPropertyFactory().parse(TestBeanProperty#, "obj.str")
+		prop := BeanPropertyFactory().parse("obj.str")
 		prop.set(this, "hello")
 		verifyEq(this.obj.str, "hello")
 		verifyEq(prop.get(this), "hello")
 	}
 
 	Void testListCreation() {
-		prop := BeanPropertyFactory().parse(TestBeanProperty#, "list[0]")
+		prop := BeanPropertyFactory().parse("list[0]")
 		prop.set(this, 69)
 		verifyEq(list[0], 69)
 		verifyEq(prop.get(this), 69)
 	}
 	
 	Void testListIndexCreation() {
-		prop := BeanPropertyFactory().parse(TestBeanProperty#, "list[3]")
+		prop := BeanPropertyFactory().parse("list[3]")
 		prop.set(this, 69)
 		verifyEq(list[3], 69)
 		verifyEq(prop.get(this), 69)
@@ -101,20 +101,20 @@ internal class TestBeanProperty : BeanTest {
 		verifyEq(list[2], Int.defVal)
 		verifyEq(list.size, 4)
 
-		prop = BeanPropertyFactory().parse(TestBeanProperty#, "list[5]")
+		prop = BeanPropertyFactory().parse("list[5]")
 		prop.set(this, 42)
 		verifyEq(list[4], Int.defVal)
 		verifyEq(list[5], 42)
 		verifyEq(list.size, 6)
 
-		prop = BeanPropertyFactory() { it.maxListSize = 100 }.parse(TestBeanProperty#, "list[101]")
+		prop = BeanPropertyFactory() { it.maxListSize = 100 }.parse("list[101]")
 		verifyErrMsg(ArgErr#, ErrMsgs.property_crazyList(101, Int#).splitLines.first) {
 			prop.set(this, 6)			
 		}
 	}
 
 	Void testListIndexNullCreation() {
-		prop := BeanPropertyFactory().parse(TestBeanProperty#, "listNull[2]")
+		prop := BeanPropertyFactory().parse("listNull[2]")
 		prop.set(this, 69)
 		verifyEq(listNull[0], null)
 		verifyEq(listNull[1], null)
@@ -123,52 +123,52 @@ internal class TestBeanProperty : BeanTest {
 	}
 	
 	Void testMapCreation() {
-		prop := BeanPropertyFactory().parse(TestBeanProperty#, "map1[wot]")
+		prop := BeanPropertyFactory().parse("map1[wot]")
 		prop.set(this, "ever")
 		verifyEq(map1["wot"], "ever")
 		verifyEq(prop.get(this), "ever")
 	}
 
 	Void testMapValueCreation() {
-		prop := BeanPropertyFactory().parse(TestBeanProperty#, "map3[wot].str")
+		prop := BeanPropertyFactory().parse("map3[wot].str")
 		prop.set(this, "ever")
 		verifyEq(map3["wot"].str, "ever")
 		verifyEq(prop.get(this), "ever")
 	}
 	
 	Void testNested() {
-		prop := BeanPropertyFactory().parse(TestBeanProperty#, "obj.list[1].map[wot].str")
+		prop := BeanPropertyFactory().parse("obj.list[1].map[wot].str")
 		prop.set(this, "ever")
 		verifyEq(obj.list[1].map["wot"].str, "ever")
 		verifyEq(prop.get(this), "ever")
 	}
 
 	Void testGetSetOperators() {
-		prop := BeanPropertyFactory().parse(TestBeanProperty#, "obj[2].str")
+		prop := BeanPropertyFactory().parse("obj[2].str")
 		prop.set(this, "ever")
 		verifyEq(obj[2].str, "ever")
 		verifyEq(prop.get(this), "ever")
 
 		// test @Op getter following a method 
-		prop = BeanPropertyFactory().parse(TestBeanProperty#, "obj2[2].str")
+		prop = BeanPropertyFactory().parse("obj2[2].str")
 		prop.set(this, "blah")
 		verifyEq(obj2[2].str, "blah")
 		verifyEq(prop.get(this), "blah")
 
-		prop = BeanPropertyFactory().parse(TestBeanProperty#, "[woot].str")
+		prop = BeanPropertyFactory().parse("[woot].str")
 		prop.set(this, "ever")
 		verifyEq(get("woot").str, "ever")
 		verifyEq(prop.get(this), "ever")
 	}
 	
 	Void testMethod() {
-		prop := BeanPropertyFactory().parse(TestBeanProperty#, "judge")
+		prop := BeanPropertyFactory().parse("judge")
 		verifyEq(prop.get(this), "Dredd")
 		verifyErrMsg(ArgErr#, ErrMsgs.property_setOnMethod(#judge)) {
 			prop.set(this, "Anderson")
 		}
 
-		prop = BeanPropertyFactory().parse(TestBeanProperty#, "judge()")
+		prop = BeanPropertyFactory().parse("judge()")
 		verifyEq(prop.get(this), "Dredd")
 		verifyErrMsg(ArgErr#, ErrMsgs.property_setOnMethod(#judge)) {
 			prop.set(this, "Dredd")			
@@ -176,15 +176,15 @@ internal class TestBeanProperty : BeanTest {
 	}
 	
 	Void testMethodArgs() {
-		prop := BeanPropertyFactory().parse(TestBeanProperty#, "add(1, 2, 3)")
+		prop := BeanPropertyFactory().parse("add(1, 2, 3)")
 		verifyEq(prop.get(this), "1 + 2 = 3")
 
-		prop = BeanPropertyFactory().parse(TestBeanProperty#, "add(1, 2)")
+		prop = BeanPropertyFactory().parse("add(1, 2)")
 		verifyEq(prop.get(this), "1 + 2 = -1")
 	}
 
 	Void testMethodNested() {
-		prop := BeanPropertyFactory().parse(TestBeanProperty#, "obj.list[2].map[wot].meth(dredd).str")
+		prop := BeanPropertyFactory().parse("obj.list[2].map[wot].meth(dredd).str")
 		verifyEq(prop[this], "dredd")
 	}
 }
