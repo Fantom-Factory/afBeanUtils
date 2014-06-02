@@ -173,14 +173,7 @@ Object Creation [#objCreation]
 When traversing a property expression, the last thing you want is a 'NullErr' half way through.
 With that in mind, should a property expression encounter 'null' part way through, a new object is created and set.
 
-Note that each part of the expression chain is dynamically inspected at Runtime.
-This means you can *not* be lazy when assigning empty Lists and Maps.
-
-  Int:Int map() { [:] }         // --> bad, returns Obj:Obj? !!!
-
-  Int:Int map() { Int:Int[:] }  // --> good
-
-Inconsistent Errs may occur if you do.
+Now you can happily chain your expressions with confidence!
 
 
 
