@@ -1,9 +1,5 @@
 
-** Does its best attempt to complete the action, be it creating classes along the way, coercing strings to types
-** 
-** Static typing, all Maps, Lists and methods must be correctly defined with return types 
-** 
-** Can't use -> dynamic calls as need to know if it's field or a method
+// FIXME: fandoc this! 
 class BeanProperties {
 
 	// Bad idea, static values are const! (Okay, well, thread safe - but they rarely change anyhow.)
