@@ -79,9 +79,7 @@ class BeanPropertyFactory {
 		matcher	:= slotRegex.matcher(property)
 		while (matcher.find) {
 			if (matcher.group(0).isEmpty) {
-				echo("[${matcher.group(1)}]")
 				continue
-				
 			}
 
 			slotName	:= matcher.group(1)
