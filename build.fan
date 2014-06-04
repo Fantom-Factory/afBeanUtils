@@ -4,8 +4,9 @@ class Build : BuildPod {
 
 	new make() {
 		podName = "afBeanUtils"
+		// TODO: make desc smaller!
 		summary = "(Internal) A collection of utilities and software patterns commonly associated with data objects"
-		version = Version("0.0.2")
+		version = Version("0.0.3")
 
 		meta = [
 			"proj.name"		: "Bean Utils",
