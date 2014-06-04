@@ -6,6 +6,24 @@ Though you are welcome to use it, you may find features are missing and the docu
 Loosely named after [JavaBeans]`http://www.oracle.com/technetwork/java/javase/documentation/spec-136004.html`, 'Bean Utils'
 is a collection of utilities and software patterns for overcoming common issues associated with data objects.
 
+Features include:
+
+ - **Bean Identity**
+
+   Generate 'equals()', 'hash()' and 'toStr()' methods from annotated fields.
+
+ - **Bean Properties**
+
+   Get and set object properties and call methods via 'property expressions'.
+
+ - **Type Coercer**
+
+   Convert objects, lists and maps from one type to another using Fantom's standard 'toXXX()' and 'fromXXX()' methods.
+
+ - **More!**
+
+   Utility methods to find matching ctors and methods.
+
 
 
 Install [#Install]
