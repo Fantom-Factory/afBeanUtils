@@ -91,7 +91,7 @@ pre>
 When setting fields, the given value is [Type Coerced]`TypeCoerecer` to fit the field type. Consider:
 
 pre>
-  BeanProperties.set(buf, "charset", "UTF-16")  // string "UTF-16" is converted to a Charset
+  BeanProperties.set(buf, "charset", "UTF-16")  // string "UTF-16" is converted to a Charset object
 <pre
 
 

@@ -5,7 +5,7 @@ class Build : BuildPod {
 	new make() {
 		podName = "afBeanUtils"
 		summary = "(Internal) A collection of utilities and software patterns commonly associated with data objects"
-		version = Version("0.0.1")
+		version = Version("0.0.2")
 
 		meta = [
 			"proj.name"		: "Bean Utils",

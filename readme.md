@@ -20,7 +20,29 @@ Full API & fandocs are available on the [Status302 repository](http://repo.statu
 
 ## Bean Identity
 
-Annotate fields with the [BeanId](http://repo.status302.com/doc/afBeanUtils/BeanId.html) facet to denote fields that can be used in an `equals()` method and to be used to create values for `hash()` and `toStr()`, and in
+Nobody likes writing `hash()` and `equals()` methods, so let [BeanIdentity](http://repo.status302.com/doc/afBeanUtils/BeanIdentity.html) take the pain away! Simply annotate important identity fields with `@BeanId` and override the Obj methods.
+
+Sample usage:
+
+```
+class User {
+  @BeanId Int? id
+  @BeanId Str? name
+          Str? notUsed
+
+  override Int hash() {
+    BeanIdentity.beanHash(this)
+  }
+
+  override Bool equals(Obj? obj) {
+    BeanIdentity.beanEquals(this, obj)
+  }
+
+  override Str toStr() {
+    BeanIdentity.beanToStr(this)
+  }
+}
+```
 
 ## Bean Properties
 
@@ -54,7 +76,7 @@ BeanProperties.set(buf, "capacity", 42) // set a new value
 When setting fields, the given value is [Type Coerced](http://repo.status302.com/doc/afBeanUtils/TypeCoerecer.html) to fit the field type. Consider:
 
 ```
-BeanProperties.set(buf, "charset", "UTF-16")  // string "UTF-16" is converted to a Charset
+BeanProperties.set(buf, "charset", "UTF-16")  // string "UTF-16" is converted to a Charset object
 ```
 
 ### Method Calls
@@ -120,13 +142,11 @@ Property expressions become very powerful when chained:
 
     obj.method(arg, arg).map[key].list[idx][operator].field
 
-Note that calls to each expression part are not dynamic and types are checked when the expression is parsed. So it is important to pay attention to the return types of methods, lists, maps, etc... Think of the expression as being statically typed.
-
 ### Object Creation
 
 When traversing a property expression, the last thing you want is a `NullErr` half way through. With that in mind, should a property expression encounter `null` part way through, a new object is created and set.
 
-This lets you happily chain your expressions in confidence!
+Now you can happily chain your expressions with confidence!
 
 #### Advanced
 
