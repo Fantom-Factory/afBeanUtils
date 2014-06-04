@@ -1,6 +1,6 @@
 
 ** Creates Lists, Maps and other Objects, optionally setting fields via an it-block ctor. 
-class BeanFactory {
+internal class BeanFactory {
 	
 	** The type this factory will create 
 	Type type {
@@ -21,6 +21,7 @@ class BeanFactory {
 	private Obj? get(Obj key) { null }
 
 	// IoC requires a Str name
+	** Adds an item to the it-block ctor plan.
 	@Operator
 	This set(Str fieldName, Obj? val) {
 		field := type.field(fieldName)
@@ -30,6 +31,8 @@ class BeanFactory {
 
 	** Creates the object.
 	Obj create() {
+		// TODO: oneshot lock
+
 		if (type.name == "List") {
 			valType := type.params["V"] ?: Obj?#
 			return valType.emptyList.rw
@@ -40,7 +43,7 @@ class BeanFactory {
 			return Map(mapType.toNonNullable)
 		}
 
-		args := ctorPlan.isEmpty ? (ctorArgs.isEmpty ? null : ctorArgs) : ctorArgs.dup.add(ctorPlan)
+		args := ctorPlan.isEmpty ? (ctorArgs.isEmpty ? null : ctorArgs) : ctorArgs.dup.add(Field.makeSetFunc(ctorPlan))
 		return type.make(args)
 	}
 }
