@@ -1,4 +1,5 @@
 
+@Js
 internal class ErrMsgs {
 
 	static Str typeCoercer_fail(Type from, Type to) {

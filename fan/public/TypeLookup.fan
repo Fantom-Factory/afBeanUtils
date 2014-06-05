@@ -65,6 +65,7 @@
 **     }
 ** }
 ** <pre
+@Js
 const class TypeLookup {	
 	private const Type:Obj? 	values
 	
@@ -163,7 +164,7 @@ const class TypeLookup {
 }
 
 ** This Err is left public just in case someone wants to catch it.
-@NoDoc
+@Js @NoDoc
 const class TypeNotFoundErr : Err, NotFoundErr {
 	override const Str?[] availableValues
 	

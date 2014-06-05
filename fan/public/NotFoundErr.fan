@@ -43,6 +43,7 @@
 ** 
 ** Note that [BedSheet]`http://www.fantomfactory.org/pods/afBedSheet` gives special treatment to 
 ** 'NotFoundErrs' on its standard Err 500 page and lists the available values in its own section.  
+@Js
 const mixin NotFoundErr {
 
 	** The standard 'Err' msg.
