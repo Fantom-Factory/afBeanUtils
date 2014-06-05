@@ -23,6 +23,7 @@
 ** <pre
 ** 
 ** @see `BeanId`
+@Js
 const class BeanIdentity {
 	
 	** Calculates a hash value from 'BeanId' fields.
@@ -90,6 +91,7 @@ const class BeanIdentity {
 ** <pre
 ** 
 ** @see `BeanIdentity`
+@Js
 facet class BeanId {
 	const Bool useInEquals	:= true
 	const Bool useInHash	:= true

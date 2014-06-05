@@ -204,6 +204,9 @@ property expressions and create your own `BeanProperty` instances.
 
 Release Notes [#releaseNotes]
 *****************************
+v0.0.4 [#v0.0.4]
+----------------
+ - New: 'Bean Utils' is now available in JavaScript.
 
 v0.0.2 [#v0.0.2]
 ----------------

@@ -1,5 +1,6 @@
 
 ** Creates Lists, Maps and other Objects, optionally setting fields via an it-block ctor. 
+@Js
 internal class BeanFactory {
 	
 	** The type this factory will create 

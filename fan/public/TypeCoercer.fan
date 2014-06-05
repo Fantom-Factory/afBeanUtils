@@ -32,6 +32,7 @@
 **    }
 ** }
 ** <pre
+@Js
 const class TypeCoercer {
 	
 	** Returns 'true' if 'fromType' can be coerced to the given 'toType'.

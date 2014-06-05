@@ -1,5 +1,6 @@
 
 ** Methods for finding fields, methods and ctors that match given parameter types.
+@Js
 class ReflectUtils {
 
 	** Finds a field.
