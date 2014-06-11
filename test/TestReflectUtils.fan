@@ -28,9 +28,15 @@ internal class TestReflectUtils : BeanTest {
 		ctor = ReflectUtils.findCtor(MyReflectTestUtils1#, "makeCtor1")
 		verifyEq(ctor, MyReflectTestUtils1#makeCtor1)
 
-		// inherited fields should not found
+		// inherited ctors should not found
 		ctor = ReflectUtils.findCtor(MyReflectTestUtils2#, "makeCtor1")
 		verifyNull(ctor)
+	}
+
+	Void testFindCtors() {
+		ctors := ReflectUtils.findCtors(MyReflectTestUtils2#)
+		verifyEq(ctors.size, 1)
+		verifyEq(ctors.first.parent, MyReflectTestUtils2#)
 	}
 
 	Void testFindMethod() {
