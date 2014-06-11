@@ -4,20 +4,20 @@
 class ReflectUtils {
 
 	** Finds a named field.
-	static Field? findField(Type type, Str fieldName, Type fieldType, Bool? isStatic := null) {
-		field := type.field(fieldName, false)
+	static Field? findField(Type type, Str fieldName, Type? fieldType := null, Bool? isStatic := null) {
+		field := type.slot(fieldName, false)
 		return _findField(field, fieldType, isStatic)
 	}
 	
 	** Finds a named ctor with the given parameter types.
 	static Method? findCtor(Type type, Str ctorName, Type[] params := Type#.emptyList) {
-		ctor := type.method(ctorName, false)
+		ctor := type.slot(ctorName, false)
 		return _findCtor(ctor, params)
 	}
 
 	** Finds a named method with the given parameter types.
 	static Method? findMethod(Type type, Str methodName, Type[] params := Type#.emptyList, Bool? isStatic := null, Type? returnType := null) {
-		method := type.method(methodName, false)
+		method := type.slot(methodName, false)
 		return _findMethod(method, params, isStatic, returnType)
 	}
 
@@ -93,32 +93,39 @@ class ReflectUtils {
 		return (paramTypeA.fits(paramTypeB) || paramTypeB.fits(paramTypeA))
 	}
 	
-	private static Field? _findField(Field? field, Type fieldType, Bool? isStatic := null) {
+	private static Field? _findField(Slot? field, Type? fieldType, Bool? isStatic) {
 		if (field == null)
+			return null
+		if (!field.isField)
 			return null
 		if (isStatic != null && field.isStatic != isStatic) 
 			return null
-		return fits(field.type, fieldType) ? field : null
+		if (fieldType != null && !fits(((Field) field).type, fieldType))
+			return null
+		return field
 	}
 
-	static Method? _findCtor(Method? ctor, Type[] params := Type#.emptyList) {
+	static Method? _findCtor(Slot? ctor, Type[] params) {
 		if (ctor == null)
+			return null
+		if (!ctor.isMethod) 
 			return null
 		if (!ctor.isCtor) 
 			return null
 		return paramTypesFitMethodSignature(params, ctor) ? ctor: null
 	}
 	
-	static Method? _findMethod(Method? method, Type[] params := Type#.emptyList, Bool? isStatic := null, Type? returnType := null) {
+	static Method? _findMethod(Slot? method, Type[] params, Bool? isStatic, Type? returnType) {
 		if (method == null)
+			return null
+		if (!method.isMethod) 
 			return null
 		if (method.isCtor) 
 			return null
 		if (isStatic != null && method.isStatic != isStatic) 
 			return null
-		if (returnType != null && !fits(method.returns, returnType))
+		if (returnType != null && !fits(((Method) method).returns, returnType))
 			return null
 		return paramTypesFitMethodSignature(params, method) ? method : null
 	}
-
 }
