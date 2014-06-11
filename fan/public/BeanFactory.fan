@@ -13,7 +13,7 @@ internal class BeanFactory {
 	
 	new make(Type type, Obj?[]? ctorArgs := null, [Field:Obj?]? ctorPlan := null) {
 		this.type = type
-		this.ctorArgs = ctorArgs ?: Obj?#.emptyList
+		this.ctorArgs = ctorArgs ?: Obj?#.emptyList.rw
 		this.ctorPlan = ctorPlan ?: [:]
 	}
 	
@@ -21,31 +21,57 @@ internal class BeanFactory {
 	@Operator 
 	private Obj? get(Obj key) { null }
 
-	// IoC requires a Str name
-	** Adds an item to the it-block ctor plan.
+//	** Sets a field on the type to be instantiated.
+//	@Operator
+//	This set(Field field, Obj? val) {
+//		ctorPlan[field] = val
+//		return this
+//	}
+//
+//	** Sets a field on the type to be instantiated.
+//	This setByName(Str fieldName, Obj? val) {
+//		field := type.field(fieldName)
+//		return set(field, val)
+//	}
+
+	** Adds a ctor argument.
 	@Operator
-	This set(Str fieldName, Obj? val) {
-		field := type.field(fieldName)
-		ctorPlan[field] = val
+	This add(Obj? arg) {
+		ctorArgs.add(arg)
 		return this
 	}
 
-	** Creates the object.
-	Obj create() {
-		// TODO: oneshot lock
+	** Creates an instance of the object, optionally using the given ctor.
+	Obj create(Method? ctor := null) {
+		if (ctor!= null && ctor.parent != type)
+			throw ArgErr(ErrMsgs.factory_ctorWrongType(type, ctor))
 
-		if (type.name == "List") {
+		if (type.name == "List" && ctorArgs.isEmpty && ctorPlan.isEmpty && ctor == null) {
 			valType := type.params["V"] ?: Obj?#
 			return valType.emptyList.rw
 		}
 
-		if (type.name == "Map") {
+		if (type.name == "Map" && ctorArgs.isEmpty && ctorPlan.isEmpty && ctor == null) {
 			mapType := type.isGeneric ? Obj:Obj?# : type
 			return Map(mapType.toNonNullable)
 		}
+		
+		args 		:= ctorArgs.dup
+		argTypes	:= args.map { it?.typeof }
 
-		args := ctorPlan.isEmpty ? (ctorArgs.isEmpty ? null : ctorArgs) : ctorArgs.dup.add(Field.makeSetFunc(ctorPlan))
-		return type.make(args)
+		if (ctor != null) {
+			if (!ReflectUtils.paramTypesFitMethodSignature(argTypes, ctor) || args.size > ctor.params.size)
+				throw Err(ErrMsgs.factory_ctorArgMismatch(ctor, args))
+		} else {
+			ctors := ReflectUtils.findCtors(type, argTypes).exclude { args.size > it.params.size  }
+			if (ctors.isEmpty)
+				throw Err(ErrMsgs.factory_noCtorsFound(type, argTypes))
+			if (ctors.size > 1)
+				throw Err(ErrMsgs.factory_tooManyCtorsFound(type, ctors.map { it.name }, argTypes))
+			ctor = ctors.first
+		}
+		
+		return ctor.callList(args)
 	}
 	
 	** Returns a default value for the given type. 
