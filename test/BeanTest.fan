@@ -12,7 +12,8 @@ internal class BeanTest : Test {
 		} catch (Err e) {
 			try {
 				verify(e.typeof.fits(errType), "Expected $errType got $e.typeof")
-				verifyEq(e.msg.splitLines.first.trim, errMsg.trim, "Expected: \n - $errMsg \nGot: \n - $e.msg")
+//				verifyEq(e.msg.splitLines.first.trim, errMsg.trim, "Expected: \n - $errMsg \nGot: \n - $e.msg")
+				verifyEq(e.msg.splitLines.first.trim, errMsg.trim)
 			} catch (Err failure) {
 				throw Err(failure.msg, e)
 			}

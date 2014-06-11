@@ -30,6 +30,23 @@ internal class ErrMsgs {
 		stripSys("Could not find a default value for ${type.signature}")
 	}
 
+	static Str factory_ctorWrongType(Type type, Method ctor) {
+		stripSys("Ctor ${ctor.qname} does not belong to $type.qname")
+	}
+
+	static Str factory_ctorArgMismatch(Method ctor, Obj?[] args) {
+		ctorSig := ctor.qname + "(" + ctor.params.join(", ") + ")"
+		return stripSys("Arguments do not match ctor params for ${ctorSig} - ${args}")
+	}
+
+	static Str factory_noCtorsFound(Type type, Type?[] argTypes) {
+		stripSys("Could not find a ctor on ${type.qname} to match argument types - ${argTypes}")
+	}
+
+	static Str factory_tooManyCtorsFound(Type type, Str[] ctorNames, Type?[] argTypes) {
+		stripSys("Found more than 1 ctor on ${type.qname} ${ctorNames} that match argument types - ${argTypes}")
+	}
+
 	private static Str stripSys(Str str) {
 		str.replace("sys::", "")
 	}
