@@ -82,63 +82,63 @@ internal class TestReflectUtils : BeanTest {
 	
 	Void testParams() {
 		// simple case
-		verify(ReflectUtils.paramTypesFitMethodSignature([,], MyReflectTestUtils2#params1))
+		verify(ReflectUtils.argTypesFitMethod([,], MyReflectTestUtils2#params1))
 		
 		// I can pass in more params than required, it's up to the method to say whether it needs 
 		// them or not - but if it DOES declare the params then they have to fit
 		// Nullable types don't matter as null is mainly a runtime check, to nip it in the bud at source
-		verify(ReflectUtils.paramTypesFitMethodSignature([Obj#], MyReflectTestUtils2#params1))
+		verify(ReflectUtils.argTypesFitMethod([Obj#], MyReflectTestUtils2#params1))
 
-		verifyFalse	(ReflectUtils.paramTypesFitMethodSignature([,],    MyReflectTestUtils2#params2))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([Num#], MyReflectTestUtils2#params2))
-		verifyFalse	(ReflectUtils.paramTypesFitMethodSignature([Obj#], MyReflectTestUtils2#params2))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([Int#], MyReflectTestUtils2#params2))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([Int#, Int#], MyReflectTestUtils2#params2))
+		verifyFalse	(ReflectUtils.argTypesFitMethod([,],    		MyReflectTestUtils2#params2))
+		verify		(ReflectUtils.argTypesFitMethod([Num#], 		MyReflectTestUtils2#params2))
+		verifyFalse	(ReflectUtils.argTypesFitMethod([Obj#], 		MyReflectTestUtils2#params2))
+		verify		(ReflectUtils.argTypesFitMethod([Int#], 		MyReflectTestUtils2#params2))
+		verify		(ReflectUtils.argTypesFitMethod([Int#, Int#],	MyReflectTestUtils2#params2))
 
-		verifyFalse	(ReflectUtils.paramTypesFitMethodSignature([,],    MyReflectTestUtils2#params3))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([Num#], MyReflectTestUtils2#params3))
-		verifyFalse	(ReflectUtils.paramTypesFitMethodSignature([Obj#], MyReflectTestUtils2#params3))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([Int#], MyReflectTestUtils2#params3))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([Int#, Int#], MyReflectTestUtils2#params3))
+		verifyFalse	(ReflectUtils.argTypesFitMethod([,],    		MyReflectTestUtils2#params3))
+		verify		(ReflectUtils.argTypesFitMethod([Num#], 		MyReflectTestUtils2#params3))
+		verifyFalse	(ReflectUtils.argTypesFitMethod([Obj#], 		MyReflectTestUtils2#params3))
+		verify		(ReflectUtils.argTypesFitMethod([Int#], 		MyReflectTestUtils2#params3))
+		verify		(ReflectUtils.argTypesFitMethod([Int#, Int#],	MyReflectTestUtils2#params3))
 
-		verify		(ReflectUtils.paramTypesFitMethodSignature([,],    MyReflectTestUtils2#params4))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([Num#], MyReflectTestUtils2#params4))
-		verifyFalse	(ReflectUtils.paramTypesFitMethodSignature([Obj#], MyReflectTestUtils2#params4))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([Int#], MyReflectTestUtils2#params4))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([Int#, Int#], MyReflectTestUtils2#params4))
+		verify		(ReflectUtils.argTypesFitMethod([,],    		MyReflectTestUtils2#params4))
+		verify		(ReflectUtils.argTypesFitMethod([Num#], 		MyReflectTestUtils2#params4))
+		verifyFalse	(ReflectUtils.argTypesFitMethod([Obj#], 		MyReflectTestUtils2#params4))
+		verify		(ReflectUtils.argTypesFitMethod([Int#], 		MyReflectTestUtils2#params4))
+		verify		(ReflectUtils.argTypesFitMethod([Int#, Int#],	MyReflectTestUtils2#params4))
 
-		verify		(ReflectUtils.paramTypesFitMethodSignature([,],    MyReflectTestUtils2#params5))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([Num#], MyReflectTestUtils2#params5))
-		verifyFalse	(ReflectUtils.paramTypesFitMethodSignature([Obj#], MyReflectTestUtils2#params5))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([Int#], MyReflectTestUtils2#params5))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([Int#, Int#], MyReflectTestUtils2#params5))
+		verify		(ReflectUtils.argTypesFitMethod([,],    		MyReflectTestUtils2#params5))
+		verify		(ReflectUtils.argTypesFitMethod([Num#], 		MyReflectTestUtils2#params5))
+		verifyFalse	(ReflectUtils.argTypesFitMethod([Obj#],			MyReflectTestUtils2#params5))
+		verify		(ReflectUtils.argTypesFitMethod([Int#],			MyReflectTestUtils2#params5))
+		verify		(ReflectUtils.argTypesFitMethod([Int#, Int#],	MyReflectTestUtils2#params5))
 
-		verifyFalse	(ReflectUtils.paramTypesFitMethodSignature([,],			 MyReflectTestUtils2#params6))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([Num#], 		 MyReflectTestUtils2#params6))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([Num#, Num#], MyReflectTestUtils2#params6))
-		verifyFalse	(ReflectUtils.paramTypesFitMethodSignature([Num#, Obj#], MyReflectTestUtils2#params6))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([Num#, Int#], MyReflectTestUtils2#params6))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([Num#, Int#, Int#], MyReflectTestUtils2#params6))
+		verifyFalse	(ReflectUtils.argTypesFitMethod([,],			MyReflectTestUtils2#params6))
+		verify		(ReflectUtils.argTypesFitMethod([Num#], 		MyReflectTestUtils2#params6))
+		verify		(ReflectUtils.argTypesFitMethod([Num#, Num#],	MyReflectTestUtils2#params6))
+		verifyFalse	(ReflectUtils.argTypesFitMethod([Num#, Obj#],	MyReflectTestUtils2#params6))
+		verify		(ReflectUtils.argTypesFitMethod([Num#, Int#],	MyReflectTestUtils2#params6))
+		verify		(ReflectUtils.argTypesFitMethod([Num#, Int#, Int#], MyReflectTestUtils2#params6))
 
-		verifyFalse	(ReflectUtils.paramTypesFitMethodSignature([,],			 MyReflectTestUtils2#params7))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([Num#], 		 MyReflectTestUtils2#params7))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([Num#, Num#], MyReflectTestUtils2#params7))
-		verifyFalse	(ReflectUtils.paramTypesFitMethodSignature([Num#, Obj#], MyReflectTestUtils2#params7))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([Num#, Int#], MyReflectTestUtils2#params7))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([Num#, Int#, Int#], MyReflectTestUtils2#params7))
+		verifyFalse	(ReflectUtils.argTypesFitMethod([,],			MyReflectTestUtils2#params7))
+		verify		(ReflectUtils.argTypesFitMethod([Num#], 		MyReflectTestUtils2#params7))
+		verify		(ReflectUtils.argTypesFitMethod([Num#, Num#],	MyReflectTestUtils2#params7))
+		verifyFalse	(ReflectUtils.argTypesFitMethod([Num#, Obj#],	MyReflectTestUtils2#params7))
+		verify		(ReflectUtils.argTypesFitMethod([Num#, Int#],	MyReflectTestUtils2#params7))
+		verify		(ReflectUtils.argTypesFitMethod([Num#, Int#, Int#], MyReflectTestUtils2#params7))
 
-		verify		(ReflectUtils.paramTypesFitMethodSignature([,],			 MyReflectTestUtils2#params8))
+		verify		(ReflectUtils.argTypesFitMethod([,],			MyReflectTestUtils2#params8))
 
-		verify		(ReflectUtils.paramTypesFitMethodSignature([Str#],		 Int#fromStr))
+		verify		(ReflectUtils.argTypesFitMethod([Str#],			Int#fromStr))
 		
 		// test I can call a method with more params than it declares
 		MyReflectTestUtils2#params1.callOn(MyReflectTestUtils2(), [48, 45])
 
 		// test nulls
-		verify		(ReflectUtils.paramTypesFitMethodSignature([Str#, Int#],		 MyReflectTestUtils2#nully))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([null, Int#],		 MyReflectTestUtils2#nully))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([null, Int?#],		 MyReflectTestUtils2#nully))
-		verifyFalse	(ReflectUtils.paramTypesFitMethodSignature([null, Str#],		 MyReflectTestUtils2#nully))
+		verify		(ReflectUtils.argTypesFitMethod([Str#, Int#],		 MyReflectTestUtils2#nully))
+		verify		(ReflectUtils.argTypesFitMethod([null, Int#],		 MyReflectTestUtils2#nully))
+		verify		(ReflectUtils.argTypesFitMethod([null, Int?#],		 MyReflectTestUtils2#nully))
+		verifyFalse	(ReflectUtils.argTypesFitMethod([null, Str#],		 MyReflectTestUtils2#nully))
 	}
 	
 	Void testKnarlyFuncsInParams() {
@@ -146,44 +146,44 @@ internal class TestReflectUtils : BeanTest {
 		Obj.echo("|Num?|#.fits(Func#) -> ${|Num?|#.fits(Func#)}")	// |Num?|#.fits(Func#) -> true
 		
 		// these tests aren't my understanding, they just demonstrate what does and doesn't work!
-		verifyFalse	(ReflectUtils.paramTypesFitMethodSignature([Func#],			MyReflectTestUtils2#funcy1))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([|->|#],			MyReflectTestUtils2#funcy1))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([|Num|#], 		MyReflectTestUtils2#funcy1))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([|Obj|#], 		MyReflectTestUtils2#funcy1))
-		verifyFalse	(ReflectUtils.paramTypesFitMethodSignature([|Int|#], 		MyReflectTestUtils2#funcy1))
-		verifyFalse	(ReflectUtils.paramTypesFitMethodSignature([|Int, Int|#],	MyReflectTestUtils2#funcy1))		
+		verify		(ReflectUtils.argTypesFitMethod([Func#],		MyReflectTestUtils2#funcy1))
+		verify		(ReflectUtils.argTypesFitMethod([|->|#],		MyReflectTestUtils2#funcy1))
+		verify		(ReflectUtils.argTypesFitMethod([|Num|#], 		MyReflectTestUtils2#funcy1))
+		verify		(ReflectUtils.argTypesFitMethod([|Obj|#], 		MyReflectTestUtils2#funcy1))
+		verify		(ReflectUtils.argTypesFitMethod([|Int|#], 		MyReflectTestUtils2#funcy1))
+		verify		(ReflectUtils.argTypesFitMethod([|Int, Int|#],	MyReflectTestUtils2#funcy1))		
 
-		verifyFalse	(ReflectUtils.paramTypesFitMethodSignature([|Num|#], 		MyReflectTestUtils2#funcy2))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([|Num->Num|#], 	MyReflectTestUtils2#funcy2))
-		verifyFalse	(ReflectUtils.paramTypesFitMethodSignature([|Num->Obj|#], 	MyReflectTestUtils2#funcy2))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([|Num->Int|#], 	MyReflectTestUtils2#funcy2))
+		verify		(ReflectUtils.argTypesFitMethod([|Num|#], 		MyReflectTestUtils2#funcy2))
+		verify		(ReflectUtils.argTypesFitMethod([|Num->Num|#], 	MyReflectTestUtils2#funcy2))
+		verify		(ReflectUtils.argTypesFitMethod([|Num->Obj|#], 	MyReflectTestUtils2#funcy2))
+		verify		(ReflectUtils.argTypesFitMethod([|Num->Int|#], 	MyReflectTestUtils2#funcy2))
 	}
 	
 	Void testLenientLists() {
-		verify		(ReflectUtils.paramTypesFitMethodSignature([ Int []# ], MyReflectTestUtils2#lenientLists))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([ Int?[]# ], MyReflectTestUtils2#lenientLists))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([ Num []# ], MyReflectTestUtils2#lenientLists))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([ Num?[]# ], MyReflectTestUtils2#lenientLists))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([ Obj []# ], MyReflectTestUtils2#lenientLists))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([ Obj?[]# ], MyReflectTestUtils2#lenientLists))
-		verifyFalse	(ReflectUtils.paramTypesFitMethodSignature([ Str []# ], MyReflectTestUtils2#lenientLists))
-		verifyFalse	(ReflectUtils.paramTypesFitMethodSignature([ Str?[]# ], MyReflectTestUtils2#lenientLists))
+		verify		(ReflectUtils.argTypesFitMethod([ Int []# ], MyReflectTestUtils2#lenientLists))
+		verify		(ReflectUtils.argTypesFitMethod([ Int?[]# ], MyReflectTestUtils2#lenientLists))
+		verify		(ReflectUtils.argTypesFitMethod([ Num []# ], MyReflectTestUtils2#lenientLists))
+		verify		(ReflectUtils.argTypesFitMethod([ Num?[]# ], MyReflectTestUtils2#lenientLists))
+		verify		(ReflectUtils.argTypesFitMethod([ Obj []# ], MyReflectTestUtils2#lenientLists))
+		verify		(ReflectUtils.argTypesFitMethod([ Obj?[]# ], MyReflectTestUtils2#lenientLists))
+		verifyFalse	(ReflectUtils.argTypesFitMethod([ Str []# ], MyReflectTestUtils2#lenientLists))
+		verifyFalse	(ReflectUtils.argTypesFitMethod([ Str?[]# ], MyReflectTestUtils2#lenientLists))
 	}
 
 	Void testLenientMaps() {
-		verify		(ReflectUtils.paramTypesFitMethodSignature([ [Int :Num ]# ], MyReflectTestUtils2#lenientMaps))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([ [Num :Num ]# ], MyReflectTestUtils2#lenientMaps))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([ [Obj :Num ]# ], MyReflectTestUtils2#lenientMaps))
-		verifyFalse	(ReflectUtils.paramTypesFitMethodSignature([ [Str :Num ]# ], MyReflectTestUtils2#lenientMaps))
+		verify		(ReflectUtils.argTypesFitMethod([ [Int :Num ]# ], MyReflectTestUtils2#lenientMaps))
+		verify		(ReflectUtils.argTypesFitMethod([ [Num :Num ]# ], MyReflectTestUtils2#lenientMaps))
+		verify		(ReflectUtils.argTypesFitMethod([ [Obj :Num ]# ], MyReflectTestUtils2#lenientMaps))
+		verifyFalse	(ReflectUtils.argTypesFitMethod([ [Str :Num ]# ], MyReflectTestUtils2#lenientMaps))
 
-		verify		(ReflectUtils.paramTypesFitMethodSignature([ [Num :Int ]# ], MyReflectTestUtils2#lenientMaps))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([ [Num :Int?]# ], MyReflectTestUtils2#lenientMaps))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([ [Num :Num ]# ], MyReflectTestUtils2#lenientMaps))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([ [Num :Num?]# ], MyReflectTestUtils2#lenientMaps))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([ [Num :Obj ]# ], MyReflectTestUtils2#lenientMaps))
-		verify		(ReflectUtils.paramTypesFitMethodSignature([ [Num :Obj?]# ], MyReflectTestUtils2#lenientMaps))
-		verifyFalse	(ReflectUtils.paramTypesFitMethodSignature([ [Num :Str ]# ], MyReflectTestUtils2#lenientMaps))
-		verifyFalse	(ReflectUtils.paramTypesFitMethodSignature([ [Num :Str?]# ], MyReflectTestUtils2#lenientMaps))
+		verify		(ReflectUtils.argTypesFitMethod([ [Num :Int ]# ], MyReflectTestUtils2#lenientMaps))
+		verify		(ReflectUtils.argTypesFitMethod([ [Num :Int?]# ], MyReflectTestUtils2#lenientMaps))
+		verify		(ReflectUtils.argTypesFitMethod([ [Num :Num ]# ], MyReflectTestUtils2#lenientMaps))
+		verify		(ReflectUtils.argTypesFitMethod([ [Num :Num?]# ], MyReflectTestUtils2#lenientMaps))
+		verify		(ReflectUtils.argTypesFitMethod([ [Num :Obj ]# ], MyReflectTestUtils2#lenientMaps))
+		verify		(ReflectUtils.argTypesFitMethod([ [Num :Obj?]# ], MyReflectTestUtils2#lenientMaps))
+		verifyFalse	(ReflectUtils.argTypesFitMethod([ [Num :Str ]# ], MyReflectTestUtils2#lenientMaps))
+		verifyFalse	(ReflectUtils.argTypesFitMethod([ [Num :Str?]# ], MyReflectTestUtils2#lenientMaps))
 	}
 	
 	Void testFits() {

@@ -2,6 +2,10 @@
 @Js
 internal class ErrMsgs {
 
+	static Str oneShotLock_violation(Str because) {
+		"Method may no longer be invoked - $because"
+	}	
+	
 	static Str typeCoercer_fail(Type from, Type to) {
 		stripSys("Could not coerce ${from.qname} to ${to.qname}")
 	}
@@ -45,6 +49,10 @@ internal class ErrMsgs {
 
 	static Str factory_tooManyCtorsFound(Type type, Str[] ctorNames, Type?[] argTypes) {
 		stripSys("Found more than 1 ctor on ${type.qname} ${ctorNames} that match argument types - ${argTypes}")
+	}
+
+	static Str factory_fieldWrongParent(Type type, Field field) {
+		stripSys("Field ${field.qname} does not belong to ${type.qname}")
 	}
 
 	private static Str stripSys(Str str) {
