@@ -206,7 +206,9 @@ Release Notes [#releaseNotes]
 *****************************
 v0.0.4 [#v0.0.4]
 ----------------
- - New: 'Bean Utils' is now available in JavaScript.
+ - New: 'Bean Utils' is now available in JavaScript. (Added '@Js' to all classes.)
+ - New: Added 'findFields()', 'findCtors()' and 'findMethods()' to 'ReflectUtils'.
+ - New: Added 'BeanFactory.defaultValue(type)' as a replacement for 'Type.make'.
 
 v0.0.2 [#v0.0.2]
 ----------------

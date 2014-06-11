@@ -3,44 +3,37 @@
 @Js
 class ReflectUtils {
 
-	** Finds a field.
+	** Finds a named field.
 	static Field? findField(Type type, Str fieldName, Type fieldType, Bool? isStatic := null) {
-		// 'fields()' returns inherited slots, 'field(name)' does not
-		return type.fields.find |field| {
-			if (field.name != fieldName) 
-				return false
-			if (isStatic != null && field.isStatic != isStatic) 
-				return false
-			return fits(field.type, fieldType)
-		}
+		field := type.field(fieldName, false)
+		return _findField(field, fieldType, isStatic)
 	}
 	
 	** Finds a named ctor with the given parameter types.
 	static Method? findCtor(Type type, Str ctorName, Type[] params := Type#.emptyList) {
-		// 'methods()' returns inherited slots, 'method(name)' does not
-		return type.methods.find |method| {
-			if (!method.isCtor) 
-				return false
-			if (method.name != ctorName) 
-				return false
-			return (paramTypesFitMethodSignature(params, method))
-		}
+		ctor := type.method(ctorName, false)
+		return _findCtor(ctor, params)
 	}
 
 	** Finds a named method with the given parameter types.
-	static Method? findMethod(Type type, Str name, Type[] params := Type#.emptyList, Bool? isStatic := null, Type? returnType := null) {
-		// 'methods()' returns inherited slots, 'method(name)' does not
-		return type.methods.find |method| {
-			if (method.isCtor) 
-				return false
-			if (method.name != name) 
-				return false
-			if (isStatic != null && method.isStatic != isStatic) 
-				return false
-			if (returnType != null && !fits(method.returns, returnType))
-				return false
-			return (paramTypesFitMethodSignature(params, method))
-		}
+	static Method? findMethod(Type type, Str methodName, Type[] params := Type#.emptyList, Bool? isStatic := null, Type? returnType := null) {
+		method := type.method(methodName, false)
+		return _findMethod(method, params, isStatic, returnType)
+	}
+
+	** Find fields.
+	static Field[] findFields(Type type, Type fieldType, Bool? isStatic := null) {
+		type.fields.findAll  { _findField(it, fieldType, isStatic) != null }
+	}
+	
+	** Find ctors with the given parameter types.
+	static Method[] findCtors(Type type, Type[] params := Type#.emptyList) {
+		type.methods.findAll { _findCtor(it, params) != null }
+	}
+
+	** Find methods with the given parameter types.
+	static Method[] findMethods(Type type, Type[] params := Type#.emptyList, Bool? isStatic := null, Type? returnType := null) {
+		type.methods.findAll { _findMethod(it, params, isStatic, returnType) != null }
 	}
 
 	** Returns 'true' if the given parameter types fit the method signature.
@@ -99,4 +92,33 @@ class ReflectUtils {
 		paramTypeB := typeB.params[key] ?: Obj?#
 		return (paramTypeA.fits(paramTypeB) || paramTypeB.fits(paramTypeA))
 	}
+	
+	private static Field? _findField(Field? field, Type fieldType, Bool? isStatic := null) {
+		if (field == null)
+			return null
+		if (isStatic != null && field.isStatic != isStatic) 
+			return null
+		return fits(field.type, fieldType) ? field : null
+	}
+
+	static Method? _findCtor(Method? ctor, Type[] params := Type#.emptyList) {
+		if (ctor == null)
+			return null
+		if (!ctor.isCtor) 
+			return null
+		return paramTypesFitMethodSignature(params, ctor) ? ctor: null
+	}
+	
+	static Method? _findMethod(Method? method, Type[] params := Type#.emptyList, Bool? isStatic := null, Type? returnType := null) {
+		if (method == null)
+			return null
+		if (method.isCtor) 
+			return null
+		if (isStatic != null && method.isStatic != isStatic) 
+			return null
+		if (returnType != null && !fits(method.returns, returnType))
+			return null
+		return paramTypesFitMethodSignature(params, method) ? method : null
+	}
+
 }
