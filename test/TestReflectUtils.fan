@@ -179,6 +179,27 @@ internal class TestReflectUtils : BeanTest {
 		verifyFalse	(ReflectUtils.paramTypesFitMethodSignature([ [Num :Str ]# ], MyReflectTestUtils2#lenientMaps))
 		verifyFalse	(ReflectUtils.paramTypesFitMethodSignature([ [Num :Str?]# ], MyReflectTestUtils2#lenientMaps))
 	}
+	
+	Void testFits() {
+		verifyTrue	(ReflectUtils.fits(Str#, Obj#))
+		verifyTrue	(Str#.fits(Obj#))
+		
+		// Fantom bugs
+		// see http://fantom.org/sidewalk/topic/2256
+		verifyTrue	(ReflectUtils.fits(Int[]#, Int[]?#))
+		verifyFalse	(Int[]#.fits(Int[]?#))
+		verifyTrue	(ReflectUtils.fits([Int:Int]#, [Int:Int]?#))
+		verifyFalse	([Int:Int]#.fits([Int:Int]?#))
+
+		// List Type inference
+		verifyTrue	(ReflectUtils.fits(Int[]#, Obj[]#))
+		verifyTrue	(Int[]#.fits(Obj[]#))
+		verifyTrue	(ReflectUtils.fits(Obj[]#, Int[]#))
+		verifyFalse	(Obj[]#.fits(Int[]#))
+
+		verifyFalse	(ReflectUtils.fits(Str[]#, Int[]#))
+		verifyFalse	(Str[]#.fits(Int[]#))
+	}
 }
 
 

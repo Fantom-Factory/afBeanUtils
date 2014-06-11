@@ -54,9 +54,33 @@ class ReflectUtils {
 		}
 	}
 		
-	** A replacement for 'Type.fits()' that takes into account type inference for Lists and Maps.
+	** A replacement for 'Type.fits()' that takes into account type inference for Lists and Maps, and fixes Famtom bugs.
+	** Returns 'true' if 'typeA' *fits into* 'typeB'.
 	** 
-	** Returns 'true' if 'typeA' *fits into* 'typeB'.  
+	** Standard usage:
+	**   Str#.fits(Obj#)                // --> true
+	**   ReflectUtils.fits(Str#, Obj#)  // --> true
+	** 
+	** List (and Map) type checking:
+	**   Int[]#.fits(Obj[]#)                // --> true
+	**   ReflectUtils.fits(Int[]#, Obj[]#)  // --> true
+	** 
+	** List (and Map) type inference. Items in 'Obj[]' *may* fit into 'Int[]'. 
+	**   Obj[]#.fits(Int[]#)                // --> false
+	**   ReflectUtils.fits(Obj[]#, Int[]#)  // --> true
+	** 
+	** This is particularly important when calling methods, for many Lists and Maps are defined by the shortcuts '[,]' and 
+	** '[:]' which create 'Obj?[]' and 'Obj:Obj?' respectively. 
+	** 
+	** But List (and Map) types than can *never* fit still return 'false':    
+	**   Str[]#.fits(Int[]#)                // --> false
+	**   ReflectUtils.fits(Str[]#, Int[]#)  // --> false
+	** 
+	** Fantom (nullable) bug fix for Lists (and Maps):
+	**   Int[]#.fits(Int[]?#)                // --> false
+	**   ReflectUtils.fits(Int[]#, Int[]?#)  // --> true
+	** 
+	** See [List Types and Nullability]`http://fantom.org/sidewalk/topic/2256` for bug details.
 	static Bool fits(Type? typeA, Type? typeB) {
 		if (typeA == typeB)					return true
 		if (typeA == null || typeB == null)	return false
@@ -74,5 +98,5 @@ class ReflectUtils {
 		paramTypeA := typeA.params[key] ?: Obj?#
 		paramTypeB := typeB.params[key] ?: Obj?#
 		return (paramTypeA.fits(paramTypeB) || paramTypeB.fits(paramTypeA))
-	}		
+	}
 }
