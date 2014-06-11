@@ -4,17 +4,19 @@
 class ReflectUtils {
 
 	** Finds a field.
-	static Field? findField(Type type, Str fieldName, Type fieldType) {
+	static Field? findField(Type type, Str fieldName, Type fieldType, Bool? isStatic := null) {
 		// 'fields()' returns inherited slots, 'field(name)' does not
 		return type.fields.find |field| {
 			if (field.name != fieldName) 
+				return false
+			if (isStatic != null && field.isStatic != isStatic) 
 				return false
 			return fits(field.type, fieldType)
 		}
 	}
 	
 	** Finds a named ctor with the given parameter types.
-	static Method? findCtor(Type type, Str ctorName, Type[] params := [,]) {
+	static Method? findCtor(Type type, Str ctorName, Type[] params := Type#.emptyList) {
 		// 'methods()' returns inherited slots, 'method(name)' does not
 		return type.methods.find |method| {
 			if (!method.isCtor) 
@@ -26,14 +28,14 @@ class ReflectUtils {
 	}
 
 	** Finds a named method with the given parameter types.
-	static Method? findMethod(Type type, Str name, Type[] params := [,], Bool isStatic := false, Type? returnType := null) {
+	static Method? findMethod(Type type, Str name, Type[] params := Type#.emptyList, Bool? isStatic := null, Type? returnType := null) {
 		// 'methods()' returns inherited slots, 'method(name)' does not
 		return type.methods.find |method| {
 			if (method.isCtor) 
 				return false
 			if (method.name != name) 
 				return false
-			if (method.isStatic != isStatic) 
+			if (isStatic != null && method.isStatic != isStatic) 
 				return false
 			if (returnType != null && !fits(method.returns, returnType))
 				return false
