@@ -36,15 +36,20 @@ class ReflectUtils {
 		type.methods.findAll { _findMethod(it, params, isStatic, returnType) != null }
 	}
 
+	@NoDoc @Deprecated { msg="Use argTypesFitMethodSignature() instead"}
+	static Bool paramTypesFitMethodSignature(Type?[] params, Method method) {
+		argTypesFitMethod(params, method)
+	}
+	
 	** Returns 'true' if the given parameter types fit the method signature.
-	static Bool paramTypesFitMethodSignature(Type?[] params, Method? method) {
-		return method.params.all |methodParam, i->Bool| {
-			if (i >= params.size)
-				return methodParam.hasDefault
-			if (params[i] == null)
-				return methodParam.type.isNullable
-			return fits(params[i], methodParam.type)
-		}
+	static Bool argTypesFitMethod(Type?[] argTypes, Method method) {
+		// interesting, 'method.params' are not the same as 'method.func.params'
+		_argTypesFitParams(argTypes, method.params)
+	}
+
+	** Returns 'true' if the given parameter types fit the given func.
+	static Bool argTypesFitFunc(Type?[] argTypes, Func func) {
+		_argTypesFitParams(argTypes, func.params)
 	}
 		
 	** A replacement for 'Type.fits()' that takes into account type inference for Lists and Maps, and fixes Famtom bugs.
@@ -83,6 +88,14 @@ class ReflectUtils {
 			
 		if (typeA.name == "Map" && typeB.name == "Map")
 			return paramFits(typeA, typeB, "K") && paramFits(typeA, typeB, "V")
+		
+		// do type inference on funcs
+		if (typeA.name == "Func" && typeB.name == "Func") {
+			// exclude the return type because Void# doesn't fit Obj#
+			return typeA.params.keys.union(typeB.params.keys).exclude { it == "R" }.all {
+				paramFits(typeA, typeB, it)
+			}
+		}
 			
 		return typeA.fits(typeB)
 	}
@@ -90,7 +103,7 @@ class ReflectUtils {
 	private static Bool paramFits(Type? typeA, Type? typeB, Str key) {
 		paramTypeA := typeA.params[key] ?: Obj?#
 		paramTypeB := typeB.params[key] ?: Obj?#
-		return (paramTypeA.fits(paramTypeB) || paramTypeB.fits(paramTypeA))
+		return paramTypeA.fits(paramTypeB) || paramTypeB.fits(paramTypeA)
 	}
 	
 	private static Field? _findField(Slot? field, Type? fieldType, Bool? isStatic) {
@@ -112,7 +125,7 @@ class ReflectUtils {
 			return null
 		if (!ctor.isCtor) 
 			return null
-		return paramTypesFitMethodSignature(params, ctor) ? ctor: null
+		return _argTypesFitParams(params, ((Method) ctor).params) ? ctor: null
 	}
 	
 	static Method? _findMethod(Slot? method, Type[] params, Bool? isStatic, Type? returnType) {
@@ -126,6 +139,16 @@ class ReflectUtils {
 			return null
 		if (returnType != null && !fits(((Method) method).returns, returnType))
 			return null
-		return paramTypesFitMethodSignature(params, method) ? method : null
+		return _argTypesFitParams(params, ((Method) method).params) ? method : null
+	}
+	
+	private static Bool _argTypesFitParams(Type?[] argTypes, Param[] params) {
+		params.all |param, i->Bool| {
+			if (i >= argTypes.size)
+				return param.hasDefault
+			if (argTypes[i] == null)
+				return param.type.isNullable
+			return fits(argTypes[i], param.type)
+		}		
 	}
 }

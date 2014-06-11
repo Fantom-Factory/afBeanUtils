@@ -1,77 +1,105 @@
 
-** Creates Lists, Maps and other Objects, optionally setting fields via an it-block ctor. 
+** Creates Lists, Maps and other Objects, optionally setting fields via an it-block ctor.
+** 
+** Bean factories may only be used the once. 
 @Js
-internal class BeanFactory {
+class BeanFactory {
 	
 	** The type this factory will create 
 	Type type {
 		private set
 	}
+
+	private OneShotLock	createLock	:= OneShotLock("Factory has been used")
+	private Obj?[]		ctorArgs
+	private Field:Obj? 	fieldVals
 	
-	private Obj?[]? 	ctorArgs
-	private Field:Obj? 	ctorPlan
-	
-	new make(Type type, Obj?[]? ctorArgs := null, [Field:Obj?]? ctorPlan := null) {
+	** Makes a factory for the given type.
+	new make(Type type, Obj?[]? ctorArgs := null, [Field:Obj?]? fieldVals := null) {
 		this.type = type
-		this.ctorArgs = ctorArgs ?: Obj?#.emptyList.rw
-		this.ctorPlan = ctorPlan ?: [:]
+		this.ctorArgs  = ctorArgs  ?: Obj?#.emptyList.rw
+		this.fieldVals = fieldVals ?: Field:Obj?[:]
 	}
 	
 	** Fantom Bug: http://fantom.org/sidewalk/topic/2163#c13978
 	@Operator 
 	private Obj? get(Obj key) { null }
 
-//	** Sets a field on the type to be instantiated.
-//	@Operator
-//	This set(Field field, Obj? val) {
-//		ctorPlan[field] = val
-//		return this
-//	}
-//
-//	** Sets a field on the type to be instantiated.
-//	This setByName(Str fieldName, Obj? val) {
-//		field := type.field(fieldName)
-//		return set(field, val)
-//	}
+	** Sets a field on the type to be instantiated.
+	@Operator
+	This set(Field field, Obj? val) {
+		createLock.check
+		if (!type.fits(field.parent))
+			throw ArgErr(ErrMsgs.factory_fieldWrongParent(type, field))
+		fieldVals[field] = val
+		return this
+	}
+
+	** Sets a field on the type to be instantiated.
+	This setByName(Str fieldName, Obj? val) {
+		createLock.check
+		field := type.field(fieldName)
+		return set(field, val)
+	}
 
 	** Adds a ctor argument.
 	@Operator
 	This add(Obj? arg) {
+		createLock.check
 		ctorArgs.add(arg)
 		return this
 	}
 
 	** Creates an instance of the object, optionally using the given ctor.
 	Obj create(Method? ctor := null) {
+		createLock.lock
+
 		if (ctor!= null && ctor.parent != type)
 			throw ArgErr(ErrMsgs.factory_ctorWrongType(type, ctor))
 
-		if (type.name == "List" && ctorArgs.isEmpty && ctorPlan.isEmpty && ctor == null) {
+		if (type.name == "List" && ctorArgs.isEmpty && ctor == null) {
 			valType := type.params["V"] ?: Obj?#
-			return valType.emptyList.rw
+			return setFieldVals(valType.emptyList.rw)
 		}
 
-		if (type.name == "Map" && ctorArgs.isEmpty && ctorPlan.isEmpty && ctor == null) {
+		if (type.name == "Map" && ctorArgs.isEmpty && ctor == null) {
 			mapType := type.isGeneric ? Obj:Obj?# : type
-			return Map(mapType.toNonNullable)
+			return setFieldVals(Map(mapType.toNonNullable))
 		}
 		
-		args 		:= ctorArgs.dup
-		argTypes	:= args.map { it?.typeof }
+		args := ctorArgs
 
 		if (ctor != null) {
-			if (!ReflectUtils.paramTypesFitMethodSignature(argTypes, ctor) || args.size > ctor.params.size)
+			if (!ctor.params.isEmpty && ctor.params[-1].type.fits(|This|#) && args.size == (ctor.params.size - 1)) {
+				itBlockFunc := Field.makeSetFunc(fieldVals.dup) 	// that .dup() is very important!
+				args.add(itBlockFunc)
+				fieldVals.clear
+			}
+
+			argTypes := args.map { it?.typeof }
+			if (!ReflectUtils.argTypesFitMethod(argTypes, ctor) || args.size > ctor.params.size)
 				throw Err(ErrMsgs.factory_ctorArgMismatch(ctor, args))
+			
 		} else {
-			ctors := ReflectUtils.findCtors(type, argTypes).exclude { args.size > it.params.size  }
+			argTypes	:= args.map { it?.typeof }
+//			ctors 		:= ReflectUtils.findCtors(type, argTypes).exclude { it.params[-1]  args.size > it.params.size  }
+			ctors 		:= ReflectUtils.findCtors(type, argTypes).exclude { args.size > it.params.size  }
 			if (ctors.isEmpty)
+				// TODO: if null, look for ctor plan
 				throw Err(ErrMsgs.factory_noCtorsFound(type, argTypes))
 			if (ctors.size > 1)
 				throw Err(ErrMsgs.factory_tooManyCtorsFound(type, ctors.map { it.name }, argTypes))
 			ctor = ctors.first
 		}
 		
-		return ctor.callList(args)
+		return setFieldVals(ctor.callList(args))
+	}
+	
+	private Obj? setFieldVals(Obj? obj) {
+		fieldVals.each |val, field| {
+			field.set(obj, val)
+		}
+		return obj
 	}
 	
 	** Returns a default value for the given type. 
