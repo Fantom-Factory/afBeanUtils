@@ -37,7 +37,7 @@ internal class TestBeanFactory : BeanTest {
 			BeanFactory(T_Ctors#).add(1).add(1).create(T_Ctors#make2)
 		}
 		
-		// do again but with a default ctor parameter
+		// do again but with an it-block ctor parameter
 		
 		obj2 := (T_CtorsWithItBlocks?) null
 		
@@ -65,25 +65,77 @@ internal class TestBeanFactory : BeanTest {
 	Void testCtorArgs() {
 		obj := (T_Ctors?) null
 		
-		obj = BeanFactory(T_Ctors#).create
+		obj = BeanFactory(T_Ctors#).set(T_Ctors#value, "m1").create
 		verifyEq(obj.ctor, "make1")
+		verifyEq(obj.value, "m1")
 
-		obj = BeanFactory(T_Ctors#).add(1).create
+		obj = BeanFactory(T_Ctors#).set(T_Ctors#value, "m2").add(1).create
 		verifyEq(obj.ctor, "make2")
+		verifyEq(obj.value, "m2")
 		
-		obj = BeanFactory(T_Ctors#).add(1).add(2).create
+		obj = BeanFactory(T_Ctors#).set(T_Ctors#value, "m3").add(1).add(2).create
 		verifyEq(obj.ctor, "make3")
+		verifyEq(obj.value, "m3")
 
 		verifyErrMsg(Err#, ErrMsgs.factory_tooManyCtorsFound(T_Ctors#, "make4 make5".split, [Int#, Str#])) {
 			BeanFactory(T_Ctors#).add(1).add("2").create
 		}
 
-		obj = BeanFactory(T_Ctors#).add(1).add("2").add(3).create
+		obj = BeanFactory(T_Ctors#).set(T_Ctors#value, "m5").add(1).add("2").add(3).create
 		verifyEq(obj.ctor, "make5")
+		verifyEq(obj.value, "m5")
 
 		verifyErrMsg(Err#, ErrMsgs.factory_noCtorsFound(T_Ctors#, [Uri#])) {
 			BeanFactory(T_Ctors#).add(`2`).create
 		}
+
+		// do again but with an optional it-block ctor parameter
+		
+		obj2 := (T_CtorsWithItBlocks?) null
+		
+		obj2 = BeanFactory(T_CtorsWithItBlocks#).setByName("value", "m1").create
+		verifyEq(obj2.ctor, "make1")
+		verifyEq(obj2.value, "m1")
+
+		obj2 = BeanFactory(T_CtorsWithItBlocks#).setByName("value", "m2").add(1).create
+		verifyEq(obj2.ctor, "make2")
+		verifyEq(obj2.value, "m2")
+		
+		obj2 = BeanFactory(T_CtorsWithItBlocks#).setByName("value", "m3").add(1).add(2).create
+		verifyEq(obj2.ctor, "make3")
+		verifyEq(obj2.value, "m3")
+
+		obj2 = BeanFactory(T_CtorsWithItBlocks#).setByName("value", "m4").add(1).add("2").create
+		verifyEq(obj2.ctor, "make4")
+		verifyEq(obj2.value, "m4")
+
+		obj2 = BeanFactory(T_CtorsWithItBlocks#).setByName("value", "m5").add(1).add("2").add(3).create
+		verifyEq(obj2.ctor, "make5")
+		verifyEq(obj2.value, "m5")
+
+		// do again but with an mandatory it-block ctor parameter
+		
+		obj3 := (T_CtorsWithMandatoryItBlocks?) null
+		
+		obj3 = BeanFactory(T_CtorsWithMandatoryItBlocks#).setByName("value", "m1").create
+		verifyEq(obj3.ctor, "make1")
+		verifyEq(obj3.value, "m1")
+
+		obj3 = BeanFactory(T_CtorsWithMandatoryItBlocks#).setByName("value", "m2").add(1).create
+		verifyEq(obj3.ctor, "make2")
+		verifyEq(obj3.value, "m2")
+		
+		obj3 = BeanFactory(T_CtorsWithMandatoryItBlocks#).setByName("value", "m3").add(1).add(2).create
+		verifyEq(obj3.ctor, "make3")
+		verifyEq(obj3.value, "m3")
+
+		obj3 = BeanFactory(T_CtorsWithMandatoryItBlocks#).setByName("value", "m4").add(1).add("2").create
+		verifyEq(obj3.ctor, "make4")
+		verifyEq(obj3.value, "m4")
+
+		obj3 = BeanFactory(T_CtorsWithMandatoryItBlocks#).setByName("value", "m5").add(1).add("2").add(3).create
+		verifyEq(obj3.ctor, "make5")
+		verifyEq(obj3.value, "m5")
 	}
 	
 	Void testLists() {
@@ -125,20 +177,6 @@ internal class TestBeanFactory : BeanTest {
 		}		
 	}
 	
-	Void testNamedCtorWithItBlock() {
-//		if it-block, set fields via it-block
-//		if no it-block, set fields post ctor
-		
-		d:= T_CtorsWithItBlocks#make1.params[-1].type.fits(|This|#)
-		echo(d)
-
-		d= Field.makeSetFunc([T_CtorsWithItBlocks#value: "2"]).typeof.fits(T_CtorsWithItBlocks#make1.params[-1].type)
-		echo(d)
-		
-		d = ReflectUtils.argTypesFitMethod([Field.makeSetFunc([T_CtorsWithItBlocks#value: "2"]).typeof], T_CtorsWithItBlocks#make1)
-		echo(d)		
-	}
-	
 	Void testSet() {
 		verifyErrMsg(ArgErr#, ErrMsgs.factory_fieldWrongParent(T_A#, T_B#b)) {
 			BeanFactory(T_A#).set(T_B#b, 3)
@@ -154,20 +192,20 @@ internal class TestBeanFactory : BeanTest {
 	}
 }
 
-const class T_Obj02 {
+internal const class T_Obj02 {
 	const Str? dude
 	static const T_Obj02 defVal := T_Obj02("defVal")
 	new make2() { dude = "ctor" }
 	new make(Str s) { dude = s }
 }
 
-const class T_Obj03 {
+internal const class T_Obj03 {
 	const Str? dude
 	static const T_Obj03 defVal := T_Obj03("defVal")
 	new make2(Str s) { dude = s }
 }
 
-class T_Ctors {
+internal class T_Ctors {
 	Str? value
 	Str  ctor
 	
@@ -178,22 +216,33 @@ class T_Ctors {
 	new make5(Int i1, Str s2, Int i3 := 2)	{ ctor = "make5" }
 }
 
-class T_NoCtor { }
+internal class T_NoCtor { }
 
-class T_A {
+internal class T_A {
 	Int a
 }
-class T_B : T_A {
+internal class T_B : T_A {
 	Int b
 }
 
-const class T_CtorsWithItBlocks {
+internal const class T_CtorsWithItBlocks {
 	const Str? value
 	const Str  ctor
 	
-	new make1(|This|? f := null)								{ ctor = "make1"; f?.call(this); echo("MAKEING M1 $f $value") }
+	new make1(|This|? f := null)								{ ctor = "make1"; f?.call(this) }
 	new make2(Int i1, |This|? f := null)	 					{ ctor = "make2"; f?.call(this) }
 	new make3(Int i1, Int i2, |This|? f := null)				{ ctor = "make3"; f?.call(this) }
 	new make4(Int i1, Str s2, |This|? f := null)				{ ctor = "make4"; f?.call(this) }
 	new make5(Int i1, Str s2, Int i3 := 2, |This|? f := null)	{ ctor = "make5"; f?.call(this) }
+}
+
+internal const class T_CtorsWithMandatoryItBlocks {
+	const Str? value
+	const Str  ctor
+	
+	new make1(|This| f)							{ ctor = "make1"; f(this) }
+	new make2(Int i1, |This| f)	 				{ ctor = "make2"; f(this) }
+	new make3(Int i1, Int i2, |This| f)			{ ctor = "make3"; f(this) }
+	private new make4(Int i1, Str s2, |This| f)			{ ctor = "make4"; f(this) }
+	new make5(Int i1, Str s2, Int i3, |This| f)	{ ctor = "make5"; f(this) }
 }
