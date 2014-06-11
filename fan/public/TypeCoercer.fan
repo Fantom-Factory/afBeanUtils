@@ -79,7 +79,7 @@ const class TypeCoercer {
 			if (((Map) value).ordered)
 				toMap	 = Map.make(toType) { ordered = true }
 			if (toMap == null)
-				toMap	 = toType.isGeneric ? Map.make(Obj:Obj?#) : Map.make(toType)
+				toMap	 = toType.isGeneric ? Map.make(Obj:Obj?#) : Map.make(toType.toNonNullable)
 
 			((Map) value).each |v1, k1| {
 				k2	:= coerce(k1, toKeyType)

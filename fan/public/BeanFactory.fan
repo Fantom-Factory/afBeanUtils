@@ -117,6 +117,10 @@ class BeanFactory {
 		return setFieldVals(ctor.callList(args))
 	}
 	
+	override Str toStr() {
+		"BeanFactory for $type.qname"
+	}
+	
 	** Returns a default value for the given type. 
 	** Use as a replacement for [Type.make()]`Type.make`.
 	** 

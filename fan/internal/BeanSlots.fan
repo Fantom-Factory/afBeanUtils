@@ -7,12 +7,15 @@ internal const abstract class SegmentFactory {
 	
 	new make(|This| f) { f(this) }
 
-	abstract SegmentExecutor makeSegment(Type staticType, Obj instance, Bool isLast)
+	abstract SegmentExecutor makeSegment(Type staticType, Obj? instance, Bool isLast)
+	abstract Void setValue(BeanFactory factory, Obj? value, Bool isLast)
+
+	abstract Str expression()
 }
 
 @Js
 internal const class SlotSegment : SegmentFactory {
-	const Obj?[]	methodArgs
+	const Str?[]	methodArgs
 	const Str 		slotName
 	
 	new make(Str slotName, Str[]? methodArgs, |This| f) : super(f) {
@@ -20,8 +23,8 @@ internal const class SlotSegment : SegmentFactory {
 		this.methodArgs = methodArgs ?: Str#.emptyList
 	}
 
-	override SegmentExecutor makeSegment(Type staticType, Obj instance, Bool isLast) {
-		slot := instance.typeof.slot(slotName)
+	override SegmentExecutor makeSegment(Type staticType, Obj? instance, Bool isLast) {
+		slot := instance?.typeof?.slot(slotName) ?: staticType.slot(slotName)
 		
 		if (slot.isField)
 			return ExecuteField(instance, slot) {
@@ -39,6 +42,21 @@ internal const class SlotSegment : SegmentFactory {
 
 		throw Err("WTF!?")
 	}
+	
+	override Void setValue(BeanFactory factory, Obj? value, Bool isLast) {
+		slot := factory.type.slot(slotName)
+		if (slot.isField) {
+			field := (Field) slot
+			factory[field] = typeCoercer.coerce(value, field.type)
+		} else
+			throw Err("TODO $slotName")	// FIXME: 
+	}
+	
+	override Str expression() {
+		methodArgs.isEmpty ? slotName : "${slotName}(" + methodArgs.join(",") + ")"
+	}
+
+	override Str toStr() { expression }
 }
 
 @Js
@@ -50,7 +68,7 @@ internal const class IndexSegment : SegmentFactory {
 		this.index	= index
 	}
 
-	override SegmentExecutor makeSegment(Type staticType, Obj instance, Bool isLast) {
+	override SegmentExecutor makeSegment(Type staticType, Obj? instance, Bool isLast) {
 		ExecuteIndex(staticType, instance, index) {
 			it.typeCoercer 	= this.typeCoercer
 			it.createIfNull	= isLast ? false : this.createIfNull
@@ -58,6 +76,25 @@ internal const class IndexSegment : SegmentFactory {
 			it.maxListSize	= this.maxListSize
 		}
 	}
+	
+	override Void setValue(BeanFactory factory, Obj? value, Bool isLast) {
+//		slot := factory.type.slot(slotName)
+//		if (slot.isField) {
+//			field := (Field) slot
+//			factory[field] = typeCoercer.coerce(value, field.type)
+//		} else
+//			throw Err("TODO $factory.type")	// FIXME:
+		
+		defVal := BeanFactory.defaultValue(factory.type, true)
+		makeSegment(factory.type, defVal, isLast).set(value)
+		
+	}
+
+	override Str expression() {
+		"[${index}]"
+	}
+	
+	override Str toStr() { expression }
 }
 
 // ---- Executors ---------------------------------------------------------------------------------
@@ -75,10 +112,10 @@ internal abstract class SegmentExecutor {
 }
 
 @Js
-internal class ExecuteField : SegmentExecutor{
+internal class ExecuteField : SegmentExecutor {
 	Field		field
 	
-	new make(Obj instance, Field field, |This| f) {
+	new make(Obj? instance, Field field, |This| f) {
 		f(this)
 		this.instance	= instance
 		this.field		= field
@@ -111,7 +148,7 @@ internal class ExecuteMethod : SegmentExecutor {
 	Method		method
 	Str[]		methodArgs
 	
-	new make(Obj instance, Method method, Str[] methodArgs, |This| f) {
+	new make(Obj? instance, Method method, Str[] methodArgs, |This| f) {
 		f(this)
 		this.instance	= instance
 		this.method		= method
@@ -143,9 +180,9 @@ internal class ExecuteIndex : SegmentExecutor {
 	Type		valType
 	Bool		isList
 
-	new make(Type staticType, Obj instance, Str index, |This| f) {
+	new make(Type staticType, Obj? instance, Str index, |This| f) {
 		f(this)
-		type			:= instance.typeof
+		type			:= instance?.typeof ?: staticType
 		this.isList		= false
 		this.instance	= instance
 		this.index		= index

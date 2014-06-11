@@ -30,8 +30,8 @@ class BeanProperties {
 	** Returns the given instance.
 	static Obj setAll(Obj instance, Str:Obj? propertyValues) {
 		factory := BeanPropertyFactory()
-		propertyValues.each |value, property| {
-			factory.parse(property).set(instance, value)
+		propertyValues.each |value, expression| {
+			factory.parse(expression).set(instance, value)
 		}
 		return instance
 	}
@@ -40,7 +40,73 @@ class BeanProperties {
 //	static Obj setAllFromHtmlForm(Obj instance, Str:Obj? propertyValues) {
 //		
 //	}
+	
+	static Obj create(Type type, Str:Obj? propertyValues) {
+		factory := BeanPropertyFactory()
+		
+		maker := BeanMaker(null)
+		propertyValues.each |value, expression| {
+			property := factory.parse(expression)
+			
+			end := (BeanMaker) property.segments[0..<-1].reduce(maker) |BeanMaker mkr, segment -> BeanMaker| {   
+				
+				innerMkr := mkr.makers.getOrAdd(segment.expression) { BeanMaker(segment) }
+				
+				return innerMkr
+			}
+			
+			end.values[property.segments[-1]] = value
+		}
+				
+		return maker.createRoot(type)
+	}
 }
+
+@Js
+internal class BeanMaker {
+	Str 				expression
+	SegmentFactory?		segmentFactory
+	Str:BeanMaker		makers			:= [:]
+	SegmentFactory:Obj?	values			:= [:]
+	
+	new make(SegmentFactory? segmentFactory) {
+		this.segmentFactory = segmentFactory
+		this.expression = segmentFactory?.expression ?: "root"
+	}
+	
+	Obj? createRoot(Type type) {
+		factory := BeanFactory(type)
+		
+		values.each |val, segFac| {
+			segFac.setValue(factory, val, true)
+		}
+
+		makers.each |mkr, exp| {
+			mkr.setValue(factory)
+		}
+		
+		return factory.create		
+	}
+
+	Void setValue(BeanFactory parentFactory) {
+		retType := segmentFactory.makeSegment(parentFactory.type, null, false).returns
+		
+		factory := BeanFactory(retType)
+		
+		values.each |val, segFac| {
+			segFac.setValue(factory, val, true)
+		}
+
+		makers.each |mkr, exp| {
+			mkr.setValue(factory)
+		}
+		
+		value	:= factory.create
+		segmentFactory.setValue(parentFactory, value, false)
+	}	
+}
+
+
 
 ** Parses property expressions to create 'BeanProperty' instances. 
 @Js @NoDoc
@@ -127,7 +193,7 @@ const class BeanProperty {
 	** The property expression that this class ultimately calls. 
 	const Str expression
 
-	private const SegmentFactory[] segments
+	internal const SegmentFactory[] segments
 	
 	internal new make(Str expression, SegmentFactory[] segments) {
 		this.expression = expression
@@ -155,6 +221,10 @@ const class BeanProperty {
 		callChain(instance).set(value)
 	}
 	
+	internal Str expressionParent() {
+		segments[0..<-1].join(".")
+	}
+	
 	private SegmentExecutor callChain(Obj instance) {
 		staticType := instance.typeof
 		segments.eachRange(0..<-1) |bean| {
@@ -163,5 +233,9 @@ const class BeanProperty {
 			staticType	= segment.returns
 		}
 		return segments[-1].makeSegment(staticType, instance, true)
+	}
+	
+	override Str toStr() {
+		segments.join(".")
 	}
 }
