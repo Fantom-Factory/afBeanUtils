@@ -35,6 +35,11 @@ class BeanProperties {
 		}
 		return instance
 	}
+	
+	// TODO: 
+//	static Obj setAllFromHtmlForm(Obj instance, Str:Obj? propertyValues) {
+//		
+//	}
 }
 
 ** Parses property expressions to create 'BeanProperty' instances. 

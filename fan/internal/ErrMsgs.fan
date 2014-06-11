@@ -26,6 +26,10 @@ internal class ErrMsgs {
 		stripSys("Can not pass method arguments to a field: ${field.qname}")
 	}
 
+	static Str factory_defValNotFound(Type type) {
+		stripSys("Could not find a default value for ${type.signature}")
+	}
+
 	private static Str stripSys(Str str) {
 		str.replace("sys::", "")
 	}
