@@ -59,7 +59,7 @@ class BeanPropertyFactory {
 	** Only used if 'createIfNull' is 'true'. 
 	** 
 	** Defaults to '|Type type->Obj| { BeanFactory.defaultValue(type) }'
-	|Type->Obj|		makeFunc 	 := |Type type->Obj| { BeanFactory.defaultValue(type) }
+	|Type->Obj|		makeFunc 	 := |Type type->Obj| { BeanFactory.defaultValue(type, true) }
 
 	** Given to 'BeanProperties' to indicate if they should create new object instances when traversing an expression.
 	** If an a new instance is *not* created then a 'NullErr' will occur.

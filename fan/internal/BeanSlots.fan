@@ -217,6 +217,8 @@ internal class ExecuteIndex : SegmentExecutor {
 			if (valType.isNullable)
 				list.size = idx + 1
 			else {
+				if (list.capacity < (idx + 1))
+					list.capacity = idx + 1
 				toAdd := idx - list.size + 1
 				toAdd.times { list.add(makeFunc(valType)) }
 			}
