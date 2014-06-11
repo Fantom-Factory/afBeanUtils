@@ -1,7 +1,13 @@
 
-** Creates Lists, Maps and other Objects, optionally setting fields via an it-block ctor.
+** Creates Lists, Maps and other Objects, optionally setting field values.
+** Ctors may be of any scope: 'public', 'protected', 'internal' and even 'private'.
 ** 
-** Bean factories may only be used the once. 
+** Fields are either set post construction or via an it-block ctor argument 
+** (which must be the last method parameter). 
+** 
+** 'const' types **must** provide an it-block ctor if fields are to be set. 
+** 
+** Bean factory instances may only be used the once. 
 @Js
 class BeanFactory {
 	
@@ -51,6 +57,8 @@ class BeanFactory {
 	}
 
 	** Creates an instance of the object, optionally using the given ctor.
+	** 
+	** If no ctor is given, a suitable one is picked that matches the arguments accumulated by the factory. 
 	Obj create(Method? ctor := null) {
 		createLock.lock
 
@@ -81,25 +89,32 @@ class BeanFactory {
 				throw Err(ErrMsgs.factory_ctorArgMismatch(ctor, args))
 			
 		} else {
-			argTypes	:= args.map { it?.typeof }
-//			ctors 		:= ReflectUtils.findCtors(type, argTypes).exclude { it.params[-1]  args.size > it.params.size  }
-			ctors 		:= ReflectUtils.findCtors(type, argTypes).exclude { args.size > it.params.size  }
-			if (ctors.isEmpty)
-				// TODO: if null, look for ctor plan
-				throw Err(ErrMsgs.factory_noCtorsFound(type, argTypes))
-			if (ctors.size > 1)
-				throw Err(ErrMsgs.factory_tooManyCtorsFound(type, ctors.map { it.name }, argTypes))
-			ctor = ctors.first
+			// look for ctors that may / or may not take an it-block, favouring those that do
+			itBlockFunc		:= Field.makeSetFunc(fieldVals.dup) 	// that .dup() is very important!
+			argsWithOut		:= args
+			argsWith		:= args.dup.add(itBlockFunc)
+			argTypesWithOut	:= argsWithOut.map { it?.typeof }
+			argTypesWith	:= argsWith   .map { it?.typeof }
+			ctorsWithOut	:= ReflectUtils.findCtors(type, argTypesWithOut).exclude { argsWithOut.size > it.params.size }
+			ctorsWith		:= ReflectUtils.findCtors(type, argTypesWith   ).exclude { argsWith.size    > it.params.size }
+			ctorsBoth		:= ctorsWithOut.dup.addAll(ctorsWith).unique
+			
+			if (ctorsWithOut.isEmpty && ctorsWith.isEmpty)
+				throw Err(ErrMsgs.factory_noCtorsFound(type, argTypesWithOut))
+			if (ctorsBoth.size > 1 && ctorsWith.size != 1)	// favour ctors with it-blocks
+				throw Err(ErrMsgs.factory_tooManyCtorsFound(type, ctorsBoth.map { it.name }, argTypesWithOut))
+			
+			if (ctorsWith.size == 1) {
+				ctor = ctorsWith.first
+				args = argsWith
+				fieldVals.clear
+			} else {
+				ctor = ctorsWithOut.first
+				args = argsWithOut
+			}
 		}
 		
 		return setFieldVals(ctor.callList(args))
-	}
-	
-	private Obj? setFieldVals(Obj? obj) {
-		fieldVals.each |val, field| {
-			field.set(obj, val)
-		}
-		return obj
 	}
 	
 	** Returns a default value for the given type. 
@@ -137,5 +152,11 @@ class BeanFactory {
 
 		throw Err(ErrMsgs.factory_defValNotFound(type))
 	}
-}
 
+	private Obj? setFieldVals(Obj? obj) {
+		fieldVals.each |val, field| {
+			field.set(obj, val)
+		}
+		return obj
+	}	
+}

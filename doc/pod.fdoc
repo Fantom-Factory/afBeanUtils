@@ -204,9 +204,10 @@ property expressions and create your own `BeanProperty` instances.
 
 Release Notes [#releaseNotes]
 *****************************
-v0.0.4 [#v0.0.4]
+v1.0.0 [#v1.0.0]
 ----------------
  - New: 'Bean Utils' is now available in JavaScript. (Added '@Js' to all classes.)
+ - New: Use 'BeanFactory' to reflectivly create instances of Lists, Maps and other Objects.
  - New: Added 'findFields()', 'findCtors()' and 'findMethods()' to 'ReflectUtils'.
  - New: Added 'BeanFactory.defaultValue(type)' as a replacement for 'Type.make'.
 
