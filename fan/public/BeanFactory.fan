@@ -17,13 +17,14 @@ internal class BeanFactory {
 		this.ctorPlan = ctorPlan ?: [:]
 	}
 	
-	** Returns a default value for the given type.
+	** Returns a default value for the given type. 
+	** Use as a replacement for [Type.make()]`Type.make`.
 	** 
 	** The default type is determined by the following algorithm:
 	** 1. If the type is nullable, 'null' is returned.
 	** 1. If the type is a Map, a read only empty map is returned.
 	** 1. If the type is a List, a read only empty list is returned. (With zero capacity.)
-	** 1. If one exists, a no-args ctor is called to create the object.
+	** 1. If one exists, a public no-args ctor is called to create the object.
 	** 1. If it exists, the value of the type's 'defVal' slot is returned. 
 	**    (Must be a static field or a static method with zero params.)
 	** 1. 'Err' is thrown. 

@@ -1,6 +1,10 @@
 
 internal class BeanTest : Test {
 	
+	Void verifyTrue(Bool cond, Str? msg := null) {
+		verify(cond, msg)
+	}
+
 	Void verifyErrMsg(Type errType, Str errMsg, |Obj| func) {
 		try {
 			func(4)
