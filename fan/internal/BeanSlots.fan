@@ -7,10 +7,15 @@ internal const abstract class SegmentFactory {
 	
 	new make(|This| f) { f(this) }
 
-	abstract SegmentExecutor makeSegment(Type staticType, Obj? instance, Bool isLast)
-	abstract Void setValue(BeanFactory factory, Obj? value, Bool isLast)
+	abstract SegmentExecutor	makeSegment(Type parentType, Obj? parentInstance, Bool isLast)
+	abstract SegmentType 		type(Type parentType)
+	abstract Str 				expression()
+}
 
-	abstract Str expression()
+
+@Js
+internal enum class SegmentType {
+	field, method, index
 }
 
 @Js
@@ -23,18 +28,18 @@ internal const class SlotSegment : SegmentFactory {
 		this.methodArgs = methodArgs ?: Str#.emptyList
 	}
 
-	override SegmentExecutor makeSegment(Type staticType, Obj? instance, Bool isLast) {
-		slot := instance?.typeof?.slot(slotName) ?: staticType.slot(slotName)
+	override SegmentExecutor makeSegment(Type parentType, Obj? parentInstance, Bool isLast) {
+		slot := parentInstance?.typeof?.slot(slotName) ?: parentType.slot(slotName)
 		
 		if (slot.isField)
-			return ExecuteField(instance, slot) {
+			return ExecuteField(parentInstance, slot) {
 				it.typeCoercer 	= this.typeCoercer
 				it.createIfNull	= isLast ? false : this.createIfNull
 				it.makeFunc		= this.makeFunc
 			}
 
 		if (slot.isMethod)
-			return ExecuteMethod(instance, slot, methodArgs) {
+			return ExecuteMethod(parentInstance, slot, methodArgs) {
 				it.typeCoercer 	= this.typeCoercer
 				it.createIfNull	= isLast ? false : this.createIfNull
 				it.makeFunc		= this.makeFunc
@@ -43,13 +48,8 @@ internal const class SlotSegment : SegmentFactory {
 		throw Err("WTF!?")
 	}
 	
-	override Void setValue(BeanFactory factory, Obj? value, Bool isLast) {
-		slot := factory.type.slot(slotName)
-		if (slot.isField) {
-			field := (Field) slot
-			factory[field] = typeCoercer.coerce(value, field.type)
-		} else
-			throw Err("TODO $slotName")	// FIXME: 
+	override SegmentType type(Type parentType) {
+		parentType.slot(slotName).isField ? SegmentType.field : SegmentType.method 
 	}
 	
 	override Str expression() {
@@ -76,18 +76,9 @@ internal const class IndexSegment : SegmentFactory {
 			it.maxListSize	= this.maxListSize
 		}
 	}
-	
-	override Void setValue(BeanFactory factory, Obj? value, Bool isLast) {
-//		slot := factory.type.slot(slotName)
-//		if (slot.isField) {
-//			field := (Field) slot
-//			factory[field] = typeCoercer.coerce(value, field.type)
-//		} else
-//			throw Err("TODO $factory.type")	// FIXME:
-		
-		defVal := BeanFactory.defaultValue(factory.type, true)
-		makeSegment(factory.type, defVal, isLast).set(value)
-		
+
+	override SegmentType type(Type parentType) {
+		SegmentType.index
 	}
 
 	override Str expression() {

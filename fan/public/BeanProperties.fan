@@ -1,5 +1,5 @@
 
-// FIXME: fandoc this! 
+** Static methods to get and set bean values from property expressions.
 @Js
 class BeanProperties {
 
@@ -44,18 +44,18 @@ class BeanProperties {
 	static Obj create(Type type, Str:Obj? propertyValues) {
 		factory := BeanPropertyFactory()
 		
-		maker := BeanMaker(null)
+		maker := SegmentTree(null)
 		propertyValues.each |value, expression| {
 			property := factory.parse(expression)
 			
-			end := (BeanMaker) property.segments[0..<-1].reduce(maker) |BeanMaker mkr, segment -> BeanMaker| {   
+			end := (SegmentTree) property.segments[0..<-1].reduce(maker) |SegmentTree mkr, segment -> SegmentTree| {   
 				
-				innerMkr := mkr.makers.getOrAdd(segment.expression) { BeanMaker(segment) }
+				innerMkr := mkr.branches.getOrAdd(segment.expression) { SegmentTree(segment) }
 				
 				return innerMkr
 			}
 			
-			end.values[property.segments[-1]] = value
+			end.leaves[property.segments[-1]] = value
 		}
 				
 		return maker.createRoot(type)
@@ -63,11 +63,11 @@ class BeanProperties {
 }
 
 @Js
-internal class BeanMaker {
+internal class SegmentTree {
 	Str 				expression
 	SegmentFactory?		segmentFactory
-	Str:BeanMaker		makers			:= [:]
-	SegmentFactory:Obj?	values			:= [:]
+	Str:SegmentTree		branches		:= [:]
+	SegmentFactory:Obj?	leaves			:= [:]
 	
 	new make(SegmentFactory? segmentFactory) {
 		this.segmentFactory = segmentFactory
@@ -75,34 +75,71 @@ internal class BeanMaker {
 	}
 	
 	Obj? createRoot(Type type) {
-		factory := BeanFactory(type)
-		
-		values.each |val, segFac| {
-			segFac.setValue(factory, val, true)
-		}
-
-		makers.each |mkr, exp| {
-			mkr.setValue(factory)
-		}
-		
-		return factory.create		
+		create(type, null)
 	}
-
-	Void setValue(BeanFactory parentFactory) {
-		retType := segmentFactory.makeSegment(parentFactory.type, null, false).returns
+	
+	Obj? create(Type type, Obj? instance) {
+		if (instance != null && !instance.typeof.fits(type))
+			throw Err("$instance.typeof.signature !fit $type.signature")
 		
-		factory := BeanFactory(retType)
+		beanFactory := BeanFactory(type)
+	
+		branches.each |tree| {
+			if (tree.segmentFactory.type(type) == SegmentType.field) {
+				segType := tree.segmentFactory.makeSegment(type, instance, false).returns
+				val := tree.create(segType, null)
+				
+				slotSegment := (SlotSegment) tree.segmentFactory
+				if (instance == null) {
+					field := (Field) type.slot(slotSegment.slotName)
+					beanFactory[field] = slotSegment.typeCoercer.coerce(val, field.type)
+				} else
+					slotSegment.makeSegment(type, instance, false).set(val)
+			}
+		}
 		
-		values.each |val, segFac| {
-			segFac.setValue(factory, val, true)
+		leaves.each |val, segmentFactory| {
+			if (segmentFactory.type(type) == SegmentType.field) {
+				slotSegment := (SlotSegment) segmentFactory
+				if (instance == null) {
+					field := type.slot(slotSegment.slotName)				
+					beanFactory[field] = val
+				} else
+					slotSegment.makeSegment(type, instance, true).set(val)
+			}
+		}
+			
+		bean := (instance != null) ? instance : beanFactory.create
+		
+		branches.each |SegmentTree tree1| {
+			if (tree1.segmentFactory.type(type) == SegmentType.index) {
+				segType := tree1.segmentFactory.makeSegment(type, bean, false).returns
+				val := tree1.create(segType, null)
+				
+				indexSegment := (IndexSegment) tree1.segmentFactory
+				indexSegment.makeSegment(type, bean, false).set(val)
+			}
 		}
 
-		makers.each |mkr, exp| {
-			mkr.setValue(factory)
+		branches.each |SegmentTree tree2| {
+			if (tree2.segmentFactory.type(type) == SegmentType.method) {
+				segType := tree2.segmentFactory.makeSegment(type, bean, false).returns
+
+				inst := tree2.segmentFactory.makeSegment(type, bean, false).get(null)
+				
+				val := tree2.create(segType, inst)
+				// nothing to set!
+			}
 		}
 		
-		value	:= factory.create
-		segmentFactory.setValue(parentFactory, value, false)
+		leaves.each |val, segmentFactory| {
+			if (segmentFactory.type(type) == SegmentType.index) {
+				indexSegment := (IndexSegment) segmentFactory
+				indexSegment.makeSegment(type, bean, true).set(val)
+			}
+		}
+		
+		return bean 
 	}	
 }
 
