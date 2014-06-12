@@ -6,8 +6,8 @@ internal class ErrMsgs {
 		"Method may no longer be invoked - $because"
 	}	
 	
-	static Str typeCoercer_fail(Type from, Type to) {
-		stripSys("Could not coerce ${from.qname} to ${to.qname}")
+	static Str typeCoercer_fail(Type from, Type to, Obj value) {
+		stripSys("Could not coerce ${from.qname} to ${to.qname} - ${value}")
 	}
 	
 	static Str typeCoercer_notFound(Type? from, Type to) {
