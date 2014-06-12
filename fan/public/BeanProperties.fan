@@ -35,14 +35,13 @@ class BeanProperties {
 		}
 		return instance
 	}
-	
-	// TODO: 
-//	static Obj setAllFromHtmlForm(Obj instance, Str:Obj? propertyValues) {
-//		
-//	}
-	
-	static Obj create(Type type, Str:Obj? propertyValues) {
+
+	** Uses the given property expressions to instantiate a tree of beans and values.
+	** Nested beans may be 'const' as long as they supply an it-block ctor argument. 
+	static Obj create(Type type, Str:Obj? propertyValues, TypeCoercer? typeCoercer := null) {
 		factory := BeanPropertyFactory()
+		if (typeCoercer != null)
+			factory.typeCoercer = typeCoercer
 		
 		tree := SegmentTree(null)
 		propertyValues.each |value, expression| {
@@ -70,10 +69,7 @@ internal class SegmentTree {
 		this.expression = segmentFactory?.expression ?: "root"
 	}
 	
-	Obj? create(Type type, Obj? instance) {
-		if (instance != null && !instance.typeof.fits(type))
-			throw Err("$instance.typeof.signature !fit $type.signature")
-		
+	Obj? create(Type type, Obj? instance) {		
 		beanFactory := (instance == null) ? BeanFactory(type) : null
 	
 		branches.each |tree| {
@@ -266,6 +262,7 @@ const class BeanProperty {
 		return segments[-1].makeSegment(staticType, instance, true)
 	}
 	
+	@NoDoc
 	override Str toStr() {
 		segments.join(".")
 	}

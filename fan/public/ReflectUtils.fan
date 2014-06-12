@@ -103,7 +103,7 @@ class ReflectUtils {
 	private static Bool paramFits(Type? typeA, Type? typeB, Str key) {
 		paramTypeA := typeA.params[key] ?: Obj?#
 		paramTypeB := typeB.params[key] ?: Obj?#
-		return paramTypeA.fits(paramTypeB) || paramTypeB.fits(paramTypeA)
+		return fits(paramTypeA, paramTypeB) || fits(paramTypeB, paramTypeA)
 	}
 	
 	private static Field? _findField(Slot? field, Type? fieldType, Bool? isStatic) {
