@@ -1,5 +1,7 @@
 ## Overview 
 
+*Bean Utils is a support library that aids Alien-Factory in the development of other libraries, frameworks and applications. Though you are welcome to use it, you may find features are missing and the documentation incomplete.*
+
 `Bean Utils` is a collection of utilities and software patterns for overcoming common issues associated with data objects.
 
 Features include:
@@ -81,7 +83,7 @@ BeanProperties.call(string, "split[1].get(2).plus(2).toChar") // --> 3
 Using `BeanProperties` and a bit of naming convention care, it now becomes trivial to populate an object with properties submitted from a HTTP form:
 
 ```
-formBean := BeanProperties.setAll(FormBean(), req.form)
+formBean := BeanProperties.create(MyFormBean#, httpReq.form)
 ```
 
 Features of property expressions include:
