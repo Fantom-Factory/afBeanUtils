@@ -60,16 +60,19 @@ internal class TestBeanProperties : BeanTest {
 			"obj.str"		: "dog",
 			"obj.obj.str"	: "cat",
 			
-			// index
-			"obj.numList[2]": 12,
+			// index leaves
+			"nums[0]"		: 1,
+			"nums[2]"		: 12,
+			"obj.nums[2]"	: 13,
 	
-//			// methods
-//			"meth.str"		: "dog2",
-//			"meth.meth.str"	: "cat2",
+			// index branches
+			"map[1].str"	: "m1",
+			"map[2].str"	: "m2",
+			"map[2].int"	: 15,
 			
-//			"map[1].str"	: "m1",
-//			"map[2].str"	: "m2",
-//			"map[2].int"	: 15,
+			// methods -> can not, 'cos you need an instance (well, you could retro call it...?)
+			"meth.str"		: "dog2",
+			"meth.meth.str"	: "cat2",
 		])
 		
 		verify  (obj is T_Obj04)
@@ -79,21 +82,23 @@ internal class TestBeanProperties : BeanTest {
 		verifyEq(obj.obj.str,			"dog")
 		verifyEq(obj.obj.obj.str,		"cat")
 		
-		verifyEq(obj.obj.numList[2],	12)
+		verifyEq(obj.nums[0],			1)
+		verifyEq(obj.nums[2],			12)
+		verifyEq(obj.obj.nums[2],		13)
 
-		verifyEq(obj.meth.str,			"dog2")
-		verifyEq(obj.meth.meth.str,		"cat2")
-		
 		verifyEq(obj.map[1].str,		"m1")
 		verifyEq(obj.map[2].str,		"m2")
 		verifyEq(obj.map[2].int,		15)
+		
+		verifyEq(obj.meth.str,			"dog2")
+		verifyEq(obj.meth.meth.str,		"cat2")
 	}
 }
 
 internal class T_Obj04 {
 	Str? 			str
 	Int? 			int
-	Int[]?			numList
+	Int[]?			nums
 	[Int:T_Obj04]?	map
 	T_Obj04?		obj
 

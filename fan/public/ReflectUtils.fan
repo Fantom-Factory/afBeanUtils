@@ -1,5 +1,5 @@
 
-** Methods for finding fields, methods and ctors that match given parameter types.
+** Static methods for finding fields, methods and ctors that match given parameter types.
 @Js
 class ReflectUtils {
 
