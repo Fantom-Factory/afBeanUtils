@@ -125,8 +125,11 @@ internal class ExecuteField : SegmentExecutor {
 	}
 
 	override Void set(Obj? value) {
-		val := typeCoercer.coerce(value, field.type)
-		field.set(instance, val)
+		field.set(instance, coerceValue(value))
+	}
+	
+	Obj? coerceValue(Obj? value) {
+		typeCoercer.coerce(value, field.type)
 	}
 	
 	override Type returns() {

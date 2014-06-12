@@ -195,7 +195,8 @@ internal class T_Obj01 {
 	[Str:T_Obj01]?	map
 	[Int:T_Obj01?]	map2 := [:]
 	
-	T_Obj01	meth(Str str) { T_Obj01().with { it.str = str } }
+	T_Obj01?		_meth
+	T_Obj01	meth(Str str) { if (_meth == null) _meth = T_Obj01(); _meth.str = str; return _meth }
 	
 	@Operator
 	T_Obj01? get(Int key) {

@@ -44,21 +44,17 @@ class BeanProperties {
 	static Obj create(Type type, Str:Obj? propertyValues) {
 		factory := BeanPropertyFactory()
 		
-		maker := SegmentTree(null)
+		tree := SegmentTree(null)
 		propertyValues.each |value, expression| {
 			property := factory.parse(expression)
 			
-			end := (SegmentTree) property.segments[0..<-1].reduce(maker) |SegmentTree mkr, segment -> SegmentTree| {   
-				
-				innerMkr := mkr.branches.getOrAdd(segment.expression) { SegmentTree(segment) }
-				
-				return innerMkr
-			}
-			
+			end := (SegmentTree) property.segments[0..<-1].reduce(tree) |SegmentTree mkr, segment -> SegmentTree| {   
+				mkr.branches.getOrAdd(segment.expression) { SegmentTree(segment) }
+			}			
 			end.leaves[property.segments[-1]] = value
 		}
-				
-		return maker.createRoot(type)
+
+		return tree.create(type, null)
 	}
 }
 
@@ -74,72 +70,70 @@ internal class SegmentTree {
 		this.expression = segmentFactory?.expression ?: "root"
 	}
 	
-	Obj? createRoot(Type type) {
-		create(type, null)
-	}
-	
 	Obj? create(Type type, Obj? instance) {
 		if (instance != null && !instance.typeof.fits(type))
 			throw Err("$instance.typeof.signature !fit $type.signature")
 		
-		beanFactory := BeanFactory(type)
+		beanFactory := (instance == null) ? BeanFactory(type) : null
 	
 		branches.each |tree| {
 			if (tree.segmentFactory.type(type) == SegmentType.field) {
-				segType := tree.segmentFactory.makeSegment(type, instance, false).returns
-				val := tree.create(segType, null)
+				segment := (ExecuteField) tree.segmentFactory.makeSegment(type, instance, false)
+				value	:= tree.create(segment.returns, null)
 				
-				slotSegment := (SlotSegment) tree.segmentFactory
 				if (instance == null) {
-					field := (Field) type.slot(slotSegment.slotName)
-					beanFactory[field] = slotSegment.typeCoercer.coerce(val, field.type)
+					beanFactory[segment.field] = segment.coerceValue(value)
 				} else
-					slotSegment.makeSegment(type, instance, false).set(val)
+					segment.set(value)
 			}
 		}
 		
-		leaves.each |val, segmentFactory| {
+		leaves.each |value, segmentFactory| {
 			if (segmentFactory.type(type) == SegmentType.field) {
-				slotSegment := (SlotSegment) segmentFactory
+				segment := (ExecuteField) segmentFactory.makeSegment(type, instance, true)
+
 				if (instance == null) {
-					field := type.slot(slotSegment.slotName)				
-					beanFactory[field] = val
+					beanFactory[segment.field] = segment.coerceValue(value)
 				} else
-					slotSegment.makeSegment(type, instance, true).set(val)
+					segment.set(value)
 			}
 		}
 			
-		bean := (instance != null) ? instance : beanFactory.create
+		instance = beanFactory?.create ?: instance
 		
-		branches.each |SegmentTree tree1| {
-			if (tree1.segmentFactory.type(type) == SegmentType.index) {
-				segType := tree1.segmentFactory.makeSegment(type, bean, false).returns
-				val := tree1.create(segType, null)
-				
-				indexSegment := (IndexSegment) tree1.segmentFactory
-				indexSegment.makeSegment(type, bean, false).set(val)
+		branches.each |SegmentTree tree| {
+			if (tree.segmentFactory.type(type) == SegmentType.index) {
+				segment := tree.segmentFactory.makeSegment(type, instance, false)
+				value	:= tree.create(segment.returns, null)
+				segment.set(value)
 			}
 		}
 
-		branches.each |SegmentTree tree2| {
-			if (tree2.segmentFactory.type(type) == SegmentType.method) {
-				segType := tree2.segmentFactory.makeSegment(type, bean, false).returns
-
-				inst := tree2.segmentFactory.makeSegment(type, bean, false).get(null)
-				
-				val := tree2.create(segType, inst)
+		branches.each |SegmentTree tree| {
+			if (tree.segmentFactory.type(type) == SegmentType.method) {
+				segment := tree.segmentFactory.makeSegment(type, instance, false)
+				inst 	:= segment.get(null)
+				value	:= tree.create(segment.returns, inst)
 				// nothing to set!
 			}
 		}
 		
-		leaves.each |val, segmentFactory| {
+		leaves.each |value, segmentFactory| {
 			if (segmentFactory.type(type) == SegmentType.index) {
-				indexSegment := (IndexSegment) segmentFactory
-				indexSegment.makeSegment(type, bean, true).set(val)
+				segment := segmentFactory.makeSegment(type, instance, true)
+				segment.set(value)
+			}
+		}
+
+		leaves.each |value, segmentFactory| {
+			if (segmentFactory.type(type) == SegmentType.method) {
+				segment := segmentFactory.makeSegment(type, instance, true)
+				// this just throws an err
+				segment.set(value)
 			}
 		}
 		
-		return bean 
+		return instance 
 	}	
 }
 
