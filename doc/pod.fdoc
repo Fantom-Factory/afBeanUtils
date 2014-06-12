@@ -1,10 +1,6 @@
 Overview [#overview]
 ********************
-*@{project.name} is a support library that aids Alien-Factory in the development of other libraries, frameworks and applications.
-Though you are welcome to use it, you may find features are missing and the documentation incomplete.*
-
-Loosely named after [JavaBeans]`http://www.oracle.com/technetwork/java/javase/documentation/spec-136004.html`, 'Bean Utils'
-is a collection of utilities and software patterns for overcoming common issues associated with data objects.
+'Bean Utils' is a collection of utilities and software patterns for overcoming common issues associated with data objects.
 
 Features include:
 
@@ -23,6 +19,8 @@ Features include:
  - **More!**
 
    Utility methods to find matching ctors and methods.
+
+'Bean Utils' is loosely named after [JavaBeans]`http://www.oracle.com/technetwork/java/javase/documentation/spec-136004.html`,
 
 
 

@@ -4,14 +4,14 @@ class Build : BuildPod {
 
 	new make() {
 		podName = "afBeanUtils"
-		// TODO: make desc smaller!
-		summary = "(Internal) A collection of utilities and software patterns commonly associated with data objects"
-		version = Version("0.0.3")
+		summary = "Utilities and software patterns commonly associated with data objects"
+		version = Version("0.0.4")
 
 		meta = [
 			"proj.name"		: "Bean Utils",
+			"internal"		: "true",
 			"tags"			: "system",
-			"repo.private"	: "true"
+			"repo.private"	: "false"
 		]
 
 		depends = [
@@ -19,9 +19,6 @@ class Build : BuildPod {
 		]
 		
 		srcDirs = [`test/`, `fan/`, `fan/public/`, `fan/internal/`]
-		resDirs = [`doc/`]
-
-		docApi = true
-		docSrc = true
+		resDirs = [,]
 	}
 }
