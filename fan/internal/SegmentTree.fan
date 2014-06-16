@@ -5,14 +5,16 @@ internal class SegmentTree {
 	SegmentFactory?		segmentFactory
 	Str:SegmentTree		branches		:= [:]
 	SegmentFactory:Obj?	leaves			:= [:]
+	|Type->BeanFactory|	factoryFunc
 	
-	new make(SegmentFactory? segmentFactory) {
+	new make(SegmentFactory? segmentFactory, |Type->BeanFactory|? factoryFunc) {
 		this.segmentFactory = segmentFactory
-		this.expression = segmentFactory?.expression ?: "root"
+		this.expression 	= segmentFactory?.expression ?: "root"
+		this.factoryFunc	= factoryFunc ?: |Type type->BeanFactory| { BeanFactory(type) } 
 	}
 	
-	Obj? create(Type type, Obj? instance) {		
-		beanFactory := (instance == null) ? BeanFactory(type) : null
+	Obj? create(Type type, Obj? instance) {
+		beanFactory := (instance == null) ? factoryFunc.call(type) : null
 	
 		branches.each |tree| {
 			if (tree.segmentFactory.type(type) == SegmentType.field) {

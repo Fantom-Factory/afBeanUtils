@@ -229,7 +229,7 @@ internal const class T_CtorsWithItBlocks {
 	const Str? value
 	const Str  ctor
 	
-	new make1(|This|? f := null)								{ ctor = "make1"; f?.call(this) }
+	new make1(|This|? f)										{ ctor = "make1"; f?.call(this) }
 	new make2(Int i1, |This|? f := null)	 					{ ctor = "make2"; f?.call(this) }
 	new make3(Int i1, Int i2, |This|? f := null)				{ ctor = "make3"; f?.call(this) }
 	new make4(Int i1, Str s2, |This|? f := null)				{ ctor = "make4"; f?.call(this) }
@@ -243,6 +243,6 @@ internal const class T_CtorsWithMandatoryItBlocks {
 	new make1(|This| f)							{ ctor = "make1"; f(this) }
 	new make2(Int i1, |This| f)	 				{ ctor = "make2"; f(this) }
 	new make3(Int i1, Int i2, |This| f)			{ ctor = "make3"; f(this) }
-	private new make4(Int i1, Str s2, |This| f)			{ ctor = "make4"; f(this) }
+	private new make4(Int i1, Str s2, |This| f)	{ ctor = "make4"; f(this) }
 	new make5(Int i1, Str s2, Int i3, |This| f)	{ ctor = "make5"; f(this) }
 }

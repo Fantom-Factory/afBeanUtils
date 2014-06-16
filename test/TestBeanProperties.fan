@@ -70,7 +70,7 @@ internal class TestBeanProperties : BeanTest {
 			"map[2].str"	: "m2",
 			"map[2].int"	: 15,
 			
-			// methods -> can not, 'cos you need an instance (well, you could retro call it...?)
+			// methods
 			"meth.str"		: "dog2",
 			"meth.meth.str"	: "cat2",
 		])
