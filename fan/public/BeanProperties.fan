@@ -38,26 +38,42 @@ class BeanProperties {
 
 	** Uses the given property expressions to instantiate a tree of beans and values.
 	** Nested beans may be 'const' as long as they supply an it-block ctor argument. 
-	static Obj create(Type type, Str:Obj? propertyValues, TypeCoercer? typeCoercer := null) {
+	static Obj create(Type type, Str:Obj? propertyValues, TypeCoercer? typeCoercer := null, |Type->BeanFactory|? factoryFunc := null) {
 		factory := BeanPropertyFactory()
 		if (typeCoercer != null)
 			factory.typeCoercer = typeCoercer
 		
-		tree := SegmentTree(null)
+		tree := SegmentTree(null, factoryFunc)
 		propertyValues.each |value, expression| {
 			property := factory.parse(expression)
 			
 			end := (SegmentTree) property.segments[0..<-1].reduce(tree) |SegmentTree mkr, segment -> SegmentTree| {   
-				mkr.branches.getOrAdd(segment.expression) { SegmentTree(segment) }
+				mkr.branches.getOrAdd(segment.expression) { SegmentTree(segment, factoryFunc) }
 			}			
 			end.leaves[property.segments[-1]] = value
 		}
 
-		return tree.create(type, null)
+		try {
+			return tree.create(type, null)
+		} catch (Err err) {
+			props := propertyValues.map |v, k| { "$k = $v" }.vals
+			throw BeanCreateErr("Could not instantiate $type.signature", props, err)
+		}
 	}
 }
 
-
+@NoDoc @Js
+const class BeanCreateErr : Err, NotFoundErr {
+	override const Str?[] availableValues
+	
+	new make(Str msg, Obj?[] availableValues, Err? cause := null) : super(msg, cause) {
+		this.availableValues = availableValues.map { it?.toStr }.sort
+	}
+	
+	override Str toStr() {
+		NotFoundErr.super.toStr		
+	}
+}
 
 ** Parses property expressions to create 'BeanProperty' instances. 
 @Js @NoDoc
@@ -67,7 +83,7 @@ class BeanPropertyFactory {
 	private static const Regex	slotRegex	:= Regex<|(?:([^\.\[\]\(\)]*)(?:\(([^\)]+)\))?)?(?:\[([^\]]+)\])?|>
 	
 	** Given to 'BeanProperties' to convert Str values into objects. 
-	** Supplied so you may substitute it with a cached version. 
+	** Supplied so you may substitute it with a cached version and / or a more intelligent one that converts IDs to Entities.
 	TypeCoercer 	typeCoercer	 := TypeCoercer()
 	
 	** Given to 'BeanProperties' to create new instances of intermediate objects.
@@ -75,7 +91,7 @@ class BeanPropertyFactory {
 	** 
 	** Only used if 'createIfNull' is 'true'. 
 	** 
-	** Defaults to '|Type type->Obj| { BeanFactory.defaultValue(type) }'
+	** Defaults to '|Type type->Obj| { BeanFactory.defaultValue(type, true) }'
 	|Type->Obj|		makeFunc 	 := |Type type->Obj| { BeanFactory.defaultValue(type, true) }
 
 	** Given to 'BeanProperties' to indicate if they should create new object instances when traversing an expression.

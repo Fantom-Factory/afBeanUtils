@@ -16,9 +16,11 @@ class BeanFactory {
 		private set
 	}
 
-	private OneShotLock	createLock	:= OneShotLock("Factory has been used")
-	private Obj?[]		ctorArgs
-	private Field:Obj? 	fieldVals
+	private OneShotLock		createLock	:= OneShotLock("Factory has been used")
+	@NoDoc
+	protected Obj?[]		ctorArgs
+ 	@NoDoc
+	protected Field:Obj? 	fieldVals
 	
 	** Makes a factory for the given type.
 	new make(Type type, Obj?[]? ctorArgs := null, [Field:Obj?]? fieldVals := null) {
@@ -64,17 +66,21 @@ class BeanFactory {
 
 		if (ctor!= null && ctor.parent != type)
 			throw ArgErr(ErrMsgs.factory_ctorWrongType(type, ctor))
-
-		if (type.name == "List" && ctorArgs.isEmpty && ctor == null) {
-			valType := type.params["V"] ?: Obj?#
-			return setFieldVals(valType.emptyList.rw)
-		}
-
-		if (type.name == "Map" && ctorArgs.isEmpty && ctor == null) {
-			mapType := type.isGeneric ? Obj:Obj?# : type
-			return setFieldVals(Map(mapType.toNonNullable))
-		}
 		
+		return doCreate(ctor)
+	}
+	
+	@NoDoc
+	protected virtual Obj doCreate(Method? ctor := null) {
+		
+		// if there is nothing to set, try our luck at a default value
+		// needed for Ints, Strs, Lists and Maps, etc...
+		if (ctor == null && ctorArgs.isEmpty) {
+			defVal := makeFromDefaultValue(type)
+			if (defVal != null)
+				return setFieldVals(defVal)
+		}
+
 		args := ctorArgs
 
 		if (ctor != null) {
@@ -88,35 +94,37 @@ class BeanFactory {
 			if (!ReflectUtils.argTypesFitMethod(argTypes, ctor) || args.size > ctor.params.size)
 				throw Err(ErrMsgs.factory_ctorArgMismatch(ctor, args))
 			
+			return setFieldVals(ctor.callList(args))
+		}
+
+		// look for ctors that may / or may not take an it-block, favouring those that do
+		itBlockFunc		:= Field.makeSetFunc(fieldVals.dup) 	// that .dup() is very important!
+		argsWithOut		:= ctorArgs
+		argsWith		:= ctorArgs.dup.add(itBlockFunc)
+		argTypesWithOut	:= argsWithOut.map { it?.typeof }
+		argTypesWith	:= argsWith   .map { it?.typeof }
+		ctorsWithOut	:= ReflectUtils.findCtors(type, argTypesWithOut).exclude { argsWithOut.size > it.params.size }
+		ctorsWith		:= ReflectUtils.findCtors(type, argTypesWith   ).exclude { argsWith.size    > it.params.size }
+		ctorsBoth		:= ctorsWithOut.dup.addAll(ctorsWith).unique
+		
+		if (ctorsWithOut.isEmpty && ctorsWith.isEmpty)
+			throw Err(ErrMsgs.factory_noCtorsFound(type, argTypesWithOut))
+		if (ctorsBoth.size > 1 && ctorsWith.size != 1)	// favour ctors with it-blocks
+			throw Err(ErrMsgs.factory_tooManyCtorsFound(type, ctorsBoth.map { it.name }, argTypesWithOut))
+		
+		if (ctorsWith.size == 1) {
+			ctor = ctorsWith.first
+			args = argsWith
+			fieldVals.clear
 		} else {
-			// look for ctors that may / or may not take an it-block, favouring those that do
-			itBlockFunc		:= Field.makeSetFunc(fieldVals.dup) 	// that .dup() is very important!
-			argsWithOut		:= args
-			argsWith		:= args.dup.add(itBlockFunc)
-			argTypesWithOut	:= argsWithOut.map { it?.typeof }
-			argTypesWith	:= argsWith   .map { it?.typeof }
-			ctorsWithOut	:= ReflectUtils.findCtors(type, argTypesWithOut).exclude { argsWithOut.size > it.params.size }
-			ctorsWith		:= ReflectUtils.findCtors(type, argTypesWith   ).exclude { argsWith.size    > it.params.size }
-			ctorsBoth		:= ctorsWithOut.dup.addAll(ctorsWith).unique
-			
-			if (ctorsWithOut.isEmpty && ctorsWith.isEmpty)
-				throw Err(ErrMsgs.factory_noCtorsFound(type, argTypesWithOut))
-			if (ctorsBoth.size > 1 && ctorsWith.size != 1)	// favour ctors with it-blocks
-				throw Err(ErrMsgs.factory_tooManyCtorsFound(type, ctorsBoth.map { it.name }, argTypesWithOut))
-			
-			if (ctorsWith.size == 1) {
-				ctor = ctorsWith.first
-				args = argsWith
-				fieldVals.clear
-			} else {
-				ctor = ctorsWithOut.first
-				args = argsWithOut
-			}
+			ctor = ctorsWithOut.first
+			args = argsWithOut
 		}
 		
-		return setFieldVals(ctor.callList(args))
+		return setFieldVals(ctor.callList(args))		
 	}
 	
+	@NoDoc
 	override Str toStr() {
 		"BeanFactory for $type.qname"
 	}
@@ -135,13 +143,32 @@ class BeanFactory {
 	** 1. If it exists, the value of the type's 'defVal' slot is returned. 
 	**    (Must be a static field or a static method with zero params.)
 	** 1. 'Err' is thrown. 
+	** 
+	** This method differs from [Type.make()]`Type.make` for the following reasons:
+	**  - 'null' is returned if type is nullable. 
+	**  - Can create Lists and Maps
+	**  - The public no-args ctor can be called *anything*. 
 	static Obj? defaultValue(Type type, Bool force := false) {
 		if (type.isNullable && !force)
 			return null
 
-		if (type.name == "List" || type.name == "Map")
-			return BeanFactory(type).create
-		
+		return makeFromDefaultValue(type) ?: throw Err(ErrMsgs.factory_defValNotFound(type)) 
+	}
+
+	@NoDoc
+	protected static Obj? makeFromDefaultValue(Type type) {
+		if (type.name == "List") {
+			valType := type.params["V"] ?: Obj?#
+			list := valType.emptyList.rw
+			list.capacity = 0
+			return list
+		}
+
+		if (type.name == "Map") {
+			mapType := type.isGeneric ? Obj:Obj?# : type
+			return Map(mapType.toNonNullable)
+		}
+
 		ctors := ReflectUtils.findCtors(type)
 		if (ctors.size == 1 && ctors.first.isPublic)
 			return ctors.first.call
@@ -154,7 +181,7 @@ class BeanFactory {
 		if (defValMethod != null && defValMethod.isPublic)
 			return defValMethod.call
 
-		throw Err(ErrMsgs.factory_defValNotFound(type))
+		return null
 	}
 
 	private Obj? setFieldVals(Obj? obj) {
