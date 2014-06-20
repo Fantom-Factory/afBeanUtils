@@ -4,36 +4,43 @@
 class ReflectUtils {
 
 	** Finds a named field.
+	** 
+	** Returns 'null' if not found.
 	static Field? findField(Type type, Str fieldName, Type? fieldType := null, Bool? isStatic := null) {
 		field := type.slot(fieldName, false)
 		return _findField(field, fieldType, isStatic)
 	}
 	
 	** Finds a named ctor with the given parameter types.
-	static Method? findCtor(Type type, Str ctorName, Type[] params := Type#.emptyList) {
+	** 
+	** Returns 'null' if not found.
+	static Method? findCtor(Type type, Str ctorName, Type[]? params := null) {
 		ctor := type.slot(ctorName, false)
-		return _findCtor(ctor, params)
+		return _findCtor(ctor, params ?: Type#.emptyList)
 	}
 
 	** Finds a named method with the given parameter types.
-	static Method? findMethod(Type type, Str methodName, Type[] params := Type#.emptyList, Bool? isStatic := null, Type? returnType := null) {
+	** 
+	** Returns 'null' if not found.
+	static Method? findMethod(Type type, Str methodName, Type[]? params := null, Bool? isStatic := null, Type? returnType := null) {
 		method := type.slot(methodName, false)
-		return _findMethod(method, params, isStatic, returnType)
+		return _findMethod(method, params ?: Type#.emptyList, isStatic, returnType)
 	}
 
 	** Find fields.
+
 	static Field[] findFields(Type type, Type fieldType, Bool? isStatic := null) {
 		type.fields.findAll  { _findField(it, fieldType, isStatic) != null }
 	}
 	
 	** Find ctors with the given parameter types.
-	static Method[] findCtors(Type type, Type[] params := Type#.emptyList) {
-		type.methods.findAll { _findCtor(it, params) != null }
+	static Method[] findCtors(Type type, Type[]? params := null) {
+		type.methods.findAll { _findCtor(it, params ?: Type#.emptyList) != null }
 	}
 
 	** Find methods with the given parameter types.
-	static Method[] findMethods(Type type, Type[] params := Type#.emptyList, Bool? isStatic := null, Type? returnType := null) {
-		type.methods.findAll { _findMethod(it, params, isStatic, returnType) != null }
+	static Method[] findMethods(Type type, Type[]? params := null, Bool? isStatic := null, Type? returnType := null) {
+		type.methods.findAll { _findMethod(it, params ?: Type#.emptyList, isStatic, returnType) != null }
 	}
 
 	@NoDoc @Deprecated { msg="Use argTypesFitMethodSignature() instead"}
