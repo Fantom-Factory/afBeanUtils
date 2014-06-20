@@ -57,7 +57,7 @@ class BeanProperties {
 			return tree.create(type, null)
 		} catch (Err err) {
 			props := propertyValues.map |v, k| { "$k = $v" }.vals
-			throw BeanCreateErr("Could not instantiate $type.signature", props, err)
+			throw BeanCreateErr(ErrMsgs.properties_couldNotMake(type), props, err)
 		}
 	}
 }
