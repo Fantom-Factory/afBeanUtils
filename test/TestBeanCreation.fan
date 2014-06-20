@@ -41,7 +41,7 @@ internal class TestBeanCreation : BeanTest {
 	}
 	
 	Void testSetMethod() {
-		verifyErrMsg(ArgErr#, ErrMsgs.property_setOnMethod(#judge)) {
+		verifyErrMsg(BeanCreateErr#, ErrMsgs.properties_couldNotMake(TestBeanCreation#)) {
 			obj := create(["judge":"hello"])
 		}
 	}
