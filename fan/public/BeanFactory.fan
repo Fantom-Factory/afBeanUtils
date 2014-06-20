@@ -142,7 +142,7 @@ class BeanFactory {
 	** 1. If one exists, a public no-args ctor is called to create the object.
 	** 1. If it exists, the value of the type's 'defVal' slot is returned. 
 	**    (Must be a static field or a static method with zero params.)
-	** 1. 'Err' is thrown. 
+	** 1. 'ArgErr' is thrown. 
 	** 
 	** This method differs from [Type.make()]`Type.make` for the following reasons:
 	**  - 'null' is returned if type is nullable. 
@@ -152,7 +152,7 @@ class BeanFactory {
 		if (type.isNullable && !force)
 			return null
 
-		return makeFromDefaultValue(type) ?: throw Err(ErrMsgs.factory_defValNotFound(type)) 
+		return makeFromDefaultValue(type) ?: throw ArgErr(ErrMsgs.factory_defValNotFound(type)) 
 	}
 
 	@NoDoc

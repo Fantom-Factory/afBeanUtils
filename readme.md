@@ -1,4 +1,4 @@
-## Overview 
+## Overview
 
 *Bean Utils is a support library that aids Alien-Factory in the development of other libraries, frameworks and applications. Though you are welcome to use it, you may find features are missing and the documentation incomplete.*
 
@@ -29,7 +29,7 @@ Features include:
 
 `Bean Utils` is loosely named after [JavaBeans](http://www.oracle.com/technetwork/java/javase/documentation/spec-136004.html),
 
-## Install 
+## Install
 
 Install `Bean Utils` with the Fantom Repository Manager ( [fanr](http://fantom.org/doc/docFanr/Tool.html#install) ):
 
@@ -37,13 +37,13 @@ Install `Bean Utils` with the Fantom Repository Manager ( [fanr](http://fantom.o
 
 To use in a [Fantom](http://fantom.org/) project, add a dependency to `build.fan`:
 
-    depends = ["sys 1.0", ..., "afBeanUtils 0.0+"]
+    depends = ["sys 1.0", ..., "afBeanUtils 1.0+"]
 
-## Documentation 
+## Documentation
 
 Full API & fandocs are available on the [Status302 repository](http://repo.status302.com/doc/afBeanUtils/).
 
-## Bean Identity 
+## Bean Identity
 
 Nobody likes writing `hash()` and `equals()` methods, so let [BeanIdentity](http://repo.status302.com/doc/afBeanUtils/BeanIdentity.html) take the pain away! Simply annotate important identity fields with `@BeanId` and override the Obj methods.
 
@@ -69,7 +69,7 @@ class User {
 }
 ```
 
-## Bean Properties 
+## Bean Properties
 
 [BeanProperties](http://repo.status302.com/doc/afBeanUtils/BeanProperties.html) is a nifty way to get and set properties, and call methods, on nested objects.
 
@@ -88,7 +88,7 @@ formBean := BeanProperties.create(MyFormBean#, httpReq.form)
 
 Features of property expressions include:
 
-### Field Access 
+### Field Access
 
 The simplest use case is getting and setting basic fields. In this example we access the field `Buf.capacity`:
 
@@ -104,7 +104,7 @@ When setting fields, the given value is [Type Coerced](http://repo.status302.com
 BeanProperties.set(buf, "charset", "UTF-16")  // string "UTF-16" is converted to a Charset object
 ```
 
-### Method Calls 
+### Method Calls
 
 Property expressions can call methods too. Like Fantom code, if the method does not take any parameters then brackets are optional:
 
@@ -128,7 +128,7 @@ BeanProperties.call(buf, "fill", [128, 4])      // --> 0x80808080
 BeanProperties.call(buf, "getRange()", [1..2])  // --> 0x8080
 ```
 
-### Indexed Properties 
+### Indexed Properties
 
 Lists, Maps and `@Operator` shortcuts for `get` and `set` may all be traversed using square bracket notation:
 
@@ -139,7 +139,7 @@ BeanProperties.get(list, "[1]") // --> "b"
 
 All keys and values are [Type Coerced](http://repo.status302.com/doc/afBeanUtils/TypeCoerecer.html) to the correct type.
 
-#### Lists 
+#### Lists
 
 When setting List items special attention is given make sure they don't throw `IndexErrs`. Should the list size be smaller than the given index, the list is automatically grown to accommodate:
 
@@ -161,19 +161,19 @@ list[0]                              // --> ""
 list[1]                              // --> "b"
 ```
 
-### Chaining 
+### Chaining
 
 Property expressions become very powerful when chained:
 
     obj.method(arg, arg).map[key].list[idx][operator].field
 
-### Object Creation 
+### Object Creation
 
 When traversing a property expression, the last thing you want is a `NullErr` half way through. With that in mind, should a property expression encounter `null` part way through, a new object is created and set.
 
 Now you can happily chain your expressions with confidence!
 
-#### Advanced 
+#### Advanced
 
 If you need more control over when and how intermediate objects are created, then use [BeanPropertyFactory](http://repo.status302.com/doc/afBeanUtils/BeanPropertyFactory.html) to manually parse property expressions and create your own [BeanProperty](http://repo.status302.com/doc/afBeanUtils/BeanProperty.html) instances.
 

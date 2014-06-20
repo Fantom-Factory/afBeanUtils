@@ -202,6 +202,10 @@ property expressions and create your own `BeanProperty` instances.
 
 Release Notes [#releaseNotes]
 *****************************
+v1.0.0 [#v1.0.0]
+----------------
+ - Chg: 'BeanProperties.create()' takes a 'factoryFunc' so [IoC]`pod:afIoc` may instantiate the objects.
+
 v0.0.4 [#v0.0.4]
 ----------------
  - New: 'Bean Utils' is now available in JavaScript. (Added '@Js' to all classes.)
