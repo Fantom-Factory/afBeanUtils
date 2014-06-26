@@ -1,5 +1,6 @@
 
 ** A simple implementation of `NotFoundErr` that extends 'ArgErr'.
+@Js
 const class ArgNotFoundErr : ArgErr, NotFoundErr {
 	override const Str?[] availableValues
 	
