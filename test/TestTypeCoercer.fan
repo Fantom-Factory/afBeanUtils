@@ -119,4 +119,18 @@ internal class TestTypeCoercer : BeanTest {
 		// test non-parameterised maps
 		verifyEq(tc.coerce([6:9], Map#), Obj:Obj?[6:9])
 	}
+	
+	Void testCoerceEmptyMaps() {
+		tc := TypeCoercer()
+
+		// keys
+		verifyEq(tc.coerce(Int:Obj[:], [Str:Obj]#), Str:Obj[:])
+		verifyEq(tc.coerce(Obj:Obj[:], [Str:Obj]#), Str:Obj[:])
+		verifyEq(tc.coerce(Int:Obj[:], [Obj:Obj]#), Obj:Obj[:])
+
+		// vals
+		verifyEq(tc.coerce(Obj:Int[:], [Obj:Str]#), Obj:Str[:])
+		verifyEq(tc.coerce(Obj:Obj[:], [Obj:Str]#), Obj:Str[:])
+		verifyEq(tc.coerce(Obj:Int[:], [Obj:Obj]#), Obj:Obj[:])
+	}
 }

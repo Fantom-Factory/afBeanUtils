@@ -52,11 +52,18 @@ const mixin NotFoundErr {
 	** A list of values the user could have used chosen.
 	abstract Str[]	availableValues()
 
+	** The msg that prefixes the list of values. 
+	** 
+	** Defaults to '"Available values:"'. Override to change it.
+	virtual Str	valueMsg() {
+		"Available values:"
+	}
+
 	** Pre-pends the list of available values to the stack trace.
 	override Str toStr() {
 		buf := StrBuf()
 		buf.add("${typeof.qname}: ${msg}\n")
-		buf.add("\nAvailable values:\n")
+		buf.add("\n${valueMsg}\n")
 		availableValues.each { buf.add("  $it\n")}
 		buf.add("\nStack Trace:")
 		return buf.toStr
