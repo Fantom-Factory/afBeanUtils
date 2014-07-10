@@ -64,8 +64,9 @@ class BeanProperties {
 
 @NoDoc @Js
 const class BeanCreateErr : Err, NotFoundErr {
-	override const Str?[] availableValues
-	
+	override const Str?[] 	availableValues
+	override const Str		valueMsg	:= "Field Values Given:"
+
 	new make(Str msg, Obj?[] availableValues, Err? cause := null) : super(msg, cause) {
 		this.availableValues = availableValues.map { it?.toStr }.sort
 	}
