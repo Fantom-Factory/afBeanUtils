@@ -35,7 +35,7 @@ internal class ErrMsgs {
 	}
 
 	static Str factory_defValNotFound(Type type) {
-		stripSys("Could not find a default value for ${type.signature}")
+		stripSys("${type.signature} is null and does not have a default value")
 	}
 
 	static Str factory_ctorWrongType(Type type, Method ctor) {

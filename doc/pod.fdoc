@@ -202,6 +202,10 @@ property expressions and create your own `BeanProperty` instances.
 
 Release Notes [#releaseNotes]
 *****************************
+v1.0.4 [#v1.0.4]
+----------------
+ - Chg: Updated the odd error message.
+
 v1.0.2 [#v1.0.2]
 ----------------
  - New: Added 'ArgNotFoundErr', a handy impl of 'NotFoundErr'.
