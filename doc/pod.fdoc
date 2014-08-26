@@ -205,6 +205,7 @@ Release Notes [#releaseNotes]
 v1.0.4 [#v1.0.4]
 ----------------
  - Chg: Updated the odd error message.
+ - Bug: 'NotFoundErr.availableValues' could not hold 'null'.
 
 v1.0.2 [#v1.0.2]
 ----------------
