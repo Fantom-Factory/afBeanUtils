@@ -50,7 +50,7 @@ const mixin NotFoundErr {
 	abstract Str 	msg()
 	
 	** A list of values the user could have used chosen.
-	abstract Str[]	availableValues()
+	abstract Str?[]	availableValues()
 
 	** The msg that prefixes the list of values. 
 	** 
