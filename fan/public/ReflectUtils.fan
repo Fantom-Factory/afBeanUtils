@@ -125,7 +125,7 @@ class ReflectUtils {
 		return field
 	}
 
-	static Method? _findCtor(Slot? ctor, Type[] params) {
+	private static Method? _findCtor(Slot? ctor, Type[] params) {
 		if (ctor == null)
 			return null
 		if (!ctor.isMethod) 
@@ -135,7 +135,7 @@ class ReflectUtils {
 		return _argTypesFitParams(params, ((Method) ctor).params) ? ctor: null
 	}
 	
-	static Method? _findMethod(Slot? method, Type[] params, Bool? isStatic, Type? returnType) {
+	private static Method? _findMethod(Slot? method, Type[] params, Bool? isStatic, Type? returnType) {
 		if (method == null)
 			return null
 		if (!method.isMethod) 
