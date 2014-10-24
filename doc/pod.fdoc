@@ -204,6 +204,7 @@ Release Notes [#releaseNotes]
 *****************************
 v1.0.4 [#v1.0.4]
 ----------------
+ - Chg: More nullable options in 'ReflectUtils'.
  - Chg: Updated the odd error message.
  - Bug: 'NotFoundErr.availableValues' could not hold 'null'.
 

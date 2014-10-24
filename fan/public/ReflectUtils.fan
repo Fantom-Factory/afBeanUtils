@@ -14,7 +14,7 @@ class ReflectUtils {
 	** Finds a named ctor with the given parameter types.
 	** 
 	** Returns 'null' if not found.
-	static Method? findCtor(Type type, Str ctorName, Type[]? params := null) {
+	static Method? findCtor(Type type, Str ctorName, Type?[]? params := null) {
 		ctor := type.slot(ctorName, false)
 		return _findCtor(ctor, params ?: Type#.emptyList)
 	}
@@ -22,7 +22,7 @@ class ReflectUtils {
 	** Finds a named method with the given parameter types.
 	** 
 	** Returns 'null' if not found.
-	static Method? findMethod(Type type, Str methodName, Type[]? params := null, Bool? isStatic := null, Type? returnType := null) {
+	static Method? findMethod(Type type, Str methodName, Type?[]? params := null, Bool? isStatic := null, Type? returnType := null) {
 		method := type.slot(methodName, false)
 		return _findMethod(method, params ?: Type#.emptyList, isStatic, returnType)
 	}
@@ -34,12 +34,12 @@ class ReflectUtils {
 	}
 	
 	** Find ctors with the given parameter types.
-	static Method[] findCtors(Type type, Type[]? params := null) {
+	static Method[] findCtors(Type type, Type?[]? params := null) {
 		type.methods.findAll { _findCtor(it, params ?: Type#.emptyList) != null }
 	}
 
 	** Find methods with the given parameter types.
-	static Method[] findMethods(Type type, Type[]? params := null, Bool? isStatic := null, Type? returnType := null) {
+	static Method[] findMethods(Type type, Type?[]? params := null, Bool? isStatic := null, Type? returnType := null) {
 		type.methods.findAll { _findMethod(it, params ?: Type#.emptyList, isStatic, returnType) != null }
 	}
 
@@ -125,7 +125,7 @@ class ReflectUtils {
 		return field
 	}
 
-	private static Method? _findCtor(Slot? ctor, Type[] params) {
+	private static Method? _findCtor(Slot? ctor, Type?[] params) {
 		if (ctor == null)
 			return null
 		if (!ctor.isMethod) 
@@ -135,7 +135,7 @@ class ReflectUtils {
 		return _argTypesFitParams(params, ((Method) ctor).params) ? ctor: null
 	}
 	
-	private static Method? _findMethod(Slot? method, Type[] params, Bool? isStatic, Type? returnType) {
+	private static Method? _findMethod(Slot? method, Type?[] params, Bool? isStatic, Type? returnType) {
 		if (method == null)
 			return null
 		if (!method.isMethod) 
