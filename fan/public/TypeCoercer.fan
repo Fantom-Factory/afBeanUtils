@@ -34,9 +34,18 @@
 ** <pre
 @Js
 const class TypeCoercer {
-	
+
 	** Returns 'true' if 'fromType' can be coerced to the given 'toType'.
-	Bool canCoerce(Type fromType, Type toType) {
+	** 
+	** If one of the supplied types is 'null', then the other has to be nullable.
+	Bool canCoerce(Type? fromType, Type? toType) {
+		if (fromType == toType)
+			return true
+		if (fromType == null)
+			return toType.isNullable
+		if (toType == null)
+			return fromType.isNullable
+
 		if (fromType.name == "List" && toType.name == "List") {
 			valFunc := createCoercionFunc(fromType.params["V"] ?: Obj?#, toType.params["V"] ?: Obj?#) 
 			return valFunc != null
@@ -105,15 +114,13 @@ const class TypeCoercer {
 	}
 	
 	** Override this method should you wish to cache the conversion functions. 
-	** 
-	** @see http://fantom.org/sidewalk/topic/2289
 	@NoDoc
 	protected virtual |Obj->Obj?|? createCoercionFunc(Type fromType, Type toType) {
 		doCreateCoercionFunc(fromType, toType)
 	}
 
-	** It kinda sucks to need this method, but it's a workaround to 
-	** [this issue]`http://fantom.org/sidewalk/topic/2289`.
+	** It kinda sucks to need this method, but it's a workaround to this 
+	** [super issue]`http://fantom.org/sidewalk/topic/2289`.
 	@NoDoc
 	protected |Obj->Obj?|? doCreateCoercionFunc(Type fromType, Type toType) {
 		// check the basics first!

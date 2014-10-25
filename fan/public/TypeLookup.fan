@@ -92,7 +92,8 @@ const class TypeLookup {
 		return values.get(nonNullable) ?: check(nonNullable, checked)
 	}
 
-	** Returns the value of the closest parent of the given type (or the given type should ).
+	** Returns the value of the closest parent of the given type. 
+	** Note an exact match is performed first.
 	** Example:
 	** pre>
 	**   strategy := StrategyRegistry( [Obj#:1, Num#:2, Int#:3] )
@@ -108,6 +109,7 @@ const class TypeLookup {
 	}
 	
 	** Returns the values of the children of the given type.
+	** Note an exact match is performed first.
 	** Example:
 	** pre>
 	**   strategy := StrategyRegistry( [Obj#:1, Num#:2, Int#:3] )
@@ -121,8 +123,14 @@ const class TypeLookup {
 		doFindChildren(type, checked)
 	}
 	
-	** It kinda sucks to need this method, but it's a workaround to 
-	** [this issue]`http://fantom.org/sidewalk/topic/2289`.
+	** Returns a list of all the types this lookup is configured for. 
+	** (Handy for debug / error messages.) 
+	Type[] types() {
+		values.keys
+	}
+	
+	** It kinda sucks to need this method, but it's a workaround to this 
+	** [super issue]`http://fantom.org/sidewalk/topic/2289`.
 	@NoDoc
 	protected Obj? doFindParent(Type type, Bool checked := true) {
 		nonNullable := type.toNonNullable
@@ -144,8 +152,8 @@ const class TypeLookup {
 		return values[match]
 	}
 	
-	** It kinda sucks to need this method, but it's a workaround to 
-	** [this issue]`http://fantom.org/sidewalk/topic/2289`.
+	** It kinda sucks to need this method, but it's a workaround to this
+	** [super issue]`http://fantom.org/sidewalk/topic/2289`.
 	@NoDoc
 	protected Obj?[] doFindChildren(Type type, Bool checked := true) {
 		nonNullable := type.toNonNullable

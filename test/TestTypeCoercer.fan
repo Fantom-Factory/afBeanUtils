@@ -42,6 +42,13 @@ internal class TestTypeCoercer : BeanTest {
 		// test cache 
 		verify     (tc.canCoerce(Str#, Int#))
 		verifyFalse(tc.canCoerce(TestTypeCoercer#, Int#))
+		
+		// test nulls
+		verify     (tc.canCoerce(null, null))
+		verify     (tc.canCoerce(null, Int?#))
+		verifyFalse(tc.canCoerce(null, Int#))
+		verify     (tc.canCoerce(Int?#, null))
+		verifyFalse(tc.canCoerce(Int#, null))
 	}
 
 	Void testCanCoerceLists() {
