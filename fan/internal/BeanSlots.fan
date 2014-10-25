@@ -2,7 +2,7 @@
 @Js
 internal const abstract class SegmentFactory {
 	const TypeCoercer	typeCoercer
-	const |Type->Obj|	makeFunc 
+	const |Type->Obj?|	makeFunc
 	const Bool			createIfNull
 	
 	new make(|This| f) { f(this) }
@@ -93,7 +93,7 @@ internal const class IndexSegment : SegmentFactory {
 @Js
 internal abstract class SegmentExecutor {
 	TypeCoercer?	typeCoercer
-	|Type->Obj|?	makeFunc 
+	|Type->Obj?|?	makeFunc 
 	Bool?			createIfNull
 	Obj?			instance
 
