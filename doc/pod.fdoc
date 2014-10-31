@@ -207,7 +207,6 @@ v1.0.4 [#v1.0.4]
  - Chg: More nullable options in 'ReflectUtils'.
  - Chg: 'TypeCoercer.canCoerce()' may now take nulls.
  - Chg: Added 'TypeLookup.types()'.
- - Chg: Updated the odd error message.
  - Bug: Property 'makeFuncs' could not return 'null'.
  - Bug: 'NotFoundErr.availableValues' could not hold 'null'.
 

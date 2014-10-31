@@ -5,11 +5,11 @@ class Build : BuildPod {
 	new make() {
 		podName = "afBeanUtils"
 		summary = "Utilities and software patterns commonly associated with data objects"
-		version = Version("1.0.3")
+		version = Version("1.0.4")
 
 		meta = [
 			"proj.name"		: "Bean Utils",
-			"internal"		: "true",
+			"internal"		: "false",
 			"tags"			: "system",
 			"repo.private"	: "true"
 		]
