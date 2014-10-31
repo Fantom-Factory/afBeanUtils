@@ -1,7 +1,5 @@
 ## Overview 
 
-*Bean Utils is a support library that aids Alien-Factory in the development of other libraries, frameworks and applications. Though you are welcome to use it, you may find features are missing and the documentation incomplete.*
-
 `Bean Utils` is a collection of utilities and software patterns for overcoming common issues associated with data objects.
 
 Features include:
@@ -37,7 +35,7 @@ Install `Bean Utils` with the Fantom Repository Manager ( [fanr](http://fantom.o
 
 To use in a [Fantom](http://fantom.org/) project, add a dependency to `build.fan`:
 
-    depends = ["sys 1.0", ..., "afBeanUtils 1.0+"]
+    depends = ["sys 1.0", ..., "afBeanUtils 1.0"]
 
 ## Documentation 
 
