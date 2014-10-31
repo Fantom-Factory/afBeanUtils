@@ -9,9 +9,9 @@ class Build : BuildPod {
 
 		meta = [
 			"proj.name"		: "Bean Utils",
-			"internal"		: "false",
+			"internal"		: "true",
 			"tags"			: "system",
-			"repo.private"	: "true"
+			"repo.private"	: "false"
 		]
 
 		depends = [
