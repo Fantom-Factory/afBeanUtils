@@ -5,13 +5,13 @@ class Build : BuildPod {
 	new make() {
 		podName = "afBeanUtils"
 		summary = "Utilities and software patterns commonly associated with data objects"
-		version = Version("1.0.4")
+		version = Version("1.0.5")
 
 		meta = [
 			"proj.name"		: "Bean Utils",
 			"internal"		: "true",
 			"tags"			: "system",
-			"repo.private"	: "false"
+			"repo.private"	: "true"
 		]
 
 		depends = [

@@ -1,5 +1,7 @@
 ## Overview 
 
+*Bean Utils is a support library that aids Alien-Factory in the development of other libraries, frameworks and applications. Though you are welcome to use it, you may find features are missing and the documentation incomplete.*
+
 `Bean Utils` is a collection of utilities and software patterns for overcoming common issues associated with data objects.
 
 Features include:
