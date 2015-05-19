@@ -108,7 +108,7 @@ internal class TestBeanProperty : BeanTest {
 		verifyEq(list.size, 6)
 
 		prop = BeanPropertyFactory() { it.maxListSize = 100 }.parse("list[101]")
-		verifyErrMsg(ArgErr#, ErrMsgs.property_crazyList(101, Int#).splitLines.first) {
+		verifyErrMsg(ArgErr#, ErrMsgs.property_crazyList(101, Int#)) {
 			prop.set(this, 6)			
 		}
 	}

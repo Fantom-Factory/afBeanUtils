@@ -24,7 +24,7 @@ internal class TestTypeCoercer : BeanTest {
 		
 		// nulls
 		verifyNull(tc.coerce(null, Str?#))
-		verifyErrMsg(ArgErr#, ErrMsgs.typeCoercer_notFound(null, Str#)) {
+		verifyErrMsg(ArgErr#, ErrMsgs.typeCoercer_notFound(null, Str#)) |t| {
 			verifyEq(tc.coerce(null, Str#), null)
 		}
 
