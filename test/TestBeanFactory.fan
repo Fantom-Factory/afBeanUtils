@@ -166,13 +166,13 @@ internal class TestBeanFactory : BeanTest {
 		verifyEq(BeanFactory.defaultValue(T_Obj03#)->dude, "defVal")
 		verifyEq(BeanFactory.defaultValue(Str#), Str.defVal)
 		
-		verifyErrMsg(Err#, ErrMsgs.factory_defValNotFound(Env#)) {
+		verifyErrMsg(ArgErr#, ErrMsgs.factory_defValNotFound(Env#)) {
 			BeanFactory.defaultValue(Env#)
 		}
 	}
 	
 	Void testMisc() {
-		verifyErrMsg(Err#, ErrMsgs.factory_ctorWrongType(Str#, T_Obj03#make2)) {
+		verifyErrMsg(ArgErr#, ErrMsgs.factory_ctorWrongType(Str#, T_Obj03#make2)) {
 			BeanFactory(Str#).create(T_Obj03#make2)
 		}		
 	}

@@ -8,7 +8,7 @@ internal class TestTypeLookup : BeanTest {
 		map[ArgErr?#] 	= 2
 		map[Err?#] 		= 3
 		
-		verifyErrMsg(Err#, "Type sys::Err is already mapped to value 1") {
+		verifyErrMsg(ArgErr#, "Type sys::Err is already mapped to value 1") {
 			ap := TypeLookup(map)
 		}
 	}
@@ -38,7 +38,7 @@ internal class TestTypeLookup : BeanTest {
 		verifyEq(ap.findExact(T_InnerArgErr?#, false), null)
 		verifyEq(ap.findExact(TestTypeLookup?#, false), null)
 		
-		verifyErrMsg(TypeNotFoundErr#, "Could not find match for Type afBeanUtils::TestTypeLookup.") {
+		verifyErrMsg(TypeNotFoundErr#, "Could not find match for Type afBeanUtils::TestTypeLookup.") |t| {
 			try {
 				ap.findExact(TestTypeLookup#)
 			} catch (TypeNotFoundErr nfe) {
@@ -49,7 +49,7 @@ internal class TestTypeLookup : BeanTest {
 			}
 		}
 
-		verifyErrMsg(TypeNotFoundErr#, "Could not find match for Type afBeanUtils::T_InnerArgErr.") {   
+		verifyErrMsg(TypeNotFoundErr#, "Could not find match for Type afBeanUtils::T_InnerArgErr.") |t| {
 			try {
 				ap.findExact(T_InnerArgErr#)
 			} catch (TypeNotFoundErr nfe) {
@@ -82,7 +82,7 @@ internal class TestTypeLookup : BeanTest {
 		verifyEq(ap.findParent(T_StratA?#, false), 3)	// should find A even though it's not directly in the map
 		verifyEq(ap.findParent(T_StratC?#, false), 3)
 		
-		verifyErrMsg(TypeNotFoundErr#, "Could not find match for Type afBeanUtils::TestTypeLookup.") {
+		verifyErrMsg(TypeNotFoundErr#, "Could not find match for Type afBeanUtils::TestTypeLookup.") |t| {
 			try {
 				ap.findExact(TestTypeLookup#)
 			} catch (TypeNotFoundErr nfe) {
