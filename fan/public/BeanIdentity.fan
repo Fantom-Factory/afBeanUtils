@@ -3,6 +3,8 @@
 ** Sample usage:
 ** 
 ** pre>
+** syntax: fantom
+** 
 ** class User {
 **   @BeanId Int? id
 **   @BeanId Str? name

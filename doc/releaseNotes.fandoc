@@ -1,0 +1,31 @@
+Versions
+********
+v1.0.4
+------
+ - Chg: More nullable options in 'ReflectUtils'.
+ - Chg: 'TypeCoercer.canCoerce()' may now take nulls.
+ - Chg: Added 'TypeLookup.types()'.
+ - Bug: Property 'makeFuncs' could not return 'null'.
+ - Bug: 'NotFoundErr.availableValues' could not hold 'null'.
+
+v1.0.2
+------
+ - New: Added 'ArgNotFoundErr', a handy impl of 'NotFoundErr'.
+ - New: Added 'NotFoundErr.valueMsg()' so you can customise the msg.
+
+v1.0.0
+------
+ - Chg: 'BeanProperties.create()' takes a 'factoryFunc' so [IoC]`pod:afIoc` may instantiate the objects.
+
+v0.0.4
+------
+ - New: 'Bean Utils' is now available in JavaScript. (Added '@Js' to all classes.)
+ - New: Use 'BeanProperties.create()' to instantiate entire trees of objects from property expressions!
+ - New: Use 'BeanFactory' to reflectivly create instances of Lists, Maps and other Objects.
+ - New: Added 'findFields()', 'findCtors()' and 'findMethods()' to 'ReflectUtils'.
+ - New: Added 'BeanFactory.defaultValue(type)' as a replacement for 'Type.make'.
+
+v0.0.2
+------
+ - New: Preview release.
+

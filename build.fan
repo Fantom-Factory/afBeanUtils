@@ -9,9 +9,9 @@ class Build : BuildPod {
 
 		meta = [
 			"proj.name"		: "Bean Utils",
-			"internal"		: "true",
-			"tags"			: "system",
-			"repo.private"	: "true"
+			"repo.internal"	: "true",
+			"repo.tags"		: "system",
+			"repo.public"	: "false"
 		]
 
 		depends = [
@@ -19,6 +19,6 @@ class Build : BuildPod {
 		]
 
 		srcDirs = [`test/`, `fan/`, `fan/public/`, `fan/internal/`]
-		resDirs = [,]
+		resDirs = [`doc/`]
 	}
 }

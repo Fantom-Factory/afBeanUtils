@@ -13,6 +13,8 @@
 ** Full code for a 'CachingTypeCoercer' is given below: 
 ** 
 ** pre>
+** syntax: fantom
+** 
 ** using afBeanUtils
 ** using afConcurrent
 ** 
