@@ -1,5 +1,5 @@
-Overview [#overview]
-********************
+Overview
+********
 'Bean Utils' is a collection of utilities and software patterns for overcoming common issues associated with data objects.
 
 Features include:
@@ -24,32 +24,16 @@ Features include:
 
 
 
-Install [#Install]
-******************
-Install '@{project.name}' with the Fantom Repository Manager ( [fanr]`docFanr::Tool.install` ):
-
-  C:\> fanr install -r http://repo.status302.com/fanr/ @{pod.name}
-
-To use in a [Fantom]`http://fantom.org/` project, add a dependency to 'build.fan':
-
-  depends = ["sys 1.0", ..., "@{pod.name} @{pod.version}"]
-
-
-
-Documentation [#documentation]
-******************************
-Full API & fandocs are available on the [Status302 repository]`http://repo.status302.com/doc/@{pod.name}/`.
-
-
-
-Bean Identity [#beanIdentity]
-*****************************
+Bean Identity
+*************
 Nobody likes writing 'hash()' and 'equals()' methods, so let `BeanIdentity` take the pain away!
 Simply annotate important identity fields with '@BeanId' and override the Obj methods.
 
 Sample usage:
 
 pre>
+syntax: fantom
+
 class User {
   @BeanId Int? id
   @BeanId Str? name
@@ -70,14 +54,15 @@ class User {
 <pre
 
 
-Bean Properties [#beanProperties]
-*********************************
+Bean Properties
+***************
 `BeanProperties` is a nifty way to get and set properties, and call methods, on nested objects.
 
 Properties are accessed via a *property expression*. Property expressions look like Fantom code and may traverse many objects.
 Their main purpose is to get and set properties, but may be used to call methods also.
 
 pre>
+  syntax: fantom
   string := "100 101 102"
   BeanProperties.call(string, "split[1].get(2).plus(2).toChar") // --> 3
 <pre
@@ -86,6 +71,7 @@ Using 'BeanProperties' and a bit of naming convention care, it now becomes trivi
 submitted from a HTTP form:
 
 pre>
+  syntax: fantom
   formBean := BeanProperties.create(MyFormBean#, httpReq.form)
 <pre
 
@@ -93,12 +79,13 @@ Features of property expressions include:
 
 
 
-Field Access [#fieldAccess]
-===========================
+Field Access
+============
 The simplest use case is getting and setting basic fields.
 In this example we access the field 'Buf.capacity':
 
 pre>
+  syntax: fantom
   buf := Buf()
   BeanProperties.get(buf, "capacity")     // --> 16
   BeanProperties.set(buf, "capacity", 42) // set a new value
@@ -107,16 +94,18 @@ pre>
 When setting fields, the given value is [Type Coerced]`TypeCoerecer` to fit the field type. Consider:
 
 pre>
+  syntax: fantom
   BeanProperties.set(buf, "charset", "UTF-16")  // string "UTF-16" is converted to a Charset object
 <pre
 
 
 
-Method Calls [#methodCalls]
-===========================
+Method Calls
+============
 Property expressions can call methods too. Like Fantom code, if the method does not take any parameters then brackets are optional:
 
 pre>
+  syntax: fantom
   buf := Buf()
   BeanProperties.call(buf, "flush")
   BeanProperties.call(buf, "flush()")
@@ -125,6 +114,7 @@ pre>
 Method arguments may also form part of the expression, and like property values, are type coerced to their respective types:
 
 pre>
+  syntax: fantom
   BeanProperties.call(buf, "fill(255, 4)")    // --> 0xFFFFFFFF
   BeanProperties.call(buf, "getRange(1..2)")  // --> 0xFFFF
 <pre
@@ -132,17 +122,19 @@ pre>
 Or you may pass arguments in:
 
 pre>
+  syntax: fantom
   BeanProperties.call(buf, "fill", [128, 4])      // --> 0x80808080
   BeanProperties.call(buf, "getRange()", [1..2])  // --> 0x8080
 <pre
 
 
 
-Indexed Properties [#indexedProperties]
-=======================================
+Indexed Properties
+==================
 Lists, Maps and '@Operator' shortcuts for 'get' and 'set' may all be traversed using square bracket notation:
 
 pre>
+  syntax: fantom
   list := Str?["a", "b", "c"]
   BeanProperties.get(list, "[1]") // --> "b"
 <pre
@@ -151,12 +143,13 @@ All keys and values are [Type Coerced]`TypeCoerecer` to the correct type.
 
 
 
-Lists [#lists]
---------------
+Lists
+-----
 When setting List items special attention is given make sure they don't throw 'IndexErrs'.
 Should the list size be smaller than the given index, the list is automatically grown to accommodate:
 
 pre>
+  syntax: fantom
   list := Str?[,]
   BeanProperties.set(list, "[1]", "b")
   list.size                            // --> 2
@@ -167,6 +160,7 @@ pre>
 If the list items are *not* nullable, then new objects are created:
 
 pre>
+  syntax: fantom
   list := Str[,]
   BeanProperties.set(list, "[1]", "b")
   list.size                            // --> 2
@@ -176,16 +170,17 @@ pre>
 
 
 
-Chaining [#chaining]
-====================
+Chaining
+========
 Property expressions become very powerful when chained:
 
+  syntax: fantom
   obj.method(arg, arg).map[key].list[idx][operator].field
 
 
 
-Object Creation [#objCreation]
-==============================
+Object Creation
+===============
 When traversing a property expression, the last thing you want is a 'NullErr' half way through.
 With that in mind, should a property expression encounter 'null' part way through, a new object is created and set.
 
@@ -193,41 +188,8 @@ Now you can happily chain your expressions with confidence!
 
 
 
-Advanced [#advanced]
---------------------
+Advanced
+--------
 If you need more control over when and how intermediate objects are created, then use `BeanPropertyFactory` to manually parse
 property expressions and create your own `BeanProperty` instances.
-
-
-
-Release Notes [#releaseNotes]
-*****************************
-v1.0.4 [#v1.0.4]
-----------------
- - Chg: More nullable options in 'ReflectUtils'.
- - Chg: 'TypeCoercer.canCoerce()' may now take nulls.
- - Chg: Added 'TypeLookup.types()'.
- - Bug: Property 'makeFuncs' could not return 'null'.
- - Bug: 'NotFoundErr.availableValues' could not hold 'null'.
-
-v1.0.2 [#v1.0.2]
-----------------
- - New: Added 'ArgNotFoundErr', a handy impl of 'NotFoundErr'.
- - New: Added 'NotFoundErr.valueMsg()' so you can customise the msg.
-
-v1.0.0 [#v1.0.0]
-----------------
- - Chg: 'BeanProperties.create()' takes a 'factoryFunc' so [IoC]`pod:afIoc` may instantiate the objects.
-
-v0.0.4 [#v0.0.4]
-----------------
- - New: 'Bean Utils' is now available in JavaScript. (Added '@Js' to all classes.)
- - New: Use 'BeanProperties.create()' to instantiate entire trees of objects from property expressions!
- - New: Use 'BeanFactory' to reflectivly create instances of Lists, Maps and other Objects.
- - New: Added 'findFields()', 'findCtors()' and 'findMethods()' to 'ReflectUtils'.
- - New: Added 'BeanFactory.defaultValue(type)' as a replacement for 'Type.make'.
-
-v0.0.2 [#v0.0.2]
-----------------
- - New: Preview release.
 

@@ -36,6 +36,8 @@
 ** Full code for a 'CachingTypeLookup' is given below: 
 **  
 ** pre>
+** syntax: fantom
+** 
 ** using afBeanUtils
 ** using afConcurrent
 ** 
