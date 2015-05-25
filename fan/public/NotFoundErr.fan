@@ -4,6 +4,8 @@
 ** Typical usage would be:
 **
 ** pre> 
+** syntax: fantom
+** 
 ** const class MyNotFoundErr : Err, NotFoundErr {
 **    override const Str?[] availableValues
 **    
