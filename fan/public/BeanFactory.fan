@@ -29,7 +29,7 @@ class BeanFactory {
 		this.fieldVals = fieldVals ?: Field:Obj?[:]
 	}
 	
-	** Fantom Bug: http://fantom.org/sidewalk/topic/2163#c13978
+	** Fantom Bug: `http://fantom.org/sidewalk/topic/2163#c13978`
 	@Operator 
 	private Obj? get(Obj key) { null }
 
@@ -130,7 +130,7 @@ class BeanFactory {
 	}
 	
 	** Returns a default value for the given type. 
-	** Use as a replacement for [Type.make()]`Type.make`.
+	** Use as a replacement for [Type.make()]`sys::Type.make`.
 	** 
 	** Returned objects are *not* guaranteed to be immutable. 
 	** Call 'toImmutable()' on returned object if you need 'const' Lists and Maps.
@@ -144,7 +144,7 @@ class BeanFactory {
 	**    (Must be a static field or a static method with zero params.)
 	** 1. 'ArgErr' is thrown. 
 	** 
-	** This method differs from [Type.make()]`Type.make` for the following reasons:
+	** This method differs from [Type.make()]`sys::Type.make` for the following reasons:
 	**  - 'null' is returned if type is nullable. 
 	**  - Can create Lists and Maps
 	**  - The public no-args ctor can be called *anything*. 
