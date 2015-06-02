@@ -91,7 +91,7 @@ pre>
   BeanProperties.set(buf, "capacity", 42) // set a new value
 <pre
 
-When setting fields, the given value is [Type Coerced]`TypeCoerecer` to fit the field type. Consider:
+When setting fields, the given value is [Type Coerced]`TypeCoercer` to fit the field type. Consider:
 
 pre>
   syntax: fantom
@@ -139,7 +139,7 @@ pre>
   BeanProperties.get(list, "[1]") // --> "b"
 <pre
 
-All keys and values are [Type Coerced]`TypeCoerecer` to the correct type.
+All keys and values are [Type Coerced]`TypeCoercer` to the correct type.
 
 
 

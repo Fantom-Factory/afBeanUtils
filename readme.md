@@ -51,7 +51,7 @@ Full API & fandocs are available on the [Status302 repository](http://repo.statu
 
 ## Bean Identity
 
-Nobody likes writing `hash()` and `equals()` methods, so let [BeanIdentity](http://repo.status302.com/doc/afBeanUtils/BeanIdentity.html) take the pain away! Simply annotate important identity fields with `@BeanId` and override the Obj methods.
+Nobody likes writing `hash()` and `equals()` methods, so let [BeanIdentity](http://pods.fantomfactory.org/pods/afBeanUtils/api/BeanIdentity) take the pain away! Simply annotate important identity fields with `@BeanId` and override the Obj methods.
 
 Sample usage:
 
@@ -77,7 +77,7 @@ class User {
 
 ## Bean Properties
 
-[BeanProperties](http://repo.status302.com/doc/afBeanUtils/BeanProperties.html) is a nifty way to get and set properties, and call methods, on nested objects.
+[BeanProperties](http://pods.fantomfactory.org/pods/afBeanUtils/api/BeanProperties) is a nifty way to get and set properties, and call methods, on nested objects.
 
 Properties are accessed via a *property expression*. Property expressions look like Fantom code and may traverse many objects. Their main purpose is to get and set properties, but may be used to call methods also.
 
@@ -104,7 +104,7 @@ BeanProperties.get(buf, "capacity")     // --> 16
 BeanProperties.set(buf, "capacity", 42) // set a new value
 ```
 
-When setting fields, the given value is [Type Coerced](http://repo.status302.com/doc/afBeanUtils/TypeCoerecer.html) to fit the field type. Consider:
+When setting fields, the given value is [Type Coerced](http://pods.fantomfactory.org/pods/afBeanUtils/api/TypeCoercer) to fit the field type. Consider:
 
 ```
 BeanProperties.set(buf, "charset", "UTF-16")  // string "UTF-16" is converted to a Charset object
@@ -143,7 +143,7 @@ list := Str?["a", "b", "c"]
 BeanProperties.get(list, "[1]") // --> "b"
 ```
 
-All keys and values are [Type Coerced](http://repo.status302.com/doc/afBeanUtils/TypeCoerecer.html) to the correct type.
+All keys and values are [Type Coerced](http://pods.fantomfactory.org/pods/afBeanUtils/api/TypeCoercer) to the correct type.
 
 #### Lists
 
@@ -181,5 +181,5 @@ Now you can happily chain your expressions with confidence!
 
 #### Advanced
 
-If you need more control over when and how intermediate objects are created, then use [BeanPropertyFactory](http://repo.status302.com/doc/afBeanUtils/BeanPropertyFactory.html) to manually parse property expressions and create your own [BeanProperty](http://repo.status302.com/doc/afBeanUtils/BeanProperty.html) instances.
+If you need more control over when and how intermediate objects are created, then use [BeanPropertyFactory](http://pods.fantomfactory.org/pods/afBeanUtils/api/BeanPropertyFactory) to manually parse property expressions and create your own [BeanProperty](http://pods.fantomfactory.org/pods/afBeanUtils/api/BeanProperty) instances.
 
