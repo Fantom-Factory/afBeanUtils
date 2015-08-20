@@ -1,5 +1,6 @@
 
 // mimic TestBeanProperty, but for testing creation
+@Js
 internal class TestBeanCreation : BeanTest {
 	
 	Int? 			basic

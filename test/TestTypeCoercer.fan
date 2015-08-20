@@ -1,4 +1,5 @@
 
+@Js
 internal class TestTypeCoercer : BeanTest {
 	
 	Void testCoerce() {

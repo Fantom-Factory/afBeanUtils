@@ -1,4 +1,5 @@
 
+@Js
 internal class TestTypeLookup : BeanTest {
 	
 	Void testDupsError() {
@@ -107,14 +108,18 @@ internal class TestTypeLookup : BeanTest {
 	}
 }
 
+@Js
 internal const mixin T_StratA { }
+@Js
 internal const class T_StratB : ArgErr, T_StratA { 
 	new make(Str msg := "", Err? cause := null) : super(msg, cause) {}
 }
+@Js
 internal const class T_StratC : T_StratB { 
 	new make(Str msg := "", Err? cause := null) : super(msg, cause) {}
 }
 
+@Js
 internal const class T_InnerArgErr : ArgErr {
 	new make(Str msg := "", Err? cause := null) : super(msg, cause) {}
 }

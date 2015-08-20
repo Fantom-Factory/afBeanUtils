@@ -1,4 +1,5 @@
 
+@Js
 internal class TestBeanProperty : BeanTest {
 	
 	Int? 			basic
@@ -189,6 +190,7 @@ internal class TestBeanProperty : BeanTest {
 	}
 }
 
+@Js
 internal class T_Obj01 {
 	Str? 			str
 	T_Obj01[]?		list

@@ -1,4 +1,5 @@
 
+@Js
 internal class TestBeanFactory : BeanTest {
 	
 	Void testBasic() {
@@ -192,6 +193,7 @@ internal class TestBeanFactory : BeanTest {
 	}
 }
 
+@Js
 internal const class T_Obj02 {
 	const Str? dude
 	static const T_Obj02 defVal := T_Obj02("defVal")
@@ -199,12 +201,14 @@ internal const class T_Obj02 {
 	new make(Str s) { dude = s }
 }
 
+@Js
 internal const class T_Obj03 {
 	const Str? dude
 	static const T_Obj03 defVal := T_Obj03("defVal")
 	new make2(Str s) { dude = s }
 }
 
+@Js
 internal class T_Ctors {
 	Str? value
 	Str  ctor
@@ -216,15 +220,19 @@ internal class T_Ctors {
 	new make5(Int i1, Str s2, Int i3 := 2)	{ ctor = "make5" }
 }
 
+@Js
 internal class T_NoCtor { }
 
+@Js
 internal class T_A {
 	Int a
 }
+@Js
 internal class T_B : T_A {
 	Int b
 }
 
+@Js
 internal const class T_CtorsWithItBlocks {
 	const Str? value
 	const Str  ctor
@@ -236,6 +244,7 @@ internal const class T_CtorsWithItBlocks {
 	new make5(Int i1, Str s2, Int i3 := 2, |This|? f := null)	{ ctor = "make5"; f?.call(this) }
 }
 
+@Js
 internal const class T_CtorsWithMandatoryItBlocks {
 	const Str? value
 	const Str  ctor
