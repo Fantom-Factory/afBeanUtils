@@ -1,4 +1,5 @@
 
+@Js
 internal class TestBeanProperties : BeanTest {
 	
 	Void testDocs() {
@@ -95,6 +96,7 @@ internal class TestBeanProperties : BeanTest {
 	}
 }
 
+@Js
 internal class T_Obj04 {
 	Str? 			str
 	Int? 			int

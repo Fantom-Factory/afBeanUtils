@@ -39,19 +39,25 @@ class BeanProperties {
 	** Uses the given property expressions to instantiate a tree of beans and values.
 	** Nested beans may be 'const' as long as they supply an it-block ctor argument. 
 	static Obj create(Type type, Str:Obj? propertyValues, TypeCoercer? typeCoercer := null, |Type->BeanFactory|? factoryFunc := null) {
+			echo("0")
 		factory := BeanPropertyFactory()
+			echo("0.3")
 		if (typeCoercer != null)
 			factory.typeCoercer = typeCoercer
 		
+			echo("0.4")
 		tree := SegmentTree(null, factoryFunc)
+			echo("0.6")
 		propertyValues.each |value, expression| {
+			echo("0.8")
 			property := factory.parse(expression)
-			
+			echo("1")
 			end := (SegmentTree) property.segments[0..<-1].reduce(tree) |SegmentTree mkr, segment -> SegmentTree| {   
 				mkr.branches.getOrAdd(segment.expression) { SegmentTree(segment, factoryFunc) }
 			}			
 			end.leaves[property.segments[-1]] = value
 		}
+			echo("2")
 
 		try {
 			return tree.create(type, null)
