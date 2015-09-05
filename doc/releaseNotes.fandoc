@@ -1,5 +1,10 @@
 Versions
 ********
+v1.0.6
+------
+ - Bug: 'BeanFactory' and 'TypeCoercer' now work in Javascript.
+ - Chg: Removed Javascript implemenation of 'BeanProperties' due to Fantom's [Func.toImmutable()]`http://fantom.org/forum/topic/1144` bug.
+
 v1.0.4
 ------
  - Chg: More nullable options in 'ReflectUtils'.

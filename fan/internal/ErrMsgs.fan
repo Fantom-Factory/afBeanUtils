@@ -18,8 +18,8 @@ internal class ErrMsgs {
 		"Could not parse property string: ${input}"
 	}
 
-	static Str property_crazyList(Int index, Type listType) {
-		stripSys("Are you CRAZY!? Do you *really* want to create ${index} instances of ${listType}??? \nSee ${BeanPropertyFactory#maxListSize.qname} to change this limit, or create them yourself.")
+	static Str property_crazyList(Int index, Type listType, Field field) {
+		stripSys("Are you CRAZY!? Do you *really* want to create ${index} instances of ${listType}??? \nSee ${field.qname} to change this limit, or create them yourself.")
 	}
 
 	static Str property_setOnMethod(Method method) {

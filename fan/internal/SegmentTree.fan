@@ -1,5 +1,4 @@
 
-@Js
 internal class SegmentTree {
 	Str 				expression
 	SegmentFactory?		segmentFactory

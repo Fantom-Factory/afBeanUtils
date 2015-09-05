@@ -29,9 +29,11 @@ internal class TestReflectUtils : BeanTest {
 		ctor = ReflectUtils.findCtor(MyReflectTestUtils1#, "makeCtor1")
 		verifyEq(ctor, MyReflectTestUtils1#makeCtor1)
 
-		// inherited ctors should not found
-		ctor = ReflectUtils.findCtor(MyReflectTestUtils2#, "makeCtor1")
-		verifyNull(ctor)
+		// inherited ctors should not be found
+		if (Env.cur.runtime != "js") {
+			ctor = ReflectUtils.findCtor(MyReflectTestUtils2#, "makeCtor1")
+			verifyNull(ctor)
+		}
 	}
 
 	Void testFindCtors() {
@@ -41,24 +43,24 @@ internal class TestReflectUtils : BeanTest {
 	}
 
 	Void testFindMethod() {
-		method := ReflectUtils.findMethod(MyReflectTestUtils2#, "method1", [,], false, Void#)
+		method := ReflectUtils.findMethod(MyReflectTestUtils2#, "method1", null, false, Void#)
 		verifyEq(method, MyReflectTestUtils2#method1)
-		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method1", [,], false, Int#)
+		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method1", null, false, Int#)
 		verifyNull(method)
-		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method1", [,], false, Int?#)
+		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method1", null, false, Int?#)
 		verifyNull(method)
 
-		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method2", [,], false, Num#)
+		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method2", null, false, Num#)
 		verifyEq(method, MyReflectTestUtils2#method2)
-		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method2", [,], false, Num?#)
+		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method2", null, false, Num?#)
 		verifyEq(method, MyReflectTestUtils2#method2)
-		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method2", [,], false, Obj#)
+		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method2", null, false, Obj#)
 		verifyEq(method, MyReflectTestUtils2#method2)
-		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method2", [,], false, Obj?#)
+		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method2", null, false, Obj?#)
 		verifyEq(method, MyReflectTestUtils2#method2)
-		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method2", [,], false, Int#)
+		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method2", null, false, Int#)
 		verifyNull(method)
-		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method2", [,], false, Int?#)
+		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method2", null, false, Int?#)
 		verifyNull(method)
 
 		// it seems Nullable has no effect on Type#fits()
@@ -67,17 +69,17 @@ internal class TestReflectUtils : BeanTest {
 		Obj.echo("Num#.fits(Num?#) -> ${Num#.fits(Num?#)}")	// Num#.fits(Num?#) -> true
 		Obj.echo("Num?#.fits(Num#) -> ${Num?#.fits(Num#)}")	// Num?#.fits(Num#) -> true
 		
-		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method3", [,], false, Num#)
+		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method3", null, false, Num#)
 		verifyEq(method, MyReflectTestUtils2#method3)	// 'cos Num# fits Num?#
-		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method3", [,], false, Num?#)
+		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method3", null, false, Num?#)
 		verifyEq(method, MyReflectTestUtils2#method3)
-		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method3", [,], false, Obj#)
+		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method3", null, false, Obj#)
 		verifyEq(method, MyReflectTestUtils2#method3)	// 'cos Num# fits Num?#
-		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method3", [,], false, Obj?#)
+		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method3", null, false, Obj?#)
 		verifyEq(method, MyReflectTestUtils2#method3)
-		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method3", [,], false, Int#)
+		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method3", null, false, Int#)
 		verifyNull(method)
-		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method3", [,], false, Int?#)
+		method = ReflectUtils.findMethod(MyReflectTestUtils2#, "method3", null, false, Int?#)
 		verifyNull(method)
 	}
 	
@@ -194,9 +196,11 @@ internal class TestReflectUtils : BeanTest {
 		// Fantom bugs
 		// see http://fantom.org/sidewalk/topic/2256
 		verifyTrue	(ReflectUtils.fits(Int[]#, Int[]?#))
-		verifyFalse	(Int[]#.fits(Int[]?#))
+		if (Env.cur.runtime != "js")
+			verifyFalse	(Int[]#.fits(Int[]?#))
 		verifyTrue	(ReflectUtils.fits([Int:Int]#, [Int:Int]?#))
-		verifyFalse	([Int:Int]#.fits([Int:Int]?#))
+		if (Env.cur.runtime != "js")
+			verifyFalse	([Int:Int]#.fits([Int:Int]?#))
 
 		// List Type inference
 		verifyTrue	(ReflectUtils.fits(Int[]#, Obj[]#))
@@ -208,7 +212,7 @@ internal class TestReflectUtils : BeanTest {
 		verifyFalse	(Str[]#.fits(Int[]#))
 	}
 }
-
+ 
 
 @Js
 internal class MyReflectTestUtils1 {

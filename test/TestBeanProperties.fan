@@ -1,5 +1,4 @@
 
-@Js
 internal class TestBeanProperties : BeanTest {
 	
 	Void testDocs() {

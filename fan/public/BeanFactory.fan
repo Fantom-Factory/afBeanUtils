@@ -101,8 +101,8 @@ class BeanFactory {
 		itBlockFunc		:= Field.makeSetFunc(fieldVals.dup) 	// that .dup() is very important!
 		argsWithOut		:= ctorArgs
 		argsWith		:= ctorArgs.dup.add(itBlockFunc)
-		argTypesWithOut	:= argsWithOut.map { it?.typeof }
-		argTypesWith	:= argsWith   .map { it?.typeof }
+		argTypesWithOut	:= (Type[]) argsWithOut.map { it?.typeof }
+		argTypesWith	:= (Type[]) argsWith   .map { it?.typeof }
 		ctorsWithOut	:= ReflectUtils.findCtors(type, argTypesWithOut).exclude { argsWithOut.size > it.params.size }
 		ctorsWith		:= ReflectUtils.findCtors(type, argTypesWith   ).exclude { argsWith.size    > it.params.size }
 		ctorsBoth		:= ctorsWithOut.dup.addAll(ctorsWith).unique

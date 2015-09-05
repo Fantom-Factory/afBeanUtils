@@ -118,7 +118,9 @@ const class TypeCoercer {
 	** Override this method should you wish to cache the conversion functions. 
 	@NoDoc
 	protected virtual |Obj->Obj?|? createCoercionFunc(Type fromType, Type toType) {
-		doCreateCoercionFunc(fromType, toType)
+		func := doCreateCoercionFunc(fromType, toType)
+		// see http://fantom.org/forum/topic/1144
+		return Env.cur.runtime == "js" ? func : func.toImmutable
 	}
 
 	** It kinda sucks to need this method, but it's a workaround to this 
@@ -131,7 +133,7 @@ const class TypeCoercer {
 
 		// first look for a 'toXXX()' instance method
 		toName		:= "to${toType.name}" 
-		toXxxMeth 	:= ReflectUtils.findMethod(fromType, toName, Obj#.emptyList, false, toType)
+		toXxxMeth 	:= ReflectUtils.findMethod(fromType, toName, Type#.emptyList, false, toType)
 		if (toXxxMeth != null)
 			return |Obj val -> Obj?| { toXxxMeth.callOn(val, null) }
 
@@ -140,10 +142,10 @@ const class TypeCoercer {
 		fromName	:= "from${fromType.name}" 
 		fromXxxMeth	:= ReflectUtils.findMethod(toType, fromName, [fromType], true)
 		if (fromXxxMeth != null)
-			return (|Obj val -> Obj?| { fromXxxMeth.call(val) }).toImmutable
+			return (|Obj val -> Obj?| { fromXxxMeth.call(val) })
 		fromXxxCtor := ReflectUtils.findCtor(toType, fromName, [fromType])
 		if (fromXxxCtor != null)
-			return (|Obj val -> Obj?| { fromXxxCtor.call(val) }).toImmutable
+			return (|Obj val -> Obj?| { fromXxxCtor.call(val) })
 				
 		// one last chance - try 'makeFromXXX()' ctors
 		makefromName	:= "makeFrom${fromType.name}" 

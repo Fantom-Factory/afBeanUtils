@@ -39,7 +39,7 @@ Features include:
 
 Install `Bean Utils` with the Fantom Repository Manager ( [fanr](http://fantom.org/doc/docFanr/Tool.html#install) ):
 
-    C:\> fanr install -r http://repo.status302.com/fanr/ afBeanUtils
+    C:\> fanr install -r http://pods.fantomfactory.org/fanr/ afBeanUtils
 
 To use in a [Fantom](http://fantom.org/) project, add a dependency to `build.fan`:
 
@@ -47,7 +47,7 @@ To use in a [Fantom](http://fantom.org/) project, add a dependency to `build.fan
 
 ## Documentation
 
-Full API & fandocs are available on the [Status302 repository](http://repo.status302.com/doc/afBeanUtils/).
+Full API & fandocs are available on the [Fantom Pod Repository](http://pods.fantomfactory.org/pods/afBeanUtils/).
 
 ## Bean Identity
 
