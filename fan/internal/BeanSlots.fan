@@ -1,5 +1,4 @@
 
-@Js
 internal const abstract class SegmentFactory {
 	const TypeCoercer	typeCoercer
 	const |Type->Obj?|	makeFunc
@@ -13,12 +12,10 @@ internal const abstract class SegmentFactory {
 }
 
 
-@Js
 internal enum class SegmentType {
 	field, method, index
 }
 
-@Js
 internal const class SlotSegment : SegmentFactory {
 	const Str?[]	methodArgs
 	const Str 		slotName
@@ -59,7 +56,6 @@ internal const class SlotSegment : SegmentFactory {
 	override Str toStr() { expression }
 }
 
-@Js
 internal const class IndexSegment : SegmentFactory {
 	const Int	maxListSize
 	const Str	index
@@ -90,7 +86,6 @@ internal const class IndexSegment : SegmentFactory {
 
 // ---- Executors ---------------------------------------------------------------------------------
 
-@Js
 internal abstract class SegmentExecutor {
 	TypeCoercer?	typeCoercer
 	|Type->Obj?|?	makeFunc 
@@ -102,7 +97,6 @@ internal abstract class SegmentExecutor {
 	abstract Type returns()
 }
 
-@Js
 internal class ExecuteField : SegmentExecutor {
 	Field		field
 	
@@ -137,7 +131,6 @@ internal class ExecuteField : SegmentExecutor {
 	}
 }
 
-@Js
 internal class ExecuteMethod : SegmentExecutor {
 	Method		method
 	Str[]		methodArgs
@@ -164,7 +157,6 @@ internal class ExecuteMethod : SegmentExecutor {
 	}
 }
 
-@Js
 internal class ExecuteIndex : SegmentExecutor {
 	Int			maxListSize
 	Str			index
@@ -244,7 +236,7 @@ internal class ExecuteIndex : SegmentExecutor {
 	private Void ensureListSize(Obj?[] list, Int idx) {
 		if (list.size <= idx) {
 			if (idx > maxListSize)
-				throw ArgErr(ErrMsgs.property_crazyList(idx, valType))
+				throw ArgErr(ErrMsgs.property_crazyList(idx, valType, BeanPropertyFactory#maxListSize))
 			if (valType.isNullable)
 				list.size = idx + 1
 			else {

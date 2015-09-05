@@ -1,6 +1,5 @@
 
 ** Static methods to get and set bean values from property expressions.
-@Js
 class BeanProperties {
 
 	// Bad idea, static values are const! (Okay, well, thread safe - but they rarely change anyhow.)
@@ -61,7 +60,7 @@ class BeanProperties {
 	}
 }
 
-@NoDoc @Js
+@NoDoc
 const class BeanCreateErr : Err, NotFoundErr {
 	override const Str?[] 	availableValues
 	override const Str		valueMsg	:= "Field Values Given:"
@@ -76,7 +75,7 @@ const class BeanCreateErr : Err, NotFoundErr {
 }
 
 ** Parses property expressions to create 'BeanProperty' instances. 
-@Js @NoDoc
+@NoDoc
 class BeanPropertyFactory {
 	
 	// Fantex test string: obj.list[2].map[wot][thing].meth(judge, dredd).str().prop
@@ -154,7 +153,7 @@ class BeanPropertyFactory {
 ** All field are accessed through their respective getter and setters.
 ** 
 ** Use `BeanPropertyFactory` to create instances of 'BeanProperty'.
-@Js @NoDoc
+@NoDoc
 const class BeanProperty {
 	
 	** The property expression that this class ultimately calls. 
