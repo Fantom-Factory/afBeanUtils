@@ -196,11 +196,9 @@ internal class TestReflectUtils : BeanTest {
 		// Fantom bugs
 		// see http://fantom.org/sidewalk/topic/2256
 		verifyTrue	(ReflectUtils.fits(Int[]#, Int[]?#))
-		if (Env.cur.runtime != "js")
-			verifyFalse	(Int[]#.fits(Int[]?#))
+		verifyTrue	(Int[]#.fits(Int[]?#))				// TRUE! - It's been Fixed!!!
 		verifyTrue	(ReflectUtils.fits([Int:Int]#, [Int:Int]?#))
-		if (Env.cur.runtime != "js")
-			verifyFalse	([Int:Int]#.fits([Int:Int]?#))
+		verifyTrue	([Int:Int]#.fits([Int:Int]?#))		// TRUE! - It's been Fixed!!!
 
 		// List Type inference
 		verifyTrue	(ReflectUtils.fits(Int[]#, Obj[]#))
