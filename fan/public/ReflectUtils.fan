@@ -63,27 +63,27 @@ class ReflectUtils {
 	** Returns 'true' if 'typeA' *fits into* 'typeB'.
 	** 
 	** Standard usage:
-	**   Str#.fits(Obj#)                // --> true
-	**   ReflectUtils.fits(Str#, Obj#)  // --> true
+	**   Str#.fits(Obj#)        // --> true
+	**   fits(Str#, Obj#)       // --> true
 	** 
 	** List (and Map) type checking:
-	**   Int[]#.fits(Obj[]#)                // --> true
-	**   ReflectUtils.fits(Int[]#, Obj[]#)  // --> true
+	**   Int[]#.fits(Obj[]#)    // --> true
+	**   fits(Int[]#, Obj[]#)   // --> true
 	** 
 	** List (and Map) type inference. Items in 'Obj[]' *may* fit into 'Int[]'. 
-	**   Obj[]#.fits(Int[]#)                // --> false
-	**   ReflectUtils.fits(Obj[]#, Int[]#)  // --> true
+	**   Obj[]#.fits(Int[]#)    // --> false
+	**   fits(Obj[]#, Int[]#)   // --> true
 	** 
 	** This is particularly important when calling methods, for many Lists and Maps are defined by the shortcuts '[,]' and 
 	** '[:]' which create 'Obj?[]' and 'Obj:Obj?' respectively. 
 	** 
 	** But List (and Map) types than can *never* fit still return 'false':    
-	**   Str[]#.fits(Int[]#)                // --> false
-	**   ReflectUtils.fits(Str[]#, Int[]#)  // --> false
+	**   Str[]#.fits(Int[]#)    // --> false
+	**   fits(Str[]#, Int[]#)   // --> false
 	** 
 	** Fantom (nullable) bug fix for Lists (and Maps):
-	**   Int[]#.fits(Int[]?#)                // --> false
-	**   ReflectUtils.fits(Int[]#, Int[]?#)  // --> true
+	**   Int[]#.fits(Int[]?#)   // --> false
+	**   fits(Int[]#, Int[]?#)  // --> true
 	** 
 	** See [List Types and Nullability]`http://fantom.org/sidewalk/topic/2256` for bug details.
 	static Bool fits(Type? typeA, Type? typeB) {
