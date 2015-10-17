@@ -108,8 +108,8 @@ class ReflectUtils {
 	}
 
 	private static Bool paramFits(Type? typeA, Type? typeB, Str key) {
-		paramTypeA := typeA.params[key] ?: Obj?#
-		paramTypeB := typeB.params[key] ?: Obj?#
+		paramTypeA := typeA?.params?.get(key) ?: Obj?#
+		paramTypeB := typeB?.params?.get(key) ?: Obj?#
 		return fits(paramTypeA, paramTypeB) || fits(paramTypeB, paramTypeA)
 	}
 	
