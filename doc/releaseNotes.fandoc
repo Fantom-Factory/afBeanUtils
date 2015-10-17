@@ -1,5 +1,10 @@
 Versions
 ********
+
+v1.0.8
+------
+ - Chg: 'ArgNotFoundErr' now extends 'Err' and is available in Javascript.
+
 v1.0.6
 ------
  - Bug: 'BeanFactory' and 'TypeCoercer' now work in Javascript.
