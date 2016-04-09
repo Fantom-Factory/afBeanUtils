@@ -190,6 +190,5 @@ Now you can happily chain your expressions with confidence!
 
 Advanced
 --------
-If you need more control over when and how intermediate objects are created, then use `BeanPropertyFactory` to manually parse
-property expressions and create your own `BeanProperty` instances.
+If you need more control over when and how intermediate objects are created, then use 'BeanPropertyFactory' to manually parse property expressions and create your own 'BeanProperty' instances.
 
