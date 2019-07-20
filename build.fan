@@ -9,7 +9,7 @@ class Build : BuildPod {
 		version = Version("1.0.8")
 
 		meta = [
-			"proj.name"		: "Bean Utils",
+			"pod.dis"		: "Bean Utils",
 			"repo.internal"	: "true",
 			"repo.tags"		: "system",
 			"repo.public"	: "false"

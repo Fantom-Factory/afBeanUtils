@@ -72,7 +72,7 @@ const class TypeCoercer {
 	** 'null' values are always coerced to 'null'.
 	Obj? coerce(Obj? value, Type toType) {
 		if (value == null) // return / dispose of nulls straight away, 'cos we don't know what type they are!
-			return toType.isNullable ? null : throw ArgErr(ErrMsgs.typeCoercer_notFound(null, toType))
+			return toType.isNullable ? null : throw ArgErr("Could not find coercion from null to ${toType.signature}".replace("sys::", ""))
 
 		if (value.typeof.name == "List" && toType.name == "List") {
 			toListType 	:= toType.params["V"] ?: Obj?#
@@ -106,12 +106,12 @@ const class TypeCoercer {
 		meth := createCoercionFunc(value.typeof, toType)
 		
 		if (meth == null)
-			throw ArgErr(ErrMsgs.typeCoercer_notFound(value.typeof, toType))
+			throw ArgErr("Could not find coercion from ${value.typeof.qname} to ${toType.signature}".replace("sys::", ""))
 
 		try {
 			return meth(value)
 		} catch (Err e) {
-			throw ArgErr(ErrMsgs.typeCoercer_fail(value.typeof, toType, value), e)
+			throw ArgErr("Could not coerce ${value.typeof.qname} to ${toType.qname} - ${value}".replace("sys::", ""), e)
 		}
 	}
 	

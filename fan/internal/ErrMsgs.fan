@@ -2,18 +2,6 @@
 @Js
 internal class ErrMsgs {
 
-	static Str oneShotLock_violation(Str because) {
-		"Method may no longer be invoked - $because"
-	}	
-	
-	static Str typeCoercer_fail(Type from, Type to, Obj value) {
-		stripSys("Could not coerce ${from.qname} to ${to.qname} - ${value}")
-	}
-	
-	static Str typeCoercer_notFound(Type? from, Type to) {
-		stripSys("Could not find coercion from ${from?.qname} to ${to.signature}")
-	}
-	
 	static Str property_badParse(Str input) {
 		"Could not parse property string: ${input}"
 	}

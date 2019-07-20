@@ -20,13 +20,13 @@ internal class TestTypeCoercer : BeanTest {
 		verifyEq(tc.coerce("2000-01-01T00:00:00Z UTC", DateTime#), DateTime.defVal)
 		
 		// no coersion
-		verifyErrMsg(ArgErr#, ErrMsgs.typeCoercer_notFound(TestTypeCoercer#, Int#)) {
+		verifyErrMsg(ArgErr#, "Could not find coercion from afBeanUtils::TestTypeCoercer to Int") {
 			tc.coerce(this, Int#)
 		}
 		
 		// nulls
 		verifyNull(tc.coerce(null, Str?#))
-		verifyErrMsg(ArgErr#, ErrMsgs.typeCoercer_notFound(null, Str#)) |t| {
+		verifyErrMsg(ArgErr#, "Could not find coercion from null to Str") |t| {
 			verifyEq(tc.coerce(null, Str#), null)
 		}
 
@@ -81,7 +81,7 @@ internal class TestTypeCoercer : BeanTest {
 		verifyEq(tc.coerce(["69", null], Int?[]#), [69, null])
 
 		// no coersion
-		verifyErrMsg(ArgErr#, ErrMsgs.typeCoercer_notFound(TestTypeCoercer#, Int#)) {
+		verifyErrMsg(ArgErr#, "Could not find coercion from afBeanUtils::TestTypeCoercer to Int") {
 			tc.coerce([this], Int[]#)
 		}
 		
@@ -116,7 +116,7 @@ internal class TestTypeCoercer : BeanTest {
 			verifyEq(tc.coerce([`6`:`9`, `4`:null], File:File?#), [`6`.toFile:`9`.toFile, `4`.toFile:null])
 
 		// no coersion
-		verifyErrMsg(ArgErr#, ErrMsgs.typeCoercer_notFound(TestTypeCoercer#, Int#)) {
+		verifyErrMsg(ArgErr#, "Could not find coercion from afBeanUtils::TestTypeCoercer to Int") {
 			tc.coerce([2:this], Int:Int#)
 		}
 		

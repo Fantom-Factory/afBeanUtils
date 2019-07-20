@@ -16,7 +16,7 @@ internal class OneShotLock {
 	
 	Void check() {
 		if (locked)
-			throw Err(ErrMsgs.oneShotLock_violation(because))
+			throw Err("Method may no longer be invoked - $because")
 	}
 	
 	override Str toStr() {

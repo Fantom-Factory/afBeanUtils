@@ -1,8 +1,9 @@
-#Bean Utils v1.0.8
+# Bean Utils v1.0.8
 ---
-[![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](http://fantom.org/)
-[![pod: v1.0.8](http://img.shields.io/badge/pod-v1.0.8-yellow.svg)](http://www.fantomfactory.org/pods/afBeanUtils)
-![Licence: MIT](http://img.shields.io/badge/licence-MIT-blue.svg)
+
+[![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](http://fantom-lang.org/)
+[![pod: v1.0.8](http://img.shields.io/badge/pod-v1.0.8-yellow.svg)](http://eggbox.fantomfactory.org/pods/afBeanUtils)
+[![Licence: ISC](http://img.shields.io/badge/licence-ISC-blue.svg)](https://choosealicense.com/licenses/isc/)
 
 ## Overview
 
@@ -37,21 +38,25 @@ Features include:
 
 ## Install
 
-Install `Bean Utils` with the Fantom Repository Manager ( [fanr](http://fantom.org/doc/docFanr/Tool.html#install) ):
+Install `Bean Utils` with the Fantom Pod Manager ( [FPM](http://eggbox.fantomfactory.org/pods/afFpm) ):
 
-    C:\> fanr install -r http://pods.fantomfactory.org/fanr/ afBeanUtils
+    C:\> fpm install afBeanUtils
 
-To use in a [Fantom](http://fantom.org/) project, add a dependency to `build.fan`:
+Or install `Bean Utils` with [fanr](http://fantom.org/doc/docFanr/Tool.html#install):
+
+    C:\> fanr install -r http://eggbox.fantomfactory.org/fanr/ afBeanUtils
+
+To use in a [Fantom](http://fantom-lang.org/) project, add a dependency to `build.fan`:
 
     depends = ["sys 1.0", ..., "afBeanUtils 1.0"]
 
 ## Documentation
 
-Full API & fandocs are available on the [Fantom Pod Repository](http://pods.fantomfactory.org/pods/afBeanUtils/).
+Full API & fandocs are available on the [Eggbox](http://eggbox.fantomfactory.org/pods/afBeanUtils/) - the Fantom Pod Repository.
 
 ## Bean Identity
 
-Nobody likes writing `hash()` and `equals()` methods, so let [BeanIdentity](http://pods.fantomfactory.org/pods/afBeanUtils/api/BeanIdentity) take the pain away! Simply annotate important identity fields with `@BeanId` and override the Obj methods.
+Nobody likes writing `hash()` and `equals()` methods, so let [BeanIdentity](http://eggbox.fantomfactory.org/pods/afBeanUtils/api/BeanIdentity) take the pain away! Simply annotate important identity fields with `@BeanId` and override the Obj methods.
 
 Sample usage:
 
@@ -77,7 +82,7 @@ class User {
 
 ## Bean Properties
 
-[BeanProperties](http://pods.fantomfactory.org/pods/afBeanUtils/api/BeanProperties) is a nifty way to get and set properties, and call methods, on nested objects.
+[BeanProperties](http://eggbox.fantomfactory.org/pods/afBeanUtils/api/BeanProperties) is a nifty way to get and set properties, and call methods, on nested objects.
 
 Properties are accessed via a *property expression*. Property expressions look like Fantom code and may traverse many objects. Their main purpose is to get and set properties, but may be used to call methods also.
 
@@ -104,7 +109,7 @@ BeanProperties.get(buf, "capacity")     // --> 16
 BeanProperties.set(buf, "capacity", 42) // set a new value
 ```
 
-When setting fields, the given value is [Type Coerced](http://pods.fantomfactory.org/pods/afBeanUtils/api/TypeCoercer) to fit the field type. Consider:
+When setting fields, the given value is [Type Coerced](http://eggbox.fantomfactory.org/pods/afBeanUtils/api/TypeCoercer) to fit the field type. Consider:
 
 ```
 BeanProperties.set(buf, "charset", "UTF-16")  // string "UTF-16" is converted to a Charset object
@@ -143,7 +148,7 @@ list := Str?["a", "b", "c"]
 BeanProperties.get(list, "[1]") // --> "b"
 ```
 
-All keys and values are [Type Coerced](http://pods.fantomfactory.org/pods/afBeanUtils/api/TypeCoercer) to the correct type.
+All keys and values are [Type Coerced](http://eggbox.fantomfactory.org/pods/afBeanUtils/api/TypeCoercer) to the correct type.
 
 #### Lists
 
@@ -181,5 +186,5 @@ Now you can happily chain your expressions with confidence!
 
 #### Advanced
 
-If you need more control over when and how intermediate objects are created, then use [BeanPropertyFactory](http://pods.fantomfactory.org/pods/afBeanUtils/api/BeanPropertyFactory) to manually parse property expressions and create your own [BeanProperty](http://pods.fantomfactory.org/pods/afBeanUtils/api/BeanProperty) instances.
+If you need more control over when and how intermediate objects are created, then use `BeanPropertyFactory` to manually parse property expressions and create your own `BeanProperty` instances.
 
