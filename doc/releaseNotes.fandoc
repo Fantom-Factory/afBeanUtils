@@ -1,17 +1,18 @@
-Versions
-********
+v1.0.10
+=======
+ - New: 'afBeanUtils' now available as a SkySpark extension.
 
 v1.0.8
-------
+======
  - Chg: 'ArgNotFoundErr' now extends 'Err' and is available in Javascript.
 
 v1.0.6
-------
+======
  - Bug: 'BeanFactory' and 'TypeCoercer' now work in Javascript.
  - Chg: Removed Javascript implemenation of 'BeanProperties' due to Fantom's [Func.toImmutable()]`http://fantom.org/forum/topic/1144` bug.
 
 v1.0.4
-------
+======
  - Chg: More nullable options in 'ReflectUtils'.
  - Chg: 'TypeCoercer.canCoerce()' may now take nulls.
  - Chg: Added 'TypeLookup.types()'.
@@ -19,16 +20,16 @@ v1.0.4
  - Bug: 'NotFoundErr.availableValues' could not hold 'null'.
 
 v1.0.2
-------
+======
  - New: Added 'ArgNotFoundErr', a handy impl of 'NotFoundErr'.
  - New: Added 'NotFoundErr.valueMsg()' so you can customise the msg.
 
 v1.0.0
-------
+======
  - Chg: 'BeanProperties.create()' takes a 'factoryFunc' so [IoC]`pod:afIoc` may instantiate the objects.
 
 v0.0.4
-------
+======
  - New: 'Bean Utils' is now available in JavaScript. (Added '@Js' to all classes.)
  - New: Use 'BeanProperties.create()' to instantiate entire trees of objects from property expressions!
  - New: Use 'BeanFactory' to reflectivly create instances of Lists, Maps and other Objects.
@@ -36,6 +37,6 @@ v0.0.4
  - New: Added 'BeanFactory.defaultValue(type)' as a replacement for 'Type.make'.
 
 v0.0.2
-------
+======
  - New: Preview release.
 

@@ -1,8 +1,8 @@
-# Bean Utils v1.0.8
+# Bean Utils v1.0.10
 ---
 
 [![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](http://fantom-lang.org/)
-[![pod: v1.0.8](http://img.shields.io/badge/pod-v1.0.8-yellow.svg)](http://eggbox.fantomfactory.org/pods/afBeanUtils)
+[![pod: v1.0.10](http://img.shields.io/badge/pod-v1.0.10-yellow.svg)](http://eggbox.fantomfactory.org/pods/afBeanUtils)
 [![Licence: ISC](http://img.shields.io/badge/licence-ISC-blue.svg)](https://choosealicense.com/licenses/isc/)
 
 ## Overview
