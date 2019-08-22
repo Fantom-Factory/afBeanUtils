@@ -106,7 +106,7 @@ internal class ExecuteField : SegmentExecutor {
 	
 	override Obj? get(Obj?[]? args) {
 		if (args != null)
-			throw ArgErr(ErrMsgs.property_notMethod(field))
+			throw ArgErr("Can not pass method arguments to a field: ${field.qname}".replace("sys::", ""))
 
 		ret := field.get(instance) 
 		if (createIfNull && ret == null) {
@@ -147,7 +147,7 @@ internal class ExecuteMethod : SegmentExecutor {
 	}
 
 	override Void set(Obj? value) {
-		throw ArgErr(ErrMsgs.property_setOnMethod(method))
+		throw ArgErr("Can not *set* a value on method: ${method.qname}".replace("sys::", ""))
 	}
 
 	override Type returns() {
@@ -234,7 +234,7 @@ internal class ExecuteIndex : SegmentExecutor {
 	private Void ensureListSize(Obj?[] list, Int idx) {
 		if (list.size <= idx) {
 			if (idx > maxListSize)
-				throw ArgErr(ErrMsgs.property_crazyList(idx, valType, BeanPropertyFactory#maxListSize))
+				throw ArgErr(property_crazyList(idx, valType, BeanPropertyFactory#maxListSize))
 			if (valType.isNullable)
 				list.size = idx + 1
 			else {
@@ -244,5 +244,9 @@ internal class ExecuteIndex : SegmentExecutor {
 				toAdd.times { list.add(makeFunc(valType)) }
 			}
 		}
+	}
+	
+	static Str property_crazyList(Int index, Type listType, Field field) {
+		"Are you CRAZY!? Do you *really* want to create ${index} instances of ${listType}??? \nSee ${field.qname} to change this limit, or create them yourself".replace("sys::", "")
 	}
 }

@@ -108,7 +108,7 @@ internal class TestBeanProperty : Test {
 		verifyEq(list.size, 6)
 
 		prop = BeanPropertyFactory() { it.maxListSize = 100 }.parse("list[101]")
-		verifyErrMsg(ArgErr#, ErrMsgs.property_crazyList(101, Int#, BeanPropertyFactory#maxListSize)) {
+		verifyErrMsg(ArgErr#, "Are you CRAZY!? Do you *really* want to create 101 instances of Int??? \nSee afBeanUtils::BeanPropertyFactory.maxListSize to change this limit, or create them yourself") {
 			prop.set(this, 6)			
 		}
 	}
@@ -164,13 +164,13 @@ internal class TestBeanProperty : Test {
 	Void testMethod() {
 		prop := BeanPropertyFactory().parse("judge")
 		verifyEq(prop.get(this), "Dredd")
-		verifyErrMsg(ArgErr#, ErrMsgs.property_setOnMethod(#judge)) {
+		verifyErrMsg(ArgErr#, "Can not *set* a value on method: afBeanUtils::TestBeanProperty.judge") {
 			prop.set(this, "Anderson")
 		}
 
 		prop = BeanPropertyFactory().parse("judge()")
 		verifyEq(prop.get(this), "Dredd")
-		verifyErrMsg(ArgErr#, ErrMsgs.property_setOnMethod(#judge)) {
+		verifyErrMsg(ArgErr#, "Can not *set* a value on method: afBeanUtils::TestBeanProperty.judge") {
 			prop.set(this, "Dredd")			
 		}
 	}
@@ -209,4 +209,3 @@ internal class T_Obj01 {
 		map2[key] = val
 	}
 }
-

@@ -41,7 +41,7 @@ internal class TestBeanCreation : Test {
 	}
 	
 	Void testSetMethod() {
-		verifyErrMsg(BeanCreateErr#, ErrMsgs.properties_couldNotMake(TestBeanCreation#)) {
+		verifyErrMsg(BeanCreateErr#, "Could not instantiate afBeanUtils::TestBeanCreation") {
 			obj := create(["judge":"hello"])
 		}
 	}

@@ -55,7 +55,7 @@ class BeanProperties {
 			return tree.create(type, null)
 		} catch (Err err) {
 			props := propertyValues.map |v, k| { "$k = $v" }.vals
-			throw BeanCreateErr(ErrMsgs.properties_couldNotMake(type), props, err)
+			throw BeanCreateErr("Could not instantiate $type.signature".replace("sys::", ""), props, err)
 		}
 	}
 }
@@ -142,7 +142,7 @@ class BeanPropertyFactory {
 		}
 
 		if (beanSlots.isEmpty)
-			throw Err(ErrMsgs.property_badParse(property))		
+			throw Err("Could not parse property string: ${property}")		
 
 		return BeanProperty(property, beanSlots)
 	}

@@ -33,11 +33,11 @@ internal class TestBeanFactory : Test {
 		verifyEq(obj.ctor, "make5")
 		verifyEq(obj.value, "m5")
 
-		verifyErrMsg(Err#, ErrMsgs.factory_ctorArgMismatch(T_Ctors#make2, [`2`])) {
+		verifyErrMsg(Err#, "Arguments do not match ctor params for afBeanUtils::T_Ctors.make2(Int i1) - [2]") {
 			BeanFactory(T_Ctors#).add(`2`).create(T_Ctors#make2)
 		}
 
-		verifyErrMsg(Err#, ErrMsgs.factory_ctorArgMismatch(T_Ctors#make2, [1, 1])) {
+		verifyErrMsg(Err#, "Arguments do not match ctor params for afBeanUtils::T_Ctors.make2(Int i1) - [1, 1]") {
 			BeanFactory(T_Ctors#).add(1).add(1).create(T_Ctors#make2)
 		}
 		
@@ -81,7 +81,7 @@ internal class TestBeanFactory : Test {
 		verifyEq(obj.ctor, "make3")
 		verifyEq(obj.value, "m3")
 
-		verifyErrMsg(Err#, ErrMsgs.factory_tooManyCtorsFound(T_Ctors#, "make4 make5".split, [Int#, Str#])) {
+		verifyErrMsg(Err#, "Found more than 1 ctor on afBeanUtils::T_Ctors [make4, make5] that match argument types - [Int, Str]") {
 			BeanFactory(T_Ctors#).add(1).add("2").create
 		}
 
@@ -89,7 +89,7 @@ internal class TestBeanFactory : Test {
 		verifyEq(obj.ctor, "make5")
 		verifyEq(obj.value, "m5")
 
-		verifyErrMsg(Err#, ErrMsgs.factory_noCtorsFound(T_Ctors#, [Uri#])) {
+		verifyErrMsg(Err#, "Could not find a ctor on afBeanUtils::T_Ctors to match argument types - [Uri]") {
 			BeanFactory(T_Ctors#).add(`2`).create
 		}
 
@@ -170,19 +170,19 @@ internal class TestBeanFactory : Test {
 		verifyEq(BeanFactory.defaultValue(T_Obj03#)->dude, "defVal")
 		verifyEq(BeanFactory.defaultValue(Str#), Str.defVal)
 		
-		verifyErrMsg(ArgErr#, ErrMsgs.factory_defValNotFound(Env#)) {
+		verifyErrMsg(ArgErr#, "Env is null and does not have a default value") {
 			BeanFactory.defaultValue(Env#)
 		}
 	}
 	
 	Void testMisc() {
-		verifyErrMsg(ArgErr#, ErrMsgs.factory_ctorWrongType(Str#, T_Obj03#make2)) {
+		verifyErrMsg(ArgErr#, "Ctor afBeanUtils::T_Obj03.make2 does not belong to Str") {
 			BeanFactory(Str#).create(T_Obj03#make2)
 		}		
 	}
 	
 	Void testSet() {
-		verifyErrMsg(ArgErr#, ErrMsgs.factory_fieldWrongParent(T_A#, T_B#b)) {
+		verifyErrMsg(ArgErr#, "Field afBeanUtils::T_B.b does not belong to afBeanUtils::T_A") {
 			BeanFactory(T_A#).set(T_B#b, 3)
 		}
 
@@ -194,6 +194,18 @@ internal class TestBeanFactory : Test {
 		verifyEq(obj.a, 6)
 		verifyEq(obj.b, 9)
 	}
+	
+	Void testImmutableFieldVals() {
+		// FIXME !!!
+		obj := (T_Obj05) BeanFactory(T_Obj05#, null, [T_Obj05#ints:[2]]).create
+		verifyEq(obj.ints, [2])		
+	}
+}
+
+@Js
+internal const class T_Obj05 {
+	const Int[] ints
+	new make(|This| f) { f(this) }
 }
 
 @Js
