@@ -1,6 +1,6 @@
 
 @Js
-internal class TestTypeLookup : BeanTest {
+internal class TestTypeLookup : Test {
 	
 	Void testDupsError() {
 		// need to get the ordering correct

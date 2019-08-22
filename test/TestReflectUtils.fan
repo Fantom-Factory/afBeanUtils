@@ -1,7 +1,7 @@
 
 ** Paradox :: Just what is 'Void?'?
 @Js
-internal class TestReflectUtils : BeanTest {
+internal class TestReflectUtils : Test {
 
 	Void testFindField() {
 		field := ReflectUtils.findField(MyReflectTestUtils2#, "int", Int#)

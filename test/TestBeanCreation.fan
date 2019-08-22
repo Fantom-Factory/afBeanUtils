@@ -1,6 +1,6 @@
 
 // mimic TestBeanProperty, but for testing creation
-internal class TestBeanCreation : BeanTest {
+internal class TestBeanCreation : Test {
 	
 	Int? 			basic
 	Int[]?			list

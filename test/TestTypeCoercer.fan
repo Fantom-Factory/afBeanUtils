@@ -1,6 +1,6 @@
 
 @Js
-internal class TestTypeCoercer : BeanTest {
+internal class TestTypeCoercer : Test {
 	
 	Void testCoerce() {
 		tc := TypeCoercer()

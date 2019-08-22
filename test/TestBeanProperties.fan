@@ -1,5 +1,5 @@
 
-internal class TestBeanProperties : BeanTest {
+internal class TestBeanProperties : Test {
 	
 	Void testDocs() {
 		string := "100 101 102"

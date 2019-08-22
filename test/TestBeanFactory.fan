@@ -1,6 +1,6 @@
 
 @Js
-internal class TestBeanFactory : BeanTest {
+internal class TestBeanFactory : Test {
 	
 	Void testBasic() {
 		obj := BeanFactory(T_NoCtor#).create

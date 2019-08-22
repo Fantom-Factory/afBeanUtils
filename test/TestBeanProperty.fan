@@ -1,5 +1,5 @@
 
-internal class TestBeanProperty : BeanTest {
+internal class TestBeanProperty : Test {
 	
 	Int? 			basic
 	Int[]?			list
