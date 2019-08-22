@@ -1,0 +1,6 @@
+
+fpm test -d -js afBeanUtils
+
+fpm run -t afBeanUtils compilerJs::NodeRunner -test afBeanUtils -keep
+
+fpm run -t afBeanUtils compilerJs::NodeRunner -test afBeanUtils::TestBeanCreation.testList -keep
