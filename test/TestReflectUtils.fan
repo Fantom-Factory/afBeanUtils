@@ -30,10 +30,8 @@ internal class TestReflectUtils : BeanTest {
 		verifyEq(ctor, MyReflectTestUtils1#makeCtor1)
 
 		// inherited ctors should not be found
-		if (Env.cur.runtime != "js") {
-			ctor = ReflectUtils.findCtor(MyReflectTestUtils2#, "makeCtor1")
-			verifyNull(ctor)
-		}
+		ctor = ReflectUtils.findCtor(MyReflectTestUtils2#, "makeCtor1")
+		verifyNull(ctor)
 	}
 
 	Void testFindCtors() {

@@ -169,7 +169,7 @@ class BeanFactory {
 			return Map(mapType.toNonNullable)
 		}
 
-		ctors := ReflectUtils.findCtors(type)
+		ctors := ReflectUtils.findCtors(type, Type#.emptyList)
 		if (ctors.size == 1 && ctors.first.isPublic)
 			return ctors.first.call
 		

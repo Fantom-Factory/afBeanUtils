@@ -10,6 +10,9 @@ internal class TestBeanFactory : BeanTest {
 	Void testCtorArgsNamed() {
 		obj := (T_Ctors?) null
 		
+		obj = BeanFactory(T_Ctors#).create
+		verifyEq(obj.ctor, "make1")
+
 		obj = BeanFactory(T_Ctors#).setByName("value", "m1").create(T_Ctors#make1)
 		verifyEq(obj.ctor, "make1")
 		verifyEq(obj.value, "m1")

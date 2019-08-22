@@ -11,7 +11,6 @@ internal const abstract class SegmentFactory {
 	abstract Str 				expression()
 }
 
-
 internal enum class SegmentType {
 	field, method, index
 }
@@ -85,7 +84,6 @@ internal const class IndexSegment : SegmentFactory {
 }
 
 // ---- Executors ---------------------------------------------------------------------------------
-
 internal abstract class SegmentExecutor {
 	TypeCoercer?	typeCoercer
 	|Type->Obj?|?	makeFunc 

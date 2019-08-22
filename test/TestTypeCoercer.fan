@@ -11,7 +11,7 @@ internal class TestTypeCoercer : BeanTest {
 
 		// toXXX()
 		verifyEq(tc.coerce(69, Str#), "69")
-		verifyEq(tc.coerce(69f, Str#), Env.cur.runtime == "js" ? "69" : "69.0")
+		verifyEq(tc.coerce(69f, Str#), "69.0")
 		verifyEq(tc.coerce("69", Int#), 69)
 		if (Env.cur.runtime != "js")
 			verifyEq(tc.coerce(`69`, File#), `69`.toFile)
@@ -76,7 +76,7 @@ internal class TestTypeCoercer : BeanTest {
 
 		// toXXX()
 		verifyEq(tc.coerce([69, 42], Str[]#), ["69", "42"])
-		verifyEq(tc.coerce([69f, 42f], Str[]#), Env.cur.runtime == "js" ? ["69", "42"] : ["69.0", "42.0"])
+		verifyEq(tc.coerce([69f, 42f], Str[]#), ["69.0", "42.0"])
 		verifyEq(tc.coerce(["69", "42"], Int[]#), [69, 42])
 		verifyEq(tc.coerce(["69", null], Int?[]#), [69, null])
 
@@ -110,7 +110,7 @@ internal class TestTypeCoercer : BeanTest {
 
 		// toXXX()
 		verifyEq(tc.coerce([6:9, 4:2], Str:Str#), ["6":"9", "4":"2"])
-		verifyEq(tc.coerce([6:9f, 4:2f], Str:Str#), Env.cur.runtime == "js" ? ["6":"9", "4":"2"] : ["6":"9.0", "4":"2.0"])
+		verifyEq(tc.coerce([6:9f, 4:2f], Str:Str#), ["6":"9.0", "4":"2.0"])
 		verifyEq(tc.coerce(["6":"9", "4":"2"], Int:Int?#), Int:Int?[6:9, 4:2])
 		if (Env.cur.runtime != "js")
 			verifyEq(tc.coerce([`6`:`9`, `4`:null], File:File?#), [`6`.toFile:`9`.toFile, `4`.toFile:null])
