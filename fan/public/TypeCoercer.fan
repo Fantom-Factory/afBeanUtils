@@ -120,7 +120,7 @@ const class TypeCoercer {
 	protected virtual |Obj->Obj?|? createCoercionFunc(Type fromType, Type toType) {
 		func := doCreateCoercionFunc(fromType, toType)
 		// see http://fantom.org/forum/topic/1144
-		return Env.cur.runtime == "js" ? func : func.toImmutable
+		return Env.cur.runtime == "js" ? func : func?.toImmutable
 	}
 
 	** It kinda sucks to need this method, but it's a workaround to this 
