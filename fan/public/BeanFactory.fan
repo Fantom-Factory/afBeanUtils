@@ -6,8 +6,6 @@
 ** (which must be the last method parameter). 
 ** 
 ** 'const' types **must** provide an it-block ctor if fields are to be set. 
-** 
-** Bean factory instances may only be used the once. 
 @Js
 class BeanFactory {
 	
@@ -16,7 +14,6 @@ class BeanFactory {
 		private set
 	}
 
-	private OneShotLock		createLock	:= OneShotLock("Factory has been used")
 	@NoDoc
 	protected Obj?[]		ctorArgs
  	@NoDoc
@@ -36,7 +33,6 @@ class BeanFactory {
 	** Sets a field on the type to be instantiated.
 	@Operator
 	This set(Field field, Obj? val) {
-		createLock.check
 		if (!type.fits(field.parent))
 			throw ArgErr("Field ${field.qname} does not belong to ${type.qname}".replace("sys::", ""))
 		fieldVals[field] = val
@@ -45,7 +41,6 @@ class BeanFactory {
 
 	** Sets a field on the type to be instantiated.
 	This setByName(Str fieldName, Obj? val) {
-		createLock.check
 		field := type.field(fieldName)
 		return set(field, val)
 	}
@@ -53,7 +48,6 @@ class BeanFactory {
 	** Adds a ctor argument.
 	@Operator
 	This add(Obj? arg) {
-		createLock.check
 		ctorArgs.add(arg)
 		return this
 	}
@@ -62,7 +56,6 @@ class BeanFactory {
 	** 
 	** If no ctor is given, a suitable one is picked that matches the arguments accumulated by the factory. 
 	Obj create(Method? ctor := null) {
-		createLock.lock
 
 		if (ctor != null && ctor.parent != type)
 			throw ArgErr("Ctor ${ctor.qname} does not belong to $type.qname".replace("sys::", ""))
@@ -139,7 +132,7 @@ class BeanFactory {
 	** 1. If the type is nullable (and 'force == false') return 'null'.
 	** 1. If the type is a Map, an empty map is returned.
 	** 1. If the type is a List, an empty list is returned. (With zero capacity.)
-	** 1. If one exists, a public no-args ctor is called to create the object.
+	** 1. If one exists, a public no-args ctor is called to create the object (may be called anything).
 	** 1. If it exists, the value of the type's 'defVal' slot is returned. 
 	**    (Must be a static field or a static method with zero params.)
 	** 1. 'ArgErr' is thrown. 
