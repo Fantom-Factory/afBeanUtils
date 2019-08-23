@@ -164,7 +164,7 @@ const class TypeLookup {
 	}
 	
 	private Obj? check(Type nonNullable, Bool checked) {
-		checked ? throw TypeNotFoundErr("Could not find match for Type ${nonNullable}.", values.keys) : null
+		checked ? throw ArgNotFoundErr("Could not find match for Type ${nonNullable}.", values.keys) : null
 	}
 	
 	@NoDoc
@@ -173,16 +173,3 @@ const class TypeLookup {
 	}
 }
 
-** This Err is left public just in case someone wants to catch it.
-@Js @NoDoc
-const class TypeNotFoundErr : Err, NotFoundErr {
-	override const Str?[] availableValues
-	
-	new make(Str msg, Obj?[] availableValues, Err? cause := null) : super(msg, cause) {
-		this.availableValues = availableValues.map { it?.toStr }.sort
-	}
-	
-	override Str toStr() {
-		NotFoundErr.super.toStr
-	}
-}
