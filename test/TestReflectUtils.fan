@@ -88,45 +88,46 @@ internal class TestReflectUtils : Test {
 		// I can pass in more params than required, it's up to the method to say whether it needs 
 		// them or not - but if it DOES declare the params then they have to fit
 		// Nullable types don't matter as null is mainly a runtime check, to nip it in the bud at source
-		verify(ReflectUtils.argTypesFitMethod([Obj#], MyReflectTestUtils2#params1))
+		// on 2nd thoughts - BULLSHIT! Let's return what I ask for!
+//		verify(ReflectUtils.argTypesFitMethod([Obj#], MyReflectTestUtils2#params1))
 
 		verifyFalse	(ReflectUtils.argTypesFitMethod([,],    		MyReflectTestUtils2#params2))
 		verify		(ReflectUtils.argTypesFitMethod([Num#], 		MyReflectTestUtils2#params2))
 		verifyFalse	(ReflectUtils.argTypesFitMethod([Obj#], 		MyReflectTestUtils2#params2))
 		verify		(ReflectUtils.argTypesFitMethod([Int#], 		MyReflectTestUtils2#params2))
-		verify		(ReflectUtils.argTypesFitMethod([Int#, Int#],	MyReflectTestUtils2#params2))
+//		verify		(ReflectUtils.argTypesFitMethod([Int#, Int#],	MyReflectTestUtils2#params2))	// BS
 
 		verifyFalse	(ReflectUtils.argTypesFitMethod([,],    		MyReflectTestUtils2#params3))
 		verify		(ReflectUtils.argTypesFitMethod([Num#], 		MyReflectTestUtils2#params3))
 		verifyFalse	(ReflectUtils.argTypesFitMethod([Obj#], 		MyReflectTestUtils2#params3))
 		verify		(ReflectUtils.argTypesFitMethod([Int#], 		MyReflectTestUtils2#params3))
-		verify		(ReflectUtils.argTypesFitMethod([Int#, Int#],	MyReflectTestUtils2#params3))
+//		verify		(ReflectUtils.argTypesFitMethod([Int#, Int#],	MyReflectTestUtils2#params3))	// BS
 
 		verify		(ReflectUtils.argTypesFitMethod([,],    		MyReflectTestUtils2#params4))
 		verify		(ReflectUtils.argTypesFitMethod([Num#], 		MyReflectTestUtils2#params4))
 		verifyFalse	(ReflectUtils.argTypesFitMethod([Obj#], 		MyReflectTestUtils2#params4))
 		verify		(ReflectUtils.argTypesFitMethod([Int#], 		MyReflectTestUtils2#params4))
-		verify		(ReflectUtils.argTypesFitMethod([Int#, Int#],	MyReflectTestUtils2#params4))
+//		verify		(ReflectUtils.argTypesFitMethod([Int#, Int#],	MyReflectTestUtils2#params4))	// BS
 
 		verify		(ReflectUtils.argTypesFitMethod([,],    		MyReflectTestUtils2#params5))
 		verify		(ReflectUtils.argTypesFitMethod([Num#], 		MyReflectTestUtils2#params5))
 		verifyFalse	(ReflectUtils.argTypesFitMethod([Obj#],			MyReflectTestUtils2#params5))
 		verify		(ReflectUtils.argTypesFitMethod([Int#],			MyReflectTestUtils2#params5))
-		verify		(ReflectUtils.argTypesFitMethod([Int#, Int#],	MyReflectTestUtils2#params5))
+//		verify		(ReflectUtils.argTypesFitMethod([Int#, Int#],	MyReflectTestUtils2#params5))	// BS
 
 		verifyFalse	(ReflectUtils.argTypesFitMethod([,],			MyReflectTestUtils2#params6))
 		verify		(ReflectUtils.argTypesFitMethod([Num#], 		MyReflectTestUtils2#params6))
 		verify		(ReflectUtils.argTypesFitMethod([Num#, Num#],	MyReflectTestUtils2#params6))
 		verifyFalse	(ReflectUtils.argTypesFitMethod([Num#, Obj#],	MyReflectTestUtils2#params6))
 		verify		(ReflectUtils.argTypesFitMethod([Num#, Int#],	MyReflectTestUtils2#params6))
-		verify		(ReflectUtils.argTypesFitMethod([Num#, Int#, Int#], MyReflectTestUtils2#params6))
+//		verify		(ReflectUtils.argTypesFitMethod([Num#, Int#, Int#], MyReflectTestUtils2#params6))	// BS
 
 		verifyFalse	(ReflectUtils.argTypesFitMethod([,],			MyReflectTestUtils2#params7))
 		verify		(ReflectUtils.argTypesFitMethod([Num#], 		MyReflectTestUtils2#params7))
 		verify		(ReflectUtils.argTypesFitMethod([Num#, Num#],	MyReflectTestUtils2#params7))
 		verifyFalse	(ReflectUtils.argTypesFitMethod([Num#, Obj#],	MyReflectTestUtils2#params7))
 		verify		(ReflectUtils.argTypesFitMethod([Num#, Int#],	MyReflectTestUtils2#params7))
-		verify		(ReflectUtils.argTypesFitMethod([Num#, Int#, Int#], MyReflectTestUtils2#params7))
+//		verify		(ReflectUtils.argTypesFitMethod([Num#, Int#, Int#], MyReflectTestUtils2#params7))	// BS
 
 		verify		(ReflectUtils.argTypesFitMethod([,],			MyReflectTestUtils2#params8))
 

@@ -150,7 +150,8 @@ class ReflectUtils {
 	}
 	
 	private static Bool _argTypesFitParams(Type?[] argTypes, Param[] params) {
-		params.all |param, i->Bool| {
+		if (argTypes.size > params.size) return false
+		return params.all |param, i->Bool| {
 			if (i >= argTypes.size)
 				return param.hasDefault
 			if (argTypes[i] == null)
