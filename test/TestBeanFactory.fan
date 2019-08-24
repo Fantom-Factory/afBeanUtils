@@ -196,7 +196,7 @@ internal class TestBeanFactory : Test {
 	}
 	
 	Void testImmutableFieldVals() {
-		// FIXME !!!
+		// fixme - actually, just use BeanBuilder instead!
 		obj := (T_Obj05) BeanFactory(T_Obj05#, null, [T_Obj05#ints:[2]]).create
 		verifyEq(obj.ints, [2])		
 	}

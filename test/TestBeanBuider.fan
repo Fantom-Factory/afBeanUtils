@@ -174,7 +174,6 @@ internal class TestBeanBuilder : Test {
 	}
 	
 	Void testImmutableFieldVals() {
-		// FIXME !!!
 		obj := (T_Obj05) build(T_Obj05#, [T_Obj05#ints:[2]])
 		verifyEq(obj.ints, [2])		
 	}

@@ -13,9 +13,14 @@
 
 Features include:
 
-- **Bean Identity**
+- **Bean Builder**
 
-  Generate `equals()`, `hash()` and `toStr()` methods from annotated fields.
+  Static methods for creating Fantom objects. Don't `make()` your beans, `build()` them instead!
+
+
+- **Bean Equality**
+
+  Generate `equals()`, `hash()` and `toStr()` methods from fields.
 
 
 - **Bean Properties**
@@ -54,29 +59,29 @@ To use in a [Fantom](http://fantom-lang.org/) project, add a dependency to `buil
 
 Full API & fandocs are available on the [Eggbox](http://eggbox.fantomfactory.org/pods/afBeanUtils/) - the Fantom Pod Repository.
 
-## Bean Identity
+## Bean Equality
 
-Nobody likes writing `hash()` and `equals()` methods, so let [BeanIdentity](http://eggbox.fantomfactory.org/pods/afBeanUtils/api/BeanIdentity) take the pain away! Simply annotate important identity fields with `@BeanId` and override the Obj methods.
+Nobody likes writing `hash()` and `equals()` methods, so let [BeanEquality](http://eggbox.fantomfactory.org/pods/afBeanUtils/api/BeanEquality) take the pain away! Simply annotate important identity fields with `@BeanId` and override the Obj methods.
 
 Sample usage:
 
 ```
 class User {
-  @BeanId Int? id
-  @BeanId Str? name
-          Str? notUsed
+    Int? id
+    Str? name
+    Str? wotever
 
-  override Int hash() {
-    BeanIdentity.beanHash(this)
-  }
+    override Int hash() {
+      BeanEquality.beanHash(this, [#id, #name])
+    }
 
-  override Bool equals(Obj? obj) {
-    BeanIdentity.beanEquals(this, obj)
-  }
+    override Bool equals(Obj? obj) {
+      BeanEquality.beanEquals(this, obj, [#id, #name])
+    }
 
-  override Str toStr() {
-    BeanIdentity.beanToStr(this)
-  }
+    override Str toStr() {
+      BeanEquality.beanToStr(this, [#id, #name])
+    }
 }
 ```
 
