@@ -202,41 +202,41 @@ internal class TestBeanFactory : Test {
 	}
 }
 
-@Js
-internal const class T_Obj05 {
-	const Int[] ints
-	new make(|This| f) { f(this) }
-}
-
-@Js
-internal const class T_Obj02 {
-	const Str? dude
-	static const T_Obj02 defVal := T_Obj02("defVal")
-	new make2() { dude = "ctor" }
-	new make(Str s) { dude = s }
-}
-
-@Js
-internal const class T_Obj03 {
-	const Str? dude
-	static const T_Obj03 defVal := T_Obj03("defVal")
-	new make2(Str s) { dude = s }
-}
-
-@Js
-internal class T_Ctors {
-	Str? value
-	Str  ctor
-	
-	new make1() 							{ ctor = "make1" }
-	new make2(Int i1) 						{ ctor = "make2" }
-	new make3(Int i1, Int i2) 				{ ctor = "make3" }
-	new make4(Int i1, Str s2) 				{ ctor = "make4" }
-	new make5(Int i1, Str s2, Int i3 := 2)	{ ctor = "make5" }
-}
-
-@Js
-internal class T_NoCtor { }
+//@Js
+//internal const class T_Obj05 {
+//	const Int[] ints
+//	new make(|This| f) { f(this) }
+//}
+//
+//@Js
+//internal const class T_Obj02 {
+//	const Str? dude
+//	static const T_Obj02 defVal := T_Obj02("defVal")
+//	new make2() { dude = "ctor" }
+//	new make(Str s) { dude = s }
+//}
+//
+//@Js
+//internal const class T_Obj03 {
+//	const Str? dude
+//	static const T_Obj03 defVal := T_Obj03("defVal")
+//	new make2(Str s) { dude = s }
+//}
+//
+//@Js
+//internal class T_Ctors {
+//	Str? value
+//	Str  ctor
+//	
+//	new make1() 							{ ctor = "make1" }
+//	new make2(Int i1) 						{ ctor = "make2" }
+//	new make3(Int i1, Int i2) 				{ ctor = "make3" }
+//	new make4(Int i1, Str s2) 				{ ctor = "make4" }
+//	new make5(Int i1, Str s2, Int i3 := 2)	{ ctor = "make5" }
+//}
+//
+//@Js
+//internal class T_NoCtor { }
 
 @Js
 internal class T_A {
@@ -247,26 +247,26 @@ internal class T_B : T_A {
 	Int b
 }
 
-@Js
-internal const class T_CtorsWithItBlocks {
-	const Str? value
-	const Str  ctor
-	
-	new make1(|This|? f)										{ ctor = "make1"; f?.call(this) }
-	new make2(Int i1, |This|? f := null)	 					{ ctor = "make2"; f?.call(this) }
-	new make3(Int i1, Int i2, |This|? f := null)				{ ctor = "make3"; f?.call(this) }
-	new make4(Int i1, Str s2, |This|? f := null)				{ ctor = "make4"; f?.call(this) }
-	new make5(Int i1, Str s2, Int i3 := 2, |This|? f := null)	{ ctor = "make5"; f?.call(this) }
-}
-
-@Js
-internal const class T_CtorsWithMandatoryItBlocks {
-	const Str? value
-	const Str  ctor
-	
-	new make1(|This| f)							{ ctor = "make1"; f(this) }
-	new make2(Int i1, |This| f)	 				{ ctor = "make2"; f(this) }
-	new make3(Int i1, Int i2, |This| f)			{ ctor = "make3"; f(this) }
-	private new make4(Int i1, Str s2, |This| f)	{ ctor = "make4"; f(this) }
-	new make5(Int i1, Str s2, Int i3, |This| f)	{ ctor = "make5"; f(this) }
-}
+//@Js
+//internal const class T_CtorsWithItBlocks {
+//	const Str? value
+//	const Str  ctor
+//	
+//	new make1(|This|? f)										{ ctor = "make1"; f?.call(this) }
+//	new make2(Int i1, |This|? f := null)	 					{ ctor = "make2"; f?.call(this) }
+//	new make3(Int i1, Int i2, |This|? f := null)				{ ctor = "make3"; f?.call(this) }
+//	new make4(Int i1, Str s2, |This|? f := null)				{ ctor = "make4"; f?.call(this) }
+//	new make5(Int i1, Str s2, Int i3 := 2, |This|? f := null)	{ ctor = "make5"; f?.call(this) }
+//}
+//
+//@Js
+//internal const class T_CtorsWithMandatoryItBlocks {
+//	const Str? value
+//	const Str  ctor
+//	
+//	new make1(|This| f)							{ ctor = "make1"; f(this) }
+//	new make2(Int i1, |This| f)	 				{ ctor = "make2"; f(this) }
+//	new make3(Int i1, Int i2, |This| f)			{ ctor = "make3"; f(this) }
+//	private new make4(Int i1, Str s2, |This| f)	{ ctor = "make4"; f(this) }
+//	new make5(Int i1, Str s2, Int i3, |This| f)	{ ctor = "make5"; f(this) }
+//}

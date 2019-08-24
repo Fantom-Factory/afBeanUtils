@@ -1,8 +1,10 @@
 v1.0.10
 =======
  - New: 'afBeanUtils' now available as a SkySpark extension.
+ - New: 'BeanBuilder' replaces 'BeanFactory'
  - Chg: Renamed 'BeanIdentity' to 'BeanEquality' and updated methods to take field list. (Breaking change.)
  - Chg: Removed 'TypeNotFoundErr' in favour of using the generic 'ArgNotFound'.
+ - Chg: Deleted 'OneShotLock' from 'BeanFactory'.
  - Bug: Fixed NPE in 'TypeCoercer' when creating coercion funcs in JS.
 
 v1.0.8
