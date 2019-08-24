@@ -6,13 +6,14 @@
 ** (which must be the last method parameter). 
 ** 
 ** 'const' types **must** provide an it-block ctor if fields are to be set. 
-@Js
+@Js @Deprecated { msg="Use BeanBuilder instead" }
 class BeanFactory {
+
+	// Note: Where this class was nice, it's a lot of overhead to create() a single type
+	// Common use-cases are now clear so the simplier BeanBuilder is much cleaner and quicker. 
 	
 	** The type this factory will create 
-	Type type {
-		private set
-	}
+	const Type type
 
 	@NoDoc
 	protected Obj?[]		ctorArgs
@@ -21,9 +22,9 @@ class BeanFactory {
 	
 	** Makes a factory for the given type.
 	new make(Type type, Obj?[]? ctorArgs := null, [Field:Obj?]? fieldVals := null) {
-		this.type = type
-		this.ctorArgs  = ctorArgs  ?: Obj?#.emptyList.rw
-		this.fieldVals = fieldVals ?: Field:Obj?[:]
+		this.type		= type.toNonNullable
+		this.ctorArgs	= ctorArgs  ?: Obj?#.emptyList.rw
+		this.fieldVals	= fieldVals ?: Field:Obj?[:]
 	}
 	
 	** Fantom Bug: `http://fantom.org/sidewalk/topic/2163#c13978`
@@ -56,7 +57,6 @@ class BeanFactory {
 	** 
 	** If no ctor is given, a suitable one is picked that matches the arguments accumulated by the factory. 
 	Obj create(Method? ctor := null) {
-
 		if (ctor != null && ctor.parent != type)
 			throw ArgErr("Ctor ${ctor.qname} does not belong to $type.qname".replace("sys::", ""))
 		
@@ -129,13 +129,13 @@ class BeanFactory {
 	** Call 'toImmutable()' on returned object if you need 'const' Lists and Maps.
 	** 
 	** The default type is determined by the following algorithm:
-	** 1. If the type is nullable (and 'force == false') return 'null'.
-	** 1. If the type is a Map, an empty map is returned.
-	** 1. If the type is a List, an empty list is returned. (With zero capacity.)
-	** 1. If one exists, a public no-args ctor is called to create the object (may be called anything).
-	** 1. If it exists, the value of the type's 'defVal' slot is returned. 
-	**    (Must be a static field or a static method with zero params.)
-	** 1. 'ArgErr' is thrown. 
+	** 1. If the type is nullable (and 'force == false') return 'null'
+	** 1. If the type is a Map, an empty map is returned
+	** 1. If the type is a List, an empty list is returned (with zero capacity)
+	** 1. If one exists, a public no-args ctor is called to create the object
+	** 1. If it exists, the value of the type's 'defVal' slot is returned
+	**    (must be a static field or method with zero params)
+	** 1. 'ArgErr' is thrown 
 	** 
 	** This method differs from [Type.make()]`sys::Type.make` for the following reasons:
 	**  - 'null' is returned if type is nullable. 
