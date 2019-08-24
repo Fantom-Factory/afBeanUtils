@@ -2,12 +2,17 @@
 @Js
 internal class TestBeanBuilder : Test {
 	
+	Void testDude() {
+		ints := [1]
+		ints = List.makeObj(ints.size)
+	}
+	
 	Void testBasic() {
 		obj := build(T_NoCtor#)
-		verify(obj is T_NoCtor)		
+		verify(obj is T_NoCtor)
 	}
 
-	Void testCtorArgsNamed() {
+	Void testCtor() {
 		obj := (T_Ctors?) null
 		
 		obj = build(T_Ctors#)

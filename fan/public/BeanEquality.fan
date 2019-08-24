@@ -10,17 +10,17 @@
 **     Str? name
 **     Str? wotever 
 ** 
-**   override Int hash() {
-**     BeanEquality.beanHash(this, [#id, #name])
-**   }
+**     override Int hash() {
+**       BeanEquality.beanHash(this, [#id, #name])
+**     }
 **   
-**   override Bool equals(Obj? obj) {
-**     BeanEquality.beanEquals(this, obj, [#id, #name])
-**   }
+**     override Bool equals(Obj? obj) {
+**       BeanEquality.beanEquals(this, obj, [#id, #name])
+**     }
 **   
-**   override Str toStr() {
-**     BeanEquality.beanToStr(this, [#id, #name])
-**   }
+**     override Str toStr() {
+**       BeanEquality.beanToStr(this, [#id, #name])
+**     }
 ** }
 ** <pre
 @Js
