@@ -16,7 +16,7 @@ class ReflectUtils {
 	** Returns 'null' if not found.
 	static Method? findCtor(Type type, Str ctorName, Type?[]? params := null) {
 		ctor := type.slot(ctorName, false)
-		return _findCtor(ctor, params ?: Type#.emptyList)
+		return _findCtor(ctor, params ?: Type#.emptyList, false)
 	}
 
 	** Finds a named method with the given parameter types.
@@ -24,7 +24,7 @@ class ReflectUtils {
 	** Returns 'null' if not found.
 	static Method? findMethod(Type type, Str methodName, Type?[]? params := null, Bool? isStatic := null, Type? returnType := null) {
 		method := type.slot(methodName, false)
-		return _findMethod(method, params ?: Type#.emptyList, isStatic, returnType)
+		return _findMethod(method, params ?: Type#.emptyList, isStatic, returnType, false)
 	}
 
 	** Find fields.
@@ -34,29 +34,30 @@ class ReflectUtils {
 	}
 	
 	** Find ctors with the given parameter types.
-	static Method[] findCtors(Type type, Type?[]? params := null) {
-		type.methods.findAll { _findCtor(it, params ?: Type#.emptyList) != null }
+	static Method[] findCtors(Type type, Type?[]? params := null, Bool matchArity := false) {
+		type.methods.findAll { _findCtor(it, params ?: Type#.emptyList, matchArity) != null }
 	}
 
 	** Find methods with the given parameter types.
-	static Method[] findMethods(Type type, Type?[]? params := null, Bool? isStatic := null, Type? returnType := null) {
-		type.methods.findAll { _findMethod(it, params ?: Type#.emptyList, isStatic, returnType) != null }
+	static Method[] findMethods(Type type, Type?[]? params := null, Bool? isStatic := null, Type? returnType := null, Bool matchArity := false) {
+		type.methods.findAll { _findMethod(it, params ?: Type#.emptyList, isStatic, returnType, matchArity) != null }
 	}
 
-	@NoDoc @Deprecated { msg="Use argTypesFitMethodSignature() instead"}
+	@NoDoc @Deprecated { msg="Use argTypesFitMethod() instead"}
 	static Bool paramTypesFitMethodSignature(Type?[] params, Method method) {
 		argTypesFitMethod(params, method)
 	}
 	
 	** Returns 'true' if the given parameter types fit the method signature.
-	static Bool argTypesFitMethod(Type?[] argTypes, Method method) {
+	** It 'matchArity' is 'false' then this will match methods with fewer args than given.
+	static Bool argTypesFitMethod(Type?[] argTypes, Method method, Bool matchArity := false) {
 		// interesting, 'method.params' are not the same as 'method.func.params'
-		_argTypesFitParams(argTypes, method.params)
+		_argTypesFitParams(argTypes, method.params, matchArity)
 	}
 
 	** Returns 'true' if the given parameter types fit the given func.
 	static Bool argTypesFitFunc(Type?[] argTypes, Func func) {
-		_argTypesFitParams(argTypes, func.params)
+		_argTypesFitParams(argTypes, func.params, false)
 	}
 		
 	** A replacement for 'Type.fits()' that takes into account type inference for Lists and Maps, and fixes Famtom bugs.
@@ -125,17 +126,17 @@ class ReflectUtils {
 		return field
 	}
 
-	private static Method? _findCtor(Slot? ctor, Type?[] params) {
+	private static Method? _findCtor(Slot? ctor, Type?[] params, Bool matchArity) {
 		if (ctor == null)
 			return null
 		if (!ctor.isMethod) 
 			return null
 		if (!ctor.isCtor) 
 			return null
-		return _argTypesFitParams(params, ((Method) ctor).params) ? ctor: null
+		return _argTypesFitParams(params, ((Method) ctor).params, matchArity) ? ctor: null
 	}
 	
-	private static Method? _findMethod(Slot? method, Type?[] params, Bool? isStatic, Type? returnType) {
+	private static Method? _findMethod(Slot? method, Type?[] params, Bool? isStatic, Type? returnType, Bool matchArity) {
 		if (method == null)
 			return null
 		if (!method.isMethod) 
@@ -146,11 +147,11 @@ class ReflectUtils {
 			return null
 		if (returnType != null && !fits(((Method) method).returns, returnType))
 			return null
-		return _argTypesFitParams(params, ((Method) method).params) ? method : null
+		return _argTypesFitParams(params, ((Method) method).params, matchArity) ? method : null
 	}
 	
-	private static Bool _argTypesFitParams(Type?[] argTypes, Param[] params) {
-		if (argTypes.size > params.size) return false
+	private static Bool _argTypesFitParams(Type?[] argTypes, Param[] params, Bool matchArity) {
+		if (matchArity && argTypes.size > params.size) return false
 		return params.all |param, i->Bool| {
 			if (i >= argTypes.size)
 				return param.hasDefault

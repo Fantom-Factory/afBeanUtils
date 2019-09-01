@@ -2,6 +2,7 @@ v1.0.10
 =======
  - New: 'afBeanUtils' now available as a SkySpark extension.
  - New: 'BeanBuilder' replaces 'BeanFactory'
+ - New: Some 'ReflectUtil' methods now take an optional 'matchArity' arg.
  - Chg: Renamed 'BeanIdentity' to 'BeanEquality' and updated methods to take field list. (Breaking change.)
  - Chg: Removed 'TypeNotFoundErr' in favour of using the generic 'ArgNotFound'.
  - Chg: Deleted 'OneShotLock' from 'BeanFactory'.

@@ -11,13 +11,13 @@
 		if ((fieldVals == null || fieldVals.isEmpty) && (ctorArgs == null || ctorArgs.isEmpty)) {
 			// we're being asked to "build" an instance, not find a defVal - so let's look for a ctor
 			
-			ctors := ReflectUtils.findCtors(type, Type#.emptyList)
+			ctors := ReflectUtils.findCtors(type, Type#.emptyList, true)
 			if (ctors.size == 1)
 				return ctors.first.call
 
 			// if no def-ctor, try an empty it-block
 			itBlockFunc	:= Field.makeSetFunc([:])
-			ctors = ReflectUtils.findCtors(type, [itBlockFunc.typeof])
+			ctors = ReflectUtils.findCtors(type, [itBlockFunc.typeof], true)
 			if (ctors.size == 1)
 				return ctors.first.call(itBlockFunc)
 
@@ -39,7 +39,7 @@
 			
 			// with no field types, just look for a matching ctor
 			argTypes := ctorArgs.map { it?.typeof }
-			ctors	 := ReflectUtils.findCtors(type, argTypes)
+			ctors	 := ReflectUtils.findCtors(type, argTypes, true)
 			if (ctors.size == 0) throw Err(msg_noCtorFound(type, argTypes))
 			if (ctors.size  > 1) throw Err(msg_tooManyCtorsFound(type, ctors.map { it.name }, argTypes))
 			return ctors.first.callList(ctorArgs)
@@ -51,7 +51,7 @@
 
 			// we have ctor args - so we MUST use them
 			argTypes := ctorArgs.map { it?.typeof }
-			ctors	 := ReflectUtils.findCtors(type, argTypes)
+			ctors	 := ReflectUtils.findCtors(type, argTypes, true)
 			if (ctors.size == 0) throw Err(msg_noCtorFound(type, argTypes))
 			if (ctors.size  > 1) throw Err(msg_tooManyCtorsFound(type, ctors.map { it.name }, argTypes))
 			return ctors.first.callList(ctorArgs)
@@ -63,7 +63,7 @@
 		if (ctorArgs == null || ctorArgs.isEmpty) {
 			//	look for basic it-block 
 			argTypes := [itBlockFunc.typeof]
-			ctors	 := ReflectUtils.findCtors(type, argTypes)
+			ctors	 := ReflectUtils.findCtors(type, argTypes, true)
 			if (ctors.size == 1)
 				return ctors.first.call(itBlockFunc)
 
@@ -79,14 +79,14 @@
 		// try first with it-block
 		ctorArgs.add(itBlockFunc)
 		argTypes := ctorArgs.map { it?.typeof }
-		ctors	 := ReflectUtils.findCtors(type, argTypes)
+		ctors	 := ReflectUtils.findCtors(type, argTypes, true)
 		if (ctors.size == 1)
 			return ctors.first.callList(ctorArgs)
 
 		// if not, do it the hard way
 		ctorArgs.removeAt(-1)
 		argTypes.removeAt(-1)
-		ctors	 = ReflectUtils.findCtors(type, argTypes)		
+		ctors	 = ReflectUtils.findCtors(type, argTypes, true)		
 		if (ctors.size == 0) throw Err(msg_noCtorFound(type, argTypes))
 		if (ctors.size  > 1) throw Err(msg_tooManyCtorsFound(type, ctors.map { it.name }, argTypes))
 
