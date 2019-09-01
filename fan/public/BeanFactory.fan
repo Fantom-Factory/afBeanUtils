@@ -13,7 +13,9 @@ class BeanFactory {
 	// Common use-cases are now clear so the simplier BeanBuilder is much cleaner and quicker. 
 	
 	** The type this factory will create 
-	const Type type
+	Type type {
+		private set	// keep this as non-const to keep binary backwards compatibility
+	}
 
 	@NoDoc
 	protected Obj?[]		ctorArgs
@@ -22,7 +24,7 @@ class BeanFactory {
 	
 	** Makes a factory for the given type.
 	new make(Type type, Obj?[]? ctorArgs := null, [Field:Obj?]? fieldVals := null) {
-		this.type		= type.toNonNullable
+		this.type = type
 		this.ctorArgs	= ctorArgs  ?: Obj?#.emptyList.rw
 		this.fieldVals	= fieldVals ?: Field:Obj?[:]
 	}
