@@ -7,6 +7,9 @@
 	static Obj? build(Type type, [Field:Obj?]? fieldVals := null, Obj?[]? ctorArgs := null) {
 		// BeanFactory.doCreate() is a lot more succinct, but creates a LOT more classes! 
 
+		if (type.toNonNullable == Obj#)
+			throw Err("Can not create an instance of sys::Obj")
+		
 		// check the basics
 		if ((fieldVals == null || fieldVals.isEmpty) && (ctorArgs == null || ctorArgs.isEmpty)) {
 			// we're being asked to "build" an instance, not find a defVal - so let's look for a ctor
@@ -29,7 +32,7 @@
 		if (type.isConst) {
 
 			// with field types, there must be an it-block at the end
-			if (fieldVals != null && !fieldVals.isEmpty) {
+			if (fieldVals != null && fieldVals.size > 0) {
 				// guard against adding it-blocks to Int[]
 				if (ctorArgs == null)	ctorArgs = List.makeObj(1)
 				else					ctorArgs = List.makeObj(ctorArgs.size + 1).addAll(ctorArgs)
