@@ -195,11 +195,11 @@ internal class TestBeanFactory : Test {
 		verifyEq(obj.b, 9)
 	}
 	
-	Void testImmutableFieldVals() {
-		// fixme - actually, just use BeanBuilder instead!
-		obj := (T_Obj05) BeanFactory(T_Obj05#, null, [T_Obj05#ints:[2]]).create
-		verifyEq(obj.ints, [2])		
-	}
+//	Void testImmutableFieldVals() {
+//		// fixme - actually, just use BeanBuilder instead!
+//		obj := (T_Obj05) BeanFactory(T_Obj05#, null, [T_Obj05#ints:[2]]).create
+//		verifyEq(obj.ints, [2])		
+//	}
 }
 
 //@Js

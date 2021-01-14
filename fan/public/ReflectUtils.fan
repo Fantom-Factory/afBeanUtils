@@ -49,7 +49,11 @@ class ReflectUtils {
 	}
 	
 	** Returns 'true' if the given parameter types fit the method signature.
-	** It 'matchArity' is 'false' then this will match methods with fewer args than given.
+	** 
+	** This has the same leniency as if you were calling the method function - 
+	** so will return 'true' even if there are more 'argTypes' than method parameters.
+	** 
+	** Set 'matchArity' to 'true' for a stricter match, more appropriate for methods.
 	static Bool argTypesFitMethod(Type?[] argTypes, Method method, Bool matchArity := false) {
 		// interesting, 'method.params' are not the same as 'method.func.params'
 		_argTypesFitParams(argTypes, method.params, matchArity)

@@ -82,6 +82,7 @@ internal class TestReflectUtils : Test {
 	}
 	
 	Void testParams() {
+		obj := MyReflectTestUtils2()
 		// simple case
 		verify(ReflectUtils.argTypesFitMethod([,], MyReflectTestUtils2#params1))
 		
@@ -90,45 +91,68 @@ internal class TestReflectUtils : Test {
 		// Nullable types don't matter as null is mainly a runtime check, to nip it in the bud at source
 		// on 2nd thoughts - BULLSHIT! Let's return what I ask for!
 		// on 3rd thoughts - a lot of reflection stuff (like efan) really need it
+		//
+		// FINAL ANSWER!
+		// Let "matchArity := false" (default) be a check as to what func can be legally called with.
+		// That way, we prevent runtime errors. (And it seems efan requires this loose protection level for some reason).
+		// Manually pass 'true' for more stringent checks, to prevent design errors. 
+		
+		// TODO I think, maybe, an afBeanUtils v2 is in order that IS more stringent by default, deletes the chuff, and has cachable type coercers.
+		
 		verify(ReflectUtils.argTypesFitMethod([Obj#], MyReflectTestUtils2#params1))
+		MyReflectTestUtils2#params1.call(obj, 2, 2)					// make sure func can be called with default matchArity
+		MyReflectTestUtils2#params1.func.call(obj, 2, 2)			// make sure func can be called with default matchArity
 
 		verifyFalse	(ReflectUtils.argTypesFitMethod([,],    		MyReflectTestUtils2#params2))
 		verify		(ReflectUtils.argTypesFitMethod([Num#], 		MyReflectTestUtils2#params2))
 		verifyFalse	(ReflectUtils.argTypesFitMethod([Obj#], 		MyReflectTestUtils2#params2))
 		verify		(ReflectUtils.argTypesFitMethod([Int#], 		MyReflectTestUtils2#params2))
-		verify		(ReflectUtils.argTypesFitMethod([Int#, Int#],	MyReflectTestUtils2#params2, true))	// BS
+		verify		(ReflectUtils.argTypesFitMethod([Int#, Int#],	MyReflectTestUtils2#params2))
+		verifyFalse	(ReflectUtils.argTypesFitMethod([Int#, Int#],	MyReflectTestUtils2#params2, true))
+		MyReflectTestUtils2#params2.call(obj, 2, 2)					// make sure func can be called with default matchArity
+		MyReflectTestUtils2#params2.func.call(obj, 2, 2)			// make sure func can be called with default matchArity
 
 		verifyFalse	(ReflectUtils.argTypesFitMethod([,],    		MyReflectTestUtils2#params3))
 		verify		(ReflectUtils.argTypesFitMethod([Num#], 		MyReflectTestUtils2#params3))
 		verifyFalse	(ReflectUtils.argTypesFitMethod([Obj#], 		MyReflectTestUtils2#params3))
 		verify		(ReflectUtils.argTypesFitMethod([Int#], 		MyReflectTestUtils2#params3))
-		verify		(ReflectUtils.argTypesFitMethod([Int#, Int#],	MyReflectTestUtils2#params3, true))	// BS
+		verify		(ReflectUtils.argTypesFitMethod([Int#, Int#],	MyReflectTestUtils2#params3))
+		verifyFalse	(ReflectUtils.argTypesFitMethod([Int#, Int#],	MyReflectTestUtils2#params3, true))
+		MyReflectTestUtils2#params3.call(obj, 2, 2)					// make sure func can be called with default matchArity
 
 		verify		(ReflectUtils.argTypesFitMethod([,],    		MyReflectTestUtils2#params4))
 		verify		(ReflectUtils.argTypesFitMethod([Num#], 		MyReflectTestUtils2#params4))
 		verifyFalse	(ReflectUtils.argTypesFitMethod([Obj#], 		MyReflectTestUtils2#params4))
 		verify		(ReflectUtils.argTypesFitMethod([Int#], 		MyReflectTestUtils2#params4))
-		verify		(ReflectUtils.argTypesFitMethod([Int#, Int#],	MyReflectTestUtils2#params4, true))	// BS
+		verify		(ReflectUtils.argTypesFitMethod([Int#, Int#],	MyReflectTestUtils2#params4))
+		verifyFalse	(ReflectUtils.argTypesFitMethod([Int#, Int#],	MyReflectTestUtils2#params4, true))
+		MyReflectTestUtils2#params4.call(obj, 2, 2)					// make sure func can be called with default matchArity
 
 		verify		(ReflectUtils.argTypesFitMethod([,],    		MyReflectTestUtils2#params5))
 		verify		(ReflectUtils.argTypesFitMethod([Num#], 		MyReflectTestUtils2#params5))
 		verifyFalse	(ReflectUtils.argTypesFitMethod([Obj#],			MyReflectTestUtils2#params5))
 		verify		(ReflectUtils.argTypesFitMethod([Int#],			MyReflectTestUtils2#params5))
-		verify		(ReflectUtils.argTypesFitMethod([Int#, Int#],	MyReflectTestUtils2#params5, true))	// BS
+		verify		(ReflectUtils.argTypesFitMethod([Int#, Int#],	MyReflectTestUtils2#params5))
+		verifyFalse	(ReflectUtils.argTypesFitMethod([Int#, Int#],	MyReflectTestUtils2#params5, true))
+		MyReflectTestUtils2#params5.call(obj, 2, 2)					// make sure func can be called with default matchArity
 
 		verifyFalse	(ReflectUtils.argTypesFitMethod([,],			MyReflectTestUtils2#params6))
 		verify		(ReflectUtils.argTypesFitMethod([Num#], 		MyReflectTestUtils2#params6))
 		verify		(ReflectUtils.argTypesFitMethod([Num#, Num#],	MyReflectTestUtils2#params6))
 		verifyFalse	(ReflectUtils.argTypesFitMethod([Num#, Obj#],	MyReflectTestUtils2#params6))
 		verify		(ReflectUtils.argTypesFitMethod([Num#, Int#],	MyReflectTestUtils2#params6))
-		verify		(ReflectUtils.argTypesFitMethod([Num#, Int#, Int#], MyReflectTestUtils2#params6, true))	// BS
+		verify		(ReflectUtils.argTypesFitMethod([Num#, Int#, Int#], MyReflectTestUtils2#params6))
+		verifyFalse	(ReflectUtils.argTypesFitMethod([Num#, Int#, Int#], MyReflectTestUtils2#params6, true))
+		MyReflectTestUtils2#params6.call(obj, 2, 2, 2)				// make sure func can be called with default matchArity
 
 		verifyFalse	(ReflectUtils.argTypesFitMethod([,],			MyReflectTestUtils2#params7))
 		verify		(ReflectUtils.argTypesFitMethod([Num#], 		MyReflectTestUtils2#params7))
 		verify		(ReflectUtils.argTypesFitMethod([Num#, Num#],	MyReflectTestUtils2#params7))
 		verifyFalse	(ReflectUtils.argTypesFitMethod([Num#, Obj#],	MyReflectTestUtils2#params7))
 		verify		(ReflectUtils.argTypesFitMethod([Num#, Int#],	MyReflectTestUtils2#params7))
-		verify		(ReflectUtils.argTypesFitMethod([Num#, Int#, Int#], MyReflectTestUtils2#params7, true))	// BS
+		verify		(ReflectUtils.argTypesFitMethod([Num#, Int#, Int#], MyReflectTestUtils2#params7))
+		verifyFalse	(ReflectUtils.argTypesFitMethod([Num#, Int#, Int#], MyReflectTestUtils2#params7, true))
+		MyReflectTestUtils2#params7.call(obj, 2, 2, 2)				// make sure func can be called with default matchArity
 
 		verify		(ReflectUtils.argTypesFitMethod([,],			MyReflectTestUtils2#params8))
 
