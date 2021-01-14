@@ -134,7 +134,7 @@ const class TypeLookup {
 	** It kinda sucks to need this method, but it's a workaround to this 
 	** [super issue]`http://fantom.org/sidewalk/topic/2289`.
 	@NoDoc
-	protected Obj? doFindParent(Type type, Bool checked := true) {
+	virtual Obj? doFindParent(Type type, Bool checked := true) {
 		nonNullable := type.toNonNullable
 
 		// chill, I got tests for all this!
@@ -157,7 +157,7 @@ const class TypeLookup {
 	** It kinda sucks to need this method, but it's a workaround to this
 	** [super issue]`http://fantom.org/sidewalk/topic/2289`.
 	@NoDoc
-	protected Obj?[] doFindChildren(Type type, Bool checked := true) {
+	virtual Obj?[] doFindChildren(Type type, Bool checked := true) {
 		nonNullable := type.toNonNullable
 		children := values.findAll |val, key| { key.fits(type) }.vals
 		return !children.isEmpty ? children : (check(nonNullable, checked) ?: Obj?#.emptyList)

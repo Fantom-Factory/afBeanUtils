@@ -23,7 +23,7 @@
 **    private const AtomicMap cache := AtomicMap()
 ** 
 **    ** Cache the conversion functions
-**    override protected |Obj->Obj?|? createCoercionFunc(Type fromType, Type toType) {
+**    override |Obj->Obj?|? createCoercionFunc(Type fromType, Type toType) {
 **       key := "${fromType.qname}->${toType.qname}"
 **       return cache.getOrAdd(key) { doCreateCoercionFunc(fromType, toType) } 
 **    }
@@ -117,7 +117,7 @@ const class TypeCoercer {
 	
 	** Override this method should you wish to cache the conversion functions. 
 	@NoDoc
-	protected virtual |Obj->Obj?|? createCoercionFunc(Type fromType, Type toType) {
+	virtual |Obj->Obj?|? createCoercionFunc(Type fromType, Type toType) {
 		func := doCreateCoercionFunc(fromType, toType)
 		// see http://fantom.org/forum/topic/1144
 		return Env.cur.runtime == "js" ? func : func?.toImmutable
@@ -126,7 +126,7 @@ const class TypeCoercer {
 	** It kinda sucks to need this method, but it's a workaround to this 
 	** [super issue]`http://fantom.org/sidewalk/topic/2289`.
 	@NoDoc
-	protected |Obj->Obj?|? doCreateCoercionFunc(Type fromType, Type toType) {
+	virtual |Obj->Obj?|? doCreateCoercionFunc(Type fromType, Type toType) {
 		// check the basics first!
 		if (fromType.fits(toType))
 			return |Obj val -> Obj?| { val }
