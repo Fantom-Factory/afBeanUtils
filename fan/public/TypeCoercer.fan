@@ -62,7 +62,7 @@ const class TypeCoercer {
 		return createCoercionFunc(fromType, toType) != null
 	}
 	
-	** Coerces the Obj to the given type.
+	** Coerces (deeply) the Obj to the given type.
 	**  
 	** Coercion methods are looked up in the following order:
 	**  1. 'toXXX()'
@@ -89,9 +89,9 @@ const class TypeCoercer {
 			toMap	  := ([Obj:Obj?]?) null
 			
 			if (((Map) value).caseInsensitive && toKeyType.fits(Str#))
-				toMap	 = Map.make(toType) { caseInsensitive = true }
+				toMap	 = Map.make(toType.toNonNullable) { caseInsensitive = true }
 			if (((Map) value).ordered)
-				toMap	 = Map.make(toType) { ordered = true }
+				toMap	 = Map.make(toType.toNonNullable) { ordered = true }
 			if (toMap == null)
 				toMap	 = toType.isGeneric ? Map.make(Obj:Obj?#) : Map.make(toType.toNonNullable)
 

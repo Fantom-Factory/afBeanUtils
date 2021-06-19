@@ -1,3 +1,7 @@
+v1.0.14
+=======
+ - Bug: Coercing ordered Maps could result in error.
+
 v1.0.12
 =======
  - Chg: Converted 'protected' methods in 'TypeCoercer' and 'TypeLookup' to 'public virtual' to allow for more customisation.
