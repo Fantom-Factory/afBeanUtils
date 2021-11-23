@@ -1,12 +1,15 @@
-v1.0.14
+Realease Notes [#releaseNotes]
+*************
+
+v1.0.14 [#v1.0.14]
 =======
  - Bug: Coercing ordered Maps could result in error.
 
-v1.0.12
+v1.0.12 [#v1.0.12]
 =======
  - Chg: Converted 'protected' methods in 'TypeCoercer' and 'TypeLookup' to 'public virtual' to allow for more customisation.
 
-v1.0.10
+v1.0.10 [#v1.0.10]
 =======
  - New: 'afBeanUtils' now available as a SkySpark extension.
  - New: 'BeanBuilder' replaces 'BeanFactory'
@@ -16,16 +19,16 @@ v1.0.10
  - Chg: Deleted 'OneShotLock' from 'BeanFactory'.
  - Bug: Fixed NPE in 'TypeCoercer' when creating coercion funcs in JS.
 
-v1.0.8
+v1.0.8 [#v1.0.8]
 ======
  - Chg: 'ArgNotFoundErr' now extends 'Err' and is available in Javascript.
 
-v1.0.6
+v1.0.6 [#v1.0.6]
 ======
  - Bug: 'BeanFactory' and 'TypeCoercer' now work in Javascript.
  - Chg: Removed Javascript implemenation of 'BeanProperties' due to Fantom's [Func.toImmutable()]`http://fantom.org/forum/topic/1144` bug.
 
-v1.0.4
+v1.0.4 [#v1.0.4]
 ======
  - Chg: More nullable options in 'ReflectUtils'.
  - Chg: 'TypeCoercer.canCoerce()' may now take nulls.
@@ -33,16 +36,16 @@ v1.0.4
  - Bug: Property 'makeFuncs' could not return 'null'.
  - Bug: 'NotFoundErr.availableValues' could not hold 'null'.
 
-v1.0.2
+v1.0.2 [#v1.0.2]
 ======
  - New: Added 'ArgNotFoundErr', a handy impl of 'NotFoundErr'.
  - New: Added 'NotFoundErr.valueMsg()' so you can customise the msg.
 
-v1.0.0
+v1.0.0 [#v1.0.0]
 ======
  - Chg: 'BeanProperties.create()' takes a 'factoryFunc' so [IoC]`pod:afIoc` may instantiate the objects.
 
-v0.0.4
+v0.0.4 [#v0.0.4]
 ======
  - New: 'Bean Utils' is now available in JavaScript. (Added '@Js' to all classes.)
  - New: Use 'BeanProperties.create()' to instantiate entire trees of objects from property expressions!
@@ -50,7 +53,7 @@ v0.0.4
  - New: Added 'findFields()', 'findCtors()' and 'findMethods()' to 'ReflectUtils'.
  - New: Added 'BeanFactory.defaultValue(type)' as a replacement for 'Type.make'.
 
-v0.0.2
+v0.0.2 [#v0.0.2]
 ======
  - New: Preview release.
 

@@ -5,9 +5,9 @@
 [![pod: v1.0.12](http://img.shields.io/badge/pod-v1.0.12-yellow.svg)](http://eggbox.fantomfactory.org/pods/afBeanUtils)
 [![Licence: ISC](http://img.shields.io/badge/licence-ISC-blue.svg)](https://choosealicense.com/licenses/isc/)
 
-## Overview
+## <a name="overview"></a>Overview
 
-*Bean Utils is a support library that aids Alien-Factory in the development of other libraries, frameworks and applications. Though you are welcome to use it, you may find features are missing and the documentation incomplete.*
+*Bean Utils is a support library that aids Fantom-Factory in the development of other libraries, frameworks and applications. Though you are welcome to use it, you may find features are missing and the documentation incomplete.*
 
 `Bean Utils` is a collection of utilities and software patterns for overcoming common issues associated with data objects.
 
@@ -50,9 +50,9 @@ To use in a [Fantom](https://fantom-lang.org/) project, add a dependency to `bui
 
 Full API & fandocs are available on the [Eggbox](http://eggbox.fantomfactory.org/pods/afBeanUtils/) - the Fantom Pod Repository.
 
-## Bean Equality
+## <a name="beanEquality"></a>Bean Equality
 
-Nobody likes writing `hash()` and `equals()` methods, so let [BeanEquality](http://eggbox.fantomfactory.org/pods/afBeanUtils/api/BeanEquality) take the pain away! Simply annotate important identity fields with `@BeanId` and override the Obj methods.
+Nobody likes writing `hash()` and `equals()` methods, so let [afBeanUtils::BeanEquality](http://eggbox.fantomfactory.org/pods/afBeanUtils/api/BeanEquality) take the pain away! Simply annotate important identity fields with `@BeanId` and override the Obj methods.
 
 Sample usage:
 
@@ -75,9 +75,9 @@ Sample usage:
     }
     
 
-## Bean Properties
+## <a name="beanProperties"></a>Bean Properties
 
-[BeanProperties](http://eggbox.fantomfactory.org/pods/afBeanUtils/api/BeanProperties) is a nifty way to get and set properties, and call methods, on nested objects.
+[afBeanUtils::BeanProperties](http://eggbox.fantomfactory.org/pods/afBeanUtils/api/BeanProperties) is a nifty way to get and set properties, and call methods, on nested objects.
 
 Properties are accessed via a *property expression*. Property expressions look like Fantom code and may traverse many objects. Their main purpose is to get and set properties, but may be used to call methods also.
 
@@ -92,7 +92,7 @@ Using `BeanProperties` and a bit of naming convention care, it now becomes trivi
 
 Features of property expressions include:
 
-### Field Access
+### <a name="fieldAccess"></a>Field Access
 
 The simplest use case is getting and setting basic fields. In this example we access the field `Buf.capacity`:
 
@@ -106,7 +106,7 @@ When setting fields, the given value is [Type Coerced](http://eggbox.fantomfacto
     BeanProperties.set(buf, "charset", "UTF-16")  // string "UTF-16" is converted to a Charset object
     
 
-### Method Calls
+### <a name="methodCalls"></a>Method Calls
 
 Property expressions can call methods too. Like Fantom code, if the method does not take any parameters then brackets are optional:
 
@@ -127,7 +127,7 @@ Or you may pass arguments in:
     BeanProperties.call(buf, "getRange()", [1..2])  // --> 0x8080
     
 
-### Indexed Properties
+### <a name="indexedProperties"></a>Indexed Properties
 
 Lists, Maps and `@Operator` shortcuts for `get` and `set` may all be traversed using square bracket notation:
 
@@ -137,7 +137,7 @@ Lists, Maps and `@Operator` shortcuts for `get` and `set` may all be traversed u
 
 All keys and values are [Type Coerced](http://eggbox.fantomfactory.org/pods/afBeanUtils/api/TypeCoercer) to the correct type.
 
-#### Lists
+#### <a name="lists"></a>Lists
 
 When setting List items special attention is given make sure they don't throw `IndexErrs`. Should the list size be smaller than the given index, the list is automatically grown to accommodate:
 
@@ -157,19 +157,19 @@ If the list items are *not* nullable, then new objects are created:
     list[1]                              // --> "b"
     
 
-### Chaining
+### <a name="chaining"></a>Chaining
 
 Property expressions become very powerful when chained:
 
     obj.method(arg, arg).map[key].list[idx][operator].field
 
-### Object Creation
+### <a name="objectCreation"></a>Object Creation
 
 When traversing a property expression, the last thing you want is a `NullErr` half way through. With that in mind, should a property expression encounter `null` part way through, a new object is created and set.
 
 Now you can happily chain your expressions with confidence!
 
-#### Advanced
+#### <a name="advanced"></a>Advanced
 
 If you need more control over when and how intermediate objects are created, then use `BeanPropertyFactory` to manually parse property expressions and create your own `BeanProperty` instances.
 

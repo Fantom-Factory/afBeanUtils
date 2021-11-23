@@ -1,4 +1,4 @@
-Overview
+Overview [#overview]
 ********
 'Bean Utils' is a collection of utilities and software patterns for overcoming common issues associated with data objects.
 
@@ -28,9 +28,9 @@ Features include:
 
 
 
-Bean Equality
+Bean Equality [#beanEquality]
 *************
-Nobody likes writing 'hash()' and 'equals()' methods, so let `BeanEquality` take the pain away!
+Nobody likes writing 'hash()' and 'equals()' methods, so let `afBeanUtils::BeanEquality` take the pain away!
 Simply annotate important identity fields with '@BeanId' and override the Obj methods.
 
 Sample usage:
@@ -58,9 +58,9 @@ class User {
 <pre
 
 
-Bean Properties
+Bean Properties [#beanProperties]
 ***************
-`BeanProperties` is a nifty way to get and set properties, and call methods, on nested objects.
+`afBeanUtils::BeanProperties` is a nifty way to get and set properties, and call methods, on nested objects.
 
 Properties are accessed via a *property expression*. Property expressions look like Fantom code and may traverse many objects.
 Their main purpose is to get and set properties, but may be used to call methods also.
@@ -83,7 +83,7 @@ Features of property expressions include:
 
 
 
-Field Access
+Field Access [#fieldAccess]
 ============
 The simplest use case is getting and setting basic fields.
 In this example we access the field 'Buf.capacity':
@@ -95,7 +95,7 @@ pre>
   BeanProperties.set(buf, "capacity", 42) // set a new value
 <pre
 
-When setting fields, the given value is [Type Coerced]`TypeCoercer` to fit the field type. Consider:
+When setting fields, the given value is [Type Coerced]`afBeanUtils::TypeCoercer` to fit the field type. Consider:
 
 pre>
   syntax: fantom
@@ -104,7 +104,7 @@ pre>
 
 
 
-Method Calls
+Method Calls [#methodCalls]
 ============
 Property expressions can call methods too. Like Fantom code, if the method does not take any parameters then brackets are optional:
 
@@ -133,7 +133,7 @@ pre>
 
 
 
-Indexed Properties
+Indexed Properties [#indexedProperties]
 ==================
 Lists, Maps and '@Operator' shortcuts for 'get' and 'set' may all be traversed using square bracket notation:
 
@@ -143,11 +143,11 @@ pre>
   BeanProperties.get(list, "[1]") // --> "b"
 <pre
 
-All keys and values are [Type Coerced]`TypeCoercer` to the correct type.
+All keys and values are [Type Coerced]`afBeanUtils::TypeCoercer` to the correct type.
 
 
 
-Lists
+Lists [#lists]
 -----
 When setting List items special attention is given make sure they don't throw 'IndexErrs'.
 Should the list size be smaller than the given index, the list is automatically grown to accommodate:
@@ -174,7 +174,7 @@ pre>
 
 
 
-Chaining
+Chaining [#chaining]
 ========
 Property expressions become very powerful when chained:
 
@@ -183,7 +183,7 @@ Property expressions become very powerful when chained:
 
 
 
-Object Creation
+Object Creation [#objectCreation]
 ===============
 When traversing a property expression, the last thing you want is a 'NullErr' half way through.
 With that in mind, should a property expression encounter 'null' part way through, a new object is created and set.
@@ -192,7 +192,7 @@ Now you can happily chain your expressions with confidence!
 
 
 
-Advanced
+Advanced [#advanced]
 --------
 If you need more control over when and how intermediate objects are created, then use 'BeanPropertyFactory' to manually parse property expressions and create your own 'BeanProperty' instances.
 
